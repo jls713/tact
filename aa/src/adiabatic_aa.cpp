@@ -78,7 +78,7 @@ void Actions_SpheroidalAdiabaticApproximation::make_grids(std::string filename){
 				Ezgrid[nL][nR][i]=((double)i)*Ezmaxgrid[nL][nR]/(double)(NGRID-1);
 				Jzgrid[nL][nR][i]=actions_Jz(Ezgrid[nL][nR][i],Lz2,{Rgrid[nR]*Rgrid[nR]-CS->alpha(),0.,nulast},&nulim);
 				nulast = nulim;
-				std::cout<<Rgrid[nR]<<" "<<nulim<<" "<<Lz2<<" "<<Ezgrid[nL][nR][i]<<" "<<Jzgrid[nL][nR][i]<<std::endl;
+				// std::cout<<Rgrid[nR]<<" "<<nulim<<" "<<Lz2<<" "<<Ezgrid[nL][nR][i]<<" "<<Jzgrid[nL][nR][i]<<std::endl;
 			}
 		}
 	}

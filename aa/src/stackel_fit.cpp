@@ -253,7 +253,7 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
         limits[0]=limits[1];limits[1]=tautmp;
     }
     // std::cout<<alpha()<<std::endl;
-    printVector(limits);
+    // printVector(limits);
     // Fit //
     // Perform integrals which are indep. of R,z
     // can do integrals analytically rather than numerically
@@ -262,17 +262,17 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
     N = (pow((limits[3]+gamma()),cv+1)-pow((limits[2]+gamma()),cv+1))/((cv+1.)*pow(fabs(gamma()-alpha()),cv));
 
     VecDoub xmin = {limits[0],limits[2]}, xmax = {limits[1],limits[3]};
-    double val, err,prob;
+    double integral[1],error[1],prob[1];
 
-    chi_integrals SFP(this,0.);
+    chi_integrals SFP(this,0.,xmin,xmax);
     double prod = 1.;int neval,fail,nregions;
     for(int i=0;i<2;i++) prod*=(SFP.x2max[i]-SFP.x2min[i]);
     Cuhre(2,1,ChiBarIntCubature,&SFP,1,1e-2,0,0,
         MINEVAL, MAXEVAL, 0, STATEFILE,SPIN,
-        &nregions, &neval, &fail, &val, &err, &prob);
+        &nregions, &neval, &fail, integral, error, prob);
 
-    val*=prod;
-    chibar = val/(L*N);
+    integral[0]*=prod;
+    chibar = integral[0]/(L*N);
 
     // Grids for interpolation
     lambdagrid=dmatrix(DATAPOINTS);

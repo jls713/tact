@@ -22,10 +22,13 @@
 #include "stackel_fit.h"
 
 int main(int argc, char*argv[]){
-	// GalPot Pot("../Torus/pot/PJM11_best.Tpot");
+	// GalPot Pot("../../Torus/pot/PJM11.Tpot");
 	Logarithmic Pot(220.,1.,0.9);
-	if(argc<8)
+
+	if(argc<8){
 		std::cerr<<"Need to pass phase-space point and filename\n";
+		return 0;
+	}
 	VecDoub X(6,0.);
 	for(unsigned i=0;i<6;++i)
 		X[i]=atof(argv[i+1]);
@@ -55,13 +58,13 @@ int main(int argc, char*argv[]){
 	Actions_StackelFit SF(&Pot);
 
 	double tt = 10.;
-	if(argc>7) tt=atof(argv[8]);
+	if(argc>8) tt=atof(argv[8]);
 	O.integrate(X,tt*Pot.torb(X),0.01*Pot.torb(X));
 	// O.plot(0,2);
 
 	std::ofstream outfile;
 	outfile.open(argv[7]);
-	outfile<<"# Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
+	outfile<<"# Fudge Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
 
 	int guess_alpha=1;
 	VecDoub Fudge, ITorus, Genfunc, GenfuncAv, uvAct, paaAct, saaAct, fitAct;

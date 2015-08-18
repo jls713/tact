@@ -1,4 +1,4 @@
-# aa_package
+# tact
 
 Code for calculating actions, angles and frequencies in various ways
 
@@ -27,3 +27,16 @@ Code for calculating actions, angles and frequencies in various ways
 9. [Generating function from orbit (axisymmetric and triaxial)](http://arxiv.org/abs/1401.3600), Sanders & Binney (2014)
 10. [Average generating function from orbit](http://arxiv.org/abs/1401.2985), Bovy (2014), [Fox (2014)](http://arxiv.org/abs/1407.1688)
 11. [Iterative Torus Machine](http://arxiv.org/abs/1412.2093), Sanders & Binney (2014)
+
+
+## Test case
+
+After successful compilation the command
+```
+./mains/test_actions.exe 8. 1. 0.2 40. 200. 50. acts.dat
+```
+should integrate an orbit with initial conditions X=(8. 1. 0.2) kpc and V = (40. 200. 50.)km/s in the potential
+
+Phi(x)=Vc^2/2 log(R^2+(z/q)^2)
+
+with Vc=220km/s and q=0.9 and compute the actions for each point using a variety of methods. The results are output in tmp with two columns per method (JR and Jz).
