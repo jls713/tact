@@ -1,0 +1,14 @@
+*.tmp*
+*.out*
+*.saa
+*.paa
+*.o
+*.pdf
+*.dat
+*.Delta_uv
+*.exe
+*.log
+build/*
+*.so
+*.eps
+*.a
