@@ -20,7 +20,6 @@ GENERALPATH = ../general/
 CTPATH = ../general/coordtransforms/
 GNUPLOTLIBPATH = $(GENERALPATH)gnuplot
 
-TORUSPATH = ../../Torus/
 TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)WDlib/inc/
 TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
 COORDINCPATH = $(CTPATH)inc/
