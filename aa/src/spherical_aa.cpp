@@ -124,7 +124,8 @@ VecDoub Actions_Spherical::angles_and_freqs(const VecDoub &x){
     double dStdL=sign(SPol[5])*GaussLegendreQuad(&dLdL,PI/2.,SPol[2],&Act,8);
     // printVector(x);
     double Thetap=dSRdL+dStdL+dSRdH*Omegap;
-    double LR=fabs(Lz)/L;
+    if(SPol[5]>0.) Thetap+=PI;
+    double LR=Lz/L;
     double sinu = LR/sqrt(1.-LR*LR)/tan(SPol[2]);
     double u = 0.;
     if(sinu>1.)
@@ -137,10 +138,6 @@ VecDoub Actions_Spherical::angles_and_freqs(const VecDoub &x){
         u=PI-u;
     double Thetat=SPol[1]-u+sign(Lz)*Thetap;
 
-    if(SPol[5]>0.)
-        Thetat-=PI;
-
-    if(SPol[5]<0.) Thetap+=PI;
     if(ThetaR>2.*PI) ThetaR-=2.*PI;
     if(ThetaR<0.) ThetaR+=2.*PI;
     if(Thetap>2.*PI) Thetap-=2.*PI;
