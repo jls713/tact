@@ -14,6 +14,7 @@
 #include "genfunc_aa.h"
 #include "debug.h"
 #include "orbit.h"
+#include "Torus.h"
 
 static int sign(double a){
 	if(a>=0.) return 1;
