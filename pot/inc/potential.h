@@ -660,5 +660,26 @@ public:
 	VecDoub Forces(const VecDoub& x);
 };
 
+template<class c>
+void vec2torus(VecDoub a, c &C){
+	C[0]=a[0];C[2]=a[1];C[1]=a[2];
+}
+
+VecDoub torusPSPT2cartvec(PSPT FF);
+
+class WrapperTorusPotential: public Potential{
+	private:
+	Potential_JS *Pot;
+	public:
+	WrapperTorusPotential(Potential_JS *pot):Pot(pot){}
+	double operator()(const double R, const double z) const;
+	double operator()(const double R, const double z, double& dPdR, double& dPdz) const;
+    Frequencies KapNuOm(            // returns kappa,nu,Om
+                const double R) const;  // given R at z=0
+    double RfromLc(const double L_in, double* dR=0) const;
+    double LfromRc(const double R, double* dR=0) const;
+
+};
+
 // potential.h
 #endif

@@ -849,32 +849,6 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     return 0;
 }
 */
-#include "Torus.h"
-template<class c>
-void vec2torus(VecDoub a, c &C){
-	C[0]=a[0];C[2]=a[1];C[1]=a[2];
-}
-
-VecDoub torusPSPT2cartvec(PSPT FF){
-	VecDoub X = {FF[0]*cos(FF[2]),FF[0]*sin(FF[2]),FF[1],FF[3]*cos(FF[2])-FF[5]*sin(FF[2]),FF[3]*sin(FF[2])+FF[5]*cos(FF[2]),FF[4]};
-	for(int i=3;i<6;++i)X[i]*=conv::kpcMyr2kms;
-	return X;
-}
-class WrapperTorusPotential: public Potential{
-	private:
-	Potential_JS *Pot;
-	public:
-	WrapperTorusPotential(Potential_JS *pot):Pot(pot){}
-	double operator()(const double R, const double z) const{
-		return Pot->Phi({R,0.,z})/conv::kpcMyr2kms;
-	}
-	double operator()(const double R, const double z, double& dPdR, double& dPdz) const{
-		VecDoub F = Pot->Forces({R,0.,z});
-		dPdR = -F[0]/conv::kpcMyr2kms;
-		dPdz = -F[2]/conv::kpcMyr2kms;
-		return Pot->Phi({R,0.,z})/conv::kpcMyr2kms;
-	}
-};
 
 VecDoub PhaseSpacePoint(VecDoub actions, VecDoub angles, Potential_JS *Pot){
 	Torus T; Actions Acts; Angles Angs;

@@ -589,4 +589,68 @@ VecDoub BowdenNFW::Forces(const VecDoub &x){
 	return f*(conv::FPG);
 }
 // ============================================================================
+
+VecDoub torusPSPT2cartvec(PSPT FF){
+	VecDoub X = {FF[0]*cos(FF[2]),FF[0]*sin(FF[2]),FF[1],FF[3]*cos(FF[2])-FF[5]*sin(FF[2]),FF[3]*sin(FF[2])+FF[5]*cos(FF[2]),FF[4]};
+	for(int i=3;i<6;++i)X[i]*=conv::kpcMyr2kms;
+	return X;
+}
+
+double WrapperTorusPotential::operator()(const double R, const double z) const{
+	return Pot->Phi({R,0.,z})/conv::kpcMyr2kmsSq;
+}
+
+double WrapperTorusPotential::operator()(const double R, const double z, double& dPdR, double& dPdz) const{
+	VecDoub F = Pot->Forces({R,0.,z});
+	dPdR = -F[0]/conv::kpcMyr2kmsSq;
+	dPdz = -F[2]/conv::kpcMyr2kmsSq;
+	return Pot->Phi({R,0.,z})/conv::kpcMyr2kmsSq;
+}
+double WrapperTorusPotential::RfromLc(const double L_in, double* dR) const
+{
+  bool more=false;
+  double R,lR=0.,dlR=0.001,dPR,dPz,LcR,oldL,L=fabs(L_in);
+  R=exp(lR);
+  (*this)(R,0.,dPR,dPz);
+  LcR=sqrt(R*R*R*dPR);
+  if(LcR == L) return R;
+  if(L>LcR) more=true;
+  oldL=LcR;
+
+  for( ; ; ) {
+    lR += (more)? dlR : -dlR;
+    R=exp(lR);
+    (*this)(R,0.,dPR,dPz);
+    LcR=sqrt(R*R*R*dPR);
+    if(LcR == L) return R;
+    if((L< LcR && L>oldL) ||(L>LcR && L<oldL)){
+  R=(more)? exp(lR-0.5*dlR) : exp(lR+0.5*dlR);
+  return R;}
+    oldL=LcR;
+  }
+}
+double WrapperTorusPotential::LfromRc(const double R, double* dR) const
+{
+  double dPR,dPz;
+  (*this)(R,0.,dPR,dPz);
+  return sqrt(R*R*R*dPR);
+}
+Frequencies WrapperTorusPotential::KapNuOm(            // returns kappa,nu,Om
+            const double R) const  // given R at z=0
+{
+  Frequencies epi;
+  double dPR,dPz, tmp, dPR2, dPz2;
+  (*this)(R,0.,dPR,dPz);
+  tmp = dPR/R;
+  double delz = 2e-3, delR = 0.01*R;
+  (*this)(R+delR,0.,dPR,dPz2);
+  (*this)(R-delR,0.,dPR2,dPz2);
+  (*this)(R,delz,dPR,dPz2);
+  epi[2] = sqrt(tmp);
+  epi[1] = sqrt((dPz2-dPz)/delz);
+  epi[0] = sqrt(.5*(dPR-dPR2)/delR+3*tmp);
+  return epi;
+}
+
+// ============================================================================
 // potential.cpp
