@@ -198,9 +198,9 @@ void Stackel_Fitted_Potential::find_limits(VecDoub x){
         ynew = Orb->integrate(y,step,step);
         // Refine our guess of alpha
         if(steps%5==0 && steps<=STEPMAX){
-            double Delta = -TruePot->DeltaGuess(ynew);
-            if(Delta<0.)Delta=0.1;
-            newalpha(((n-1)*alpha()-Delta+gamma())/(double)n);
+            double new_alpha = -TruePot->DeltaGuess(ynew)+gamma();
+            if(new_alpha>gamma())new_alpha=gamma()-0.1;
+            newalpha(((n-1)*alpha()+new_alpha)/(double)n);
             n++;
         }
         taunew = xv2tau(ynew);

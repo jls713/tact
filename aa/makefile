@@ -42,7 +42,7 @@ LIB = $(LIBPATHS) -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) -lpot_js -lcoords \
-	  -lpress_cp -lTorus -lOther -lPot -lWD -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -lblas -ljamestools
+	  -lpress_cp -lTorus -lOther -lPot -lWD -lebf_cpp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 

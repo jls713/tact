@@ -98,7 +98,7 @@ VecDoub Potential_JS::dPhidRdz(const VecDoub& Rz){
 }
 
 double Potential_JS::DeltaGuess(const VecDoub& x){
-	// Returns a guess of Alpha-Gamma assuming dldv((l-v)V)=0
+	// Returns a guess of Gamma-Alpha=Delta^2 assuming dldv((l-v)V)=0
 	double R = norm<double>({x[0],x[1]}), z = x[2];
 	VecDoub F = Forces({R,0.,z});
 	VecDoub d2P = dPhidRdz({R,z});

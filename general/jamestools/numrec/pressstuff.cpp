@@ -802,7 +802,7 @@ void sort2(unsigned long n, double *arr, double *brr)
 
 #define EPS1 0.001
 #define EPS2 1.0e-8
-double probks(double alam){
+double probks_NR(double alam){
 	int j;
 	double a2,fac=2.0,sum=0.0,term,termbf=0.0;
 	a2 = -2.0*alam*alam;
@@ -819,7 +819,7 @@ double probks(double alam){
 #undef EPS2
 
 double ksone(double *data, unsigned long n, double (*func)(double), double *d){
-	double probks(double alam);
+	double probks_NR(double alam);
 	void sort(unsigned long n, double *arr);
 	unsigned long j;
 	double dt,en,ff,fn,fo=0.0;
@@ -835,11 +835,11 @@ double ksone(double *data, unsigned long n, double (*func)(double), double *d){
 		fo=fn;
 	}
 	en=sqrt(en);
-	return probks((en+0.12+0.11/en)*(*d));
+	return probks_NR((en+0.12+0.11/en)*(*d));
 }
 
 double kstwo(double *data1, unsigned long n1, double *data2, unsigned long n2, double *d){
-	double probks(double alam);
+	double probks_NR(double alam);
 	void sort(unsigned long n, double *arr);
 	unsigned long j1=0,j2=0;
 	double dt,en1,en2,d1,d2,fn1,fn2;
@@ -853,7 +853,7 @@ double kstwo(double *data1, unsigned long n1, double *data2, unsigned long n2, d
 		if((dt=fabs(fn2-fn1))>*d)*d=dt;
 	}
 	double en=sqrt(en1*en2/(en1+en2));
-	return probks((en+0.12+0.11/en)*(*d));
+	return probks_NR((en+0.12+0.11/en)*(*d));
 }
 
 double bessj0(double x)
