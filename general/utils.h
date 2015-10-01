@@ -32,6 +32,12 @@ const double TINY = 1e-10;
 #define MIN(A,B) ((A)<(B)?(A):(B))
 #define SIGN(A) ((A)>0.?(1.0):(-1.0))
 
+template<class c>
+inline double sign(c a){
+    if(a>0.)return 1.;
+    else return -1.;
+}
+
 extern rand_uniform *rn;
 extern rand_gaussian *rnGauss;
 extern rand_exponential *rnExp;
