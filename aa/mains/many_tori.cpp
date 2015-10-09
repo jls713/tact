@@ -1,3 +1,31 @@
+// ============================================================================
+/// \file src/many_tori.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Computes the variance of the actions, angles and frequencies using various methods for axisymmetric potential and computes total time taken.
+///
+/// Must pass output file
+/// e.g. mains/./many_tori.exe output
+// ============================================================================
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -41,9 +69,13 @@ MatDoub dvdJ(VecDoub X, double dv, Actions_Genfunc *AG){
 
 using namespace std::chrono;
 
+
+
 int main(int argc, char*argv[]){
 
-	GalPot Pot("../Torus/pot/PJM11_best.Tpot");
+	// GalPot Pot("../Torus/pot/PJM11_best.Tpot");
+	GalPot Pot("../Torus/pot/Piffl14.Tpot");
+	WrapperTorusPotential TPot(&Pot);
 	// Logarithmic Pot(220.,1.,0.9);
 	VecDoub X(6,1e-4);
 
@@ -64,13 +96,13 @@ int main(int argc, char*argv[]){
 	Actions_Genfunc_Average AGav(&Pot,"axisymmetric");
 
 	// uvorb
-	uv_orb UV(&Pot,1.,40.,10,10,"example.delta_uv");
+	uv_orb UV(&Pot,1.,40.,50,50,"example.delta_uv");
 
 	// Polar Adiabatic
-	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false);
+	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,1.,40.,20.);
 
 	// Spheroidal Adiabatic
-	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,-30.);
+	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,1.,40.,40.);
 
 	// Spheroidal Adiabatic
 	Actions_StackelFit SF(&Pot);
@@ -78,92 +110,107 @@ int main(int argc, char*argv[]){
 	std::ofstream outfile;
 	outfile.open(argv[1]);
 	outfile<<"# JRJzLz Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
-	double VMax = sqrt(2.*(Pot.Phi({40.,0.,40.})-Pot.Phi(X)));
-
-	VecDoub range = create_range(0.01*VMax,0.3*VMax,30);
+	double VMax = sqrt((Pot.Phi({50.,0.,50.})-Pot.Phi(X))-.5*X[4]*X[4]);
+	VecDoub range = create_log_range(0.03*VMax,0.6*VMax,100);
 
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
 	for(auto j: range){
-		X[3]=sqrt(2.)*j;
-		X[5]=sqrt(2.)*j;
-		O.integrate(X,10.*Pot.torb(X),0.2*Pot.torb(X));
-
+		X[3]=j;
+		X[5]=j*.8;
+		O.integrate(X,10.*Pot.torb(X),0.204*Pot.torb(X));
 		int guess_alpha=1;
 		MatDoub FResults,ITResults,GResults,GAvResults,UVResults,PAAResults,SAAResults,FITResults;
 		VecDoub Fudge, ITorus, Genfunc, GenfuncAv, uvAct, paaAct, saaAct, fitAct;
-		double FudgeV=0., ITorusV=0., GenfuncV=0., GenfuncAvV=0., uvActV=0., paaActV=0., saaActV=0., fitActV=0.;
 		MatDoub dvdJ_e;
 		t1 = high_resolution_clock::now();
 		std::vector<nanoseconds> times(8,duration_cast<nanoseconds>(t1-t1));
 		for(auto i:O.results()){
 			t1 = high_resolution_clock::now();
-			Genfunc = AG.actions(i);
+			Genfunc = AG.full_actions(i,64,2400,20);
 			times[2]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);GenfuncAv.resize(3);
-			Genfunc.resize(3);
-			GResults.push_back({Genfunc[0],Genfunc[1],Genfunc[2]});
+			VecDoub aa = AG.angles(i);
+			GResults.push_back({Genfunc[0],Genfunc[2],aa[3],aa[4],aa[5],0.,0.,0.});
 		}
-		VecDoub acts = columnMean(GResults);
+		VecDoub acts = {columnMean(GResults)[0],Pot.Lz(X),columnMean(GResults)[1],columnMean(GResults)[2],columnMean(GResults)[3],columnMean(GResults)[4]};
+		Actions J;J[0]=acts[0]/conv::kpcMyr2kms;
+		J[2]=acts[1]/conv::kpcMyr2kms;J[1]=acts[2]/conv::kpcMyr2kms;
+		Torus T; T.AutoFit(J,&TPot,1e-5);
 		VecDoub GF_SD = columnSD(GResults);
-		outfile<<acts[0]<<" "<<acts[2]<<" "<<(acts[0]+acts[2])/fabs(acts[1])<<" ";
+		outfile<<acts[0]<<" "<<acts[1]<<" "<<acts[2]<<" "<<(acts[0]+acts[2])/fabs(acts[1])<<" "<<T.minR()<<" "<<T.maxR()<<" "<<" "<<T.maxz()<<" "<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" ";
 		int N=0;
 		for(auto i:O.results()){
-			// t1 = high_resolution_clock::now();
-			// Fudge = AA.actions(i,&guess_alpha);
-			// times[0]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			// Fudge.resize(3);Fudge=Fudge-acts;
-			// t1 = high_resolution_clock::now();
-			// ITorus = Tor.actions(i);ITorus.resize(3);ITorus=ITorus-acts;
-			// times[1]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			// t1 = high_resolution_clock::now();
-			// GenfuncAv = AGav.actions(i);
-			// times[3]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			// GenfuncAv.resize(3);GenfuncAv=GenfuncAv-acts;
+			VecDoub ang = AG.angles(i);
+			t1 = high_resolution_clock::now();
+			Fudge = AA.actions(i,&guess_alpha);
+			times[0]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
+			VecDoub ang2 = AA.angles(i,&guess_alpha);
+			FResults.push_back({Fudge[0]-acts[0],Fudge[2]-acts[2],ang2[0]-ang[0],ang2[1]-ang[1],ang2[2]-ang[2],ang2[3]-ang[3],ang2[4]-ang[4],ang2[5]-ang[5]});
+			for(unsigned k=2;k<5;++k){
+				if(FResults[N][k]>PI) FResults[N][k] = 2.*PI-FResults[N][k];
+				if(FResults[N][k]<-PI) FResults[N][k] = 2.*PI+FResults[N][k];
+			}
+			t1 = high_resolution_clock::now();
+			ITorus = Tor.actions(i);
+			times[1]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
+			ITResults.push_back({ITorus[0]-acts[0],ITorus[2]-acts[2],ITorus[6]-ang[0],ITorus[7]-ang[1],ITorus[8]-ang[2],ITorus[3]-ang[3],ITorus[4]-ang[4],ITorus[5]-ang[5]});
+			for(unsigned k=2;k<5;++k){
+				if(ITResults[N][k]>PI) ITResults[N][k]=2.*PI-ITResults[N][k];
+				if(ITResults[N][k]<-PI) ITResults[N][k]=2.*PI+ITResults[N][k];
+			}
+			t1 = high_resolution_clock::now();
+			GenfuncAv = AGav.actions(i);
+			times[3]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
+			GAvResults.push_back({GenfuncAv[0]-acts[0],GenfuncAv[2]-acts[2],0.,0.,0.,0.,0.,0.});
 			t1 = high_resolution_clock::now();
 			uvAct = UV.actions(i);
 			times[4]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			uvAct.resize(3);uvAct=uvAct; //-acts;
-			// t1 = high_resolution_clock::now();
-			// paaAct = PAA.actions(i);
-			// times[5]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			// paaAct.resize(3);paaAct=paaAct-acts;
-			// t1 = high_resolution_clock::now();
-			// saaAct = SAA.actions(i,&guess_alpha);
-			// times[6]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			// saaAct.resize(3);saaAct=saaAct-acts;
-			// t1 = high_resolution_clock::now();
-			// fitAct = SF.actions(i);
-			// times[7]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
-			// fitAct.resize(3);fitAct=fitAct-acts;
-
-			// dvdJ_e=dvdJ(i,.5,&AG);
-			// FudgeV += normsq(dvdJ_e*Fudge);
-			// ITorusV += normsq(dvdJ_e*ITorus);
-			// GenfuncV += normsq(dvdJ_e*GResults[N]);
-			// GenfuncAvV += normsq(dvdJ_e*GenfuncAv);
-			// uvActV += normsq(dvdJ_e*uvAct);
-			// paaActV += normsq(dvdJ_e*paaAct);
-			// saaActV += normsq(dvdJ_e*saaAct);
-			// fitActV += normsq(dvdJ_e*fitAct);
-
-			// FResults.push_back({Fudge[0],Fudge[2]});
-			// ITResults.push_back({ITorus[0],ITorus[2]});
-			// GAvResults.push_back({GenfuncAv[0],GenfuncAv[2]});
-			UVResults.push_back({uvAct[0],uvAct[2]});
-			// PAAResults.push_back({paaAct[0],paaAct[2]});
-			// SAAResults.push_back({saaAct[0],saaAct[2]});
-			// FITResults.push_back({fitAct[0],fitAct[2]});
+			ang2 = UV.angles(i);
+			UVResults.push_back({uvAct[0]-acts[0],uvAct[2]-acts[2],ang2[0]-ang[0],ang2[1]-ang[1],ang2[2]-ang[2],ang2[3]-ang[3],ang2[4]-ang[4],ang2[5]-ang[5]});
+			for(unsigned k=2;k<5;++k){
+				if(UVResults[N][k]>PI) UVResults[N][k]=2.*PI-UVResults[N][k];
+				if(UVResults[N][k]<-PI) UVResults[N][k]=2.*PI+UVResults[N][k];
+			}
+			t1 = high_resolution_clock::now();
+			paaAct = PAA.actions(i);
+			times[5]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
+			ang2 = PAA.angles(i);
+			PAAResults.push_back({paaAct[0]-acts[0],paaAct[2]-acts[2],ang2[0]-ang[0],ang2[1]-ang[1],ang2[2]-ang[2],ang2[3]-ang[3],ang2[4]-ang[4],ang2[5]-ang[5]});
+			for(unsigned k=2;k<5;++k){
+				if(PAAResults[N][k]>PI)PAAResults[N][k]=2.*PI-PAAResults[N][k];
+				if(PAAResults[N][k]<-PI)PAAResults[N][k]=2.*PI+PAAResults[N][k];
+			}
+			t1 = high_resolution_clock::now();
+			saaAct = SAA.actions(i,&guess_alpha);
+			times[6]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
+			ang2 = SAA.angles(i,&guess_alpha);
+			SAAResults.push_back({saaAct[0]-acts[0],saaAct[2]-acts[2],ang2[0]-ang[0],ang2[1]-ang[1],ang2[2]-ang[2],ang2[3]-ang[3],ang2[4]-ang[4],ang2[5]-ang[5]});
+			for(unsigned k=2;k<5;++k){
+				if(SAAResults[N][k]>PI)SAAResults[N][k]=2.*PI-SAAResults[N][k];
+				if(SAAResults[N][k]<-PI)SAAResults[N][k]=2.*PI+SAAResults[N][k];
+			}
+			t1 = high_resolution_clock::now();
+			fitAct = SF.actions(i);
+			times[7]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
+			ang2 = SF.angles(i);
+			FITResults.push_back({fitAct[0]-acts[0],fitAct[2]-acts[2],ang2[0]-ang[0],ang2[1]-ang[1],ang2[2]-ang[2],ang2[3]-ang[3],ang2[4]-ang[4],ang2[5]-ang[5]});
+			for(unsigned k=2;k<5;++k){
+				if(FITResults[N][k]>PI)FITResults[N][k]=2.*PI-FITResults[N][k];
+				if(FITResults[N][k]<-PI)FITResults[N][k]=2.*PI+FITResults[N][k];
+			}
 			++N;
 		}
-		// for(auto k:columnSD(FResults)) outfile<<k<<" "; outfile<<sqrt(FudgeV/(double)N)<<" "<<times[0].count()<<" ";
-		// for(auto k:columnSD(ITResults)) outfile<<k<<" ";outfile<<sqrt(ITorusV/(double)N)<<" ";
-		// for(auto k:columnSD(GResults)) outfile<<k<<" ";outfile<<sqrt(GenfuncV/(double)N)<<" "<<times[2].count()<<" ";
-		// for(auto k:columnSD(GAvResults)) outfile<<k<<" ";outfile<<sqrt(GenfuncAvV/(double)N)<<" "<<times[3].count()<<" ";
-		for(auto k:columnSD(UVResults)) outfile<<k<<" ";outfile<<sqrt(uvActV/(double)N)<<" "<<times[4].count()<<" ";
-		// for(auto k:columnSD(PAAResults)) outfile<<k<<" ";outfile<<sqrt(paaActV/(double)N)<<" "<<times[5].count()<<" ";
-		// for(auto k:columnSD(SAAResults)) outfile<<k<<" ";outfile<<sqrt(saaActV/(double)N)<<" "<<times[6].count()<<" ";
-		// for(auto k:columnSD(FITResults)) outfile<<k<<" ";outfile<<sqrt(fitActV/(double)N)<<" "<<times[7].count()<<" ";
+		for(auto k:columnRMS(FResults)) outfile<<k<<" ";
+		for(auto k:columnRMS(ITResults)) outfile<<k<<" ";
+		for(auto k:columnSD(GResults)) outfile<<k<<" ";
+		for(auto k:columnRMS(GAvResults)) outfile<<k<<" ";
+		for(auto k:columnRMS(UVResults)) outfile<<k<<" ";
+		for(auto k:columnRMS(PAAResults)) outfile<<k<<" ";
+		for(auto k:columnRMS(SAAResults)) outfile<<k<<" ";
+		for(auto k:columnRMS(FITResults)) outfile<<k<<" ";
+		for(unsigned N=0;N<8;++N) outfile<<times[N].count()/range.size()<<" ";
 		outfile<<std::endl;
 	}
 	outfile.close();
 }
+
+// ============================================================================

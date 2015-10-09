@@ -1,5 +1,5 @@
 // ============================================================================
-/// \file src/test_actions.cpp
+/// \file src/test_angles.cpp
 // ============================================================================
 /// \author Jason Sanders
 /// \date 2014-2015
@@ -21,11 +21,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ============================================================================
-/// \brief Computes the actions using most of the available methods for axisymmetric potentials
+/// \brief Computes the angles and frequencies using most of the available methods for axisymmetric potentials
 ///
 /// Must pass phase-space point x y z vx vy vz, output file and no of orbital
 /// times to integrate for.
-/// e.g. mains/./test_actions.exe 8.29 0.1 0.1 30.22 211.1 19.22 thin 10.
+/// e.g. mains/./test_angles.exe 8.29 0.1 0.1 30.22 211.1 19.22 thin 10.
 // ============================================================================
 #include <iostream>
 #include <vector>
@@ -109,24 +109,23 @@ int main(int argc, char*argv[]){
 	int guess_alpha=1; int N=0;
 	VecDoub Fudge, ITorus, Genfunc, GenfuncAv, uvAct, paaAct, saaAct, fitAct;
 	for(auto i:O.results()){
-		Fudge = AA.actions(i,&guess_alpha);
-		ITorus = Tor.actions(i);
-		Genfunc = AG.actions(i);
-		GenfuncAv = AGav.actions(i);
-		uvAct = UV.actions(i);
-		paaAct = PAA.actions(i);
-		saaAct = SAA.actions(i,&guess_alpha);
-		fitAct = SF.actions(i);
-		outfile << tstep*N<<" "
-				<<Fudge[0]<<" "<<Fudge[2]<<" "
-				<<ITorus[0]<<" "<<ITorus[2]<<" "
-				<<Genfunc[0]<<" "<<Genfunc[2]<<" "
-				<<GenfuncAv[0]<<" "<<GenfuncAv[2]<<" "
-				<<uvAct[0]<<" "<<uvAct[2]<<" "
-				<<paaAct[0]<<" "<<paaAct[2]<<" "
-				<<saaAct[0]<<" "<<saaAct[2]<<" "
-				<<fitAct[0]<<" "<<fitAct[2]<<" "
-				;
+		// Fudge = AA.angles(i,&guess_alpha);
+		// ITorus = Tor.angles(i);
+		Genfunc = AG.angles(i);
+		// GenfuncAv = AGav.angles(i);
+		// uvAct = UV.angles(i);
+		paaAct = PAA.angles(i);
+		saaAct = SAA.angles(i,&guess_alpha);
+		// fitAct = SF.angles(i);
+		outfile << tstep*N<<" ";
+		// for(auto k: Fudge) outfile<<k<<" ";
+		// for(auto k: ITorus) outfile<<k<<" ";
+		for(auto k: Genfunc) outfile<<k<<" ";
+		// for(auto k: GenfuncAv) outfile<<k<<" ";
+		// for(auto k: uvAct) outfile<<k<<" ";
+		for(auto k: paaAct) outfile<<k<<" ";
+		for(auto k: saaAct) outfile<<k<<" ";
+		// for(auto k: fitAct) outfile<<k<<" ";
 		for(auto j:i) outfile<<j<<" ";
 		outfile <<std::endl;
 	++N;
