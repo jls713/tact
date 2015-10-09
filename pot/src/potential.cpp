@@ -1,3 +1,29 @@
+// ============================================================================
+/// \file inc/potential.h
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Potential classes
+// ============================================================================
+
 /*======================================*/
 /* 			    Potential_JS 			*/
 /*======================================*/
@@ -86,7 +112,7 @@ double Potential_JS::torb(const VecDoub &x){
 }
 
 VecDoub Potential_JS::dPhidRdz(const VecDoub& Rz){
-	double Delta = 0.001;
+	double Delta = 0.005;
 
 	VecDoub Rplus =  Forces({Rz[0]+Delta,0.,Rz[1]});
 	VecDoub Rminus = Forces({Rz[0]-Delta,0.,Rz[1]});
@@ -98,7 +124,7 @@ VecDoub Potential_JS::dPhidRdz(const VecDoub& Rz){
 }
 
 double Potential_JS::DeltaGuess(const VecDoub& x){
-	// Returns a guess of Gamma-Alpha=Delta^2 assuming dldv((l-v)V)=0
+	// Returns a guess of Gamma-Alpha = Delta^2 assuming dldv((l-v)V)=0
 	double R = norm<double>({x[0],x[1]}), z = x[2];
 	VecDoub F = Forces({R,0.,z});
 	VecDoub d2P = dPhidRdz({R,z});
@@ -653,4 +679,5 @@ Frequencies WrapperTorusPotential::KapNuOm(            // returns kappa,nu,Om
 }
 
 // ============================================================================
+
 // potential.cpp

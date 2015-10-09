@@ -1,3 +1,34 @@
+// ============================================================================
+/// \file inc/Multipole.h
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Multipole expansion for general densities
+///
+/// Main class is MultipoleExpansion that implements the multipole expansion.
+/// There are inherited classes that are specific for spherical, axisymmetric
+/// , triaxial and up-down symmetric density profiles.
+/// Also some test density profiles.
+//============================================================================
+
 #ifndef MULTIPOLE_H
 #define MULTIPOLE_H
 
@@ -10,7 +41,6 @@
 // ============================================================================
 // General density interface
 // ============================================================================
-
 class Density{
 private:
     const double TargetMass;
@@ -29,7 +59,6 @@ public:
 // ============================================================================
 // Example Miyamoto-Nagai density interface -- to test axisymmetric
 // ============================================================================
-
 class Miyamoto_NagaiDensity: public Density{
 private:
     double M,a,b;
@@ -55,7 +84,6 @@ public:
 // ============================================================================
 // General Triaxial density interface
 // ============================================================================
-
 class TriaxialDensity: public Density{
 private:
     VecDoub axes;
@@ -82,7 +110,6 @@ public:
 // ============================================================================
 // Some test triaxial densities
 // ============================================================================
-
 class TestDensity_Stackel: public TriaxialDensity{
 private:
     double rho0;
@@ -227,20 +254,19 @@ struct phi_integrand_st{
 // ============================================================================
 // Multipole expansion
 // ============================================================================
-
-
+/*! Multipole expansion for general density profile */
 class MultipoleExpansion: public Potential_JS{
 private:
-    Density *rho;
-    int NR, NA, NA_theta, NA_phi, LMAX, MMAX;
-    double a0, rmin, rmax;
-    bool axisymmetric, triaxial, flip;
-    VecDoub radial_grid, delta_grid;
+    Density *rho;                           /*! Density profile              */
+    int NR, NA, NA_theta, NA_phi;           /*! number of integration points */
+    int LMAX, MMAX;                         /*! max l and m moments          */
+    double a0, rmin, rmax;                  /*! scale, min and max radius    */
+    bool axisymmetric, triaxial, flip;      /*! symmetries                   */
+    VecDoub radial_grid, delta_grid;        /*!radius and func of radius grid*/
     std::vector<std::vector<VecDoub>> Phi_grid, rho_grid, dPhi_grid;
-    std::unique_ptr<GaussLegendreIntegrator> GLtheta;
-    std::unique_ptr<GaussLegendreIntegrator> GLphi;
-    // Can use a logarithmically-spaced grid or a sinh-spaced
-    const bool loggrid = true;
+    std::unique_ptr<GaussLegendreIntegrator> GLtheta;/*! Gaussian integrator for theta */
+    std::unique_ptr<GaussLegendreIntegrator> GLphi;/*! Gaussian integrator for phi */
+    const bool loggrid = true;/*! if true, use a logarithmically-spaced grid or if false, a sinh-spaced */
     const double err;
 
     void fill_radial_grid(double aa0, double rrmin, double rrmax);
@@ -250,15 +276,25 @@ private:
     void extend_density_grid(void);
 
 public:
-    void fillPhigrid();
-    MultipoleExpansion(void):err(0.){};
-    virtual ~MultipoleExpansion(void){};
+    //! MultipoleExpansion constructor.
+    /*!
+        \param rho Density profile
+        \param NR number of radial grid points for integration
+        \param NA number of angular grid points for integration
+        \param LMAX max l moment
+        \param MMAX max m moment
+        \param a0 scale radius
+        \param rmin minimum radius
+        \param rmax maximum radius
+        \param axisymmetric -- if true, use axisymmetric symmetry
+        \param triaxial -- if true, use triaxial symmetry
+        \param flip -- if true, use up-down symmetry
+    */
     MultipoleExpansion(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100., bool axisymmetric = false, bool triaxial = false, bool flip = true, double err=0.);
+    MultipoleExpansion(void):err(0.){};
     MultipoleExpansion(const std::string&);
-    void output_to_file(const std::string&);
-    void visualize(const std::string&);
-    double Phi(const VecDoub& x);
-    VecDoub Forces(const VecDoub& x);
+    virtual ~MultipoleExpansion(void){};
+
     inline VecDoub const &get_radial_grid() const {return radial_grid; }
     inline double innerradius(void) const {return rmin;}
     inline double outerradius(void) const {return rmax;}
@@ -267,44 +303,106 @@ public:
     inline int nangular(void) const {return NA;}
     inline int lmax(void) const {return LMAX;}
     inline int mmax(void) const {return MMAX;}
+
+    void fillPhigrid();
+    void output_to_file(const std::string&);
+    void visualize(const std::string&);
+
+    double Phi(const VecDoub& x);
+    VecDoub Forces(const VecDoub& x);
 };
 
+/*! Multipole expansion for up-down symmetric density profile */
 class MultipoleExpansion_UpDownSymmetric: public MultipoleExpansion{
 public:
+    //! MultipoleExpansion_UpDownSymmetric constructor.
+    /*!
+        \param rho Density profile
+        \param NR number of radial grid points for integration
+        \param NA number of angular grid points for integration
+        \param LMAX max l moment
+        \param MMAX max m moment
+        \param a0 scale radius
+        \param rmin minimum radius
+        \param rmax maximum radius
+    */
     MultipoleExpansion_UpDownSymmetric(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.)
      :MultipoleExpansion(rho,NR,NA,LMAX,MMAX,a0,rmin,rmax,false,false,true){};
     MultipoleExpansion_UpDownSymmetric(const std::string& s)
      :MultipoleExpansion(s){}
 };
 
+/*! Multipole expansion for triaxial density profile */
 class MultipoleExpansion_Triaxial: public MultipoleExpansion{
 public:
+    //! MultipoleExpansion_Triaxial constructor.
+    /*!
+        \param rho Density profile
+        \param NR number of radial grid points for integration
+        \param NA number of angular grid points for integration
+        \param LMAX max l moment
+        \param MMAX max m moment
+        \param a0 scale radius
+        \param rmin minimum radius
+        \param rmax maximum radius
+    */
     MultipoleExpansion_Triaxial(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01)
      :MultipoleExpansion(rho,NR,NA,LMAX,MMAX,a0,rmin,rmax,false,true,true,err){};
     MultipoleExpansion_Triaxial(const std::string& s)
      :MultipoleExpansion(s){}
 };
 
+/*! Multipole expansion for axisymmetric density profile */
 class MultipoleExpansion_Axisymmetric: public MultipoleExpansion{
 public:
+    //! MultipoleExpansion_Axisymmetric constructor.
+    /*!
+        \param rho Density profile
+        \param NR number of radial grid points for integration
+        \param NA number of angular grid points for integration
+        \param LMAX max l moment
+        \param a0 scale radius
+        \param rmin minimum radius
+        \param rmax maximum radius
+    */
     MultipoleExpansion_Axisymmetric(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01)
      :MultipoleExpansion(rho,NR,NA,LMAX,-1,a0,rmin,rmax,true,true,true,err){};
     MultipoleExpansion_Axisymmetric(const std::string& s)
      :MultipoleExpansion(s){}
 };
 
+/*! Multipole expansion for spherical density profile */
 class MultipoleExpansion_Spherical: public MultipoleExpansion{
 public:
+    //! MultipoleExpansion_Spherical constructor.
+    /*!
+        \param rho Density profile
+        \param NR number of radial grid points for integration
+        \param a0 scale radius
+        \param rmin minimum radius
+        \param rmax maximum radius
+    */
     MultipoleExpansion_Spherical(Density *rho, int NR = 50, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01)
      :MultipoleExpansion(rho,NR,1,1,0,a0,rmin,rmax,true,true,true,err){};
     MultipoleExpansion_Spherical(const std::string& s)
      :MultipoleExpansion(s){}
 };
 
+/*! Multipole expansion for spherical density profile with SphericalPotential signature */
 class MultipoleExpansion_SphericalPotential: public SphericalPotential{
 private:
     MultipoleExpansion_Spherical *MES;
 public:
+    //! MultipoleExpansion_SphericalPotential constructor.
+    /*!
+        \param rho Density profile
+        \param NR number of radial grid points for integration
+        \param a0 scale radius
+        \param rmin minimum radius
+        \param rmax maximum radius
+
+        Same as MultipoleExpansion_Spherical but can be used with Spherical action finders
+    */
     MultipoleExpansion_SphericalPotential(Density *rho, int NR = 50, double a0=1.,double rmin=0.01,double rmax=100.)
      :MES(new MultipoleExpansion_Spherical(rho,NR,a0,rmin,rmax)){};
     MultipoleExpansion_SphericalPotential(const std::string& s)

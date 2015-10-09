@@ -1,3 +1,56 @@
+// ============================================================================
+/// \file inc/potential.h
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Potential classes
+///
+/// We give a list of the available potentials. Most potentials are
+/// self-documented, in that they contain a string that outputs their info.
+///
+/// 1. Potential_JS -- Base class
+/// 2. SphericalPotential -- Base spherical class
+/// 3. IsochronePotential -- Isochrone spherical potential
+/// 4. StackelProlate_PerfectEllipsoid -- axisymmetric Stackel potential perfect ellipsoid
+/// 5. StackelTriaxial -- triaxial perfect ellipsoid
+/// 6. Logarithmic -- triaxial logarithmic potential
+/// 7. PowerLaw -- triaxial power-law potential
+/// 8. Isochrone -- triaxial isochrone potential
+/// 9. HarmonicOscillator -- triaxial harmonic oscillator
+/// 10. Dehnen -- spherical Dehnen potential
+/// 11. MiyamotoNagai_JS -- axisymmetric Miyamoto-Nagai potential
+/// 11. NFW -- triaxial NFW potential
+/// 12. Hernquist -- triaxial Hernquist potential
+/// 13. Bulge -- triaxial Jaffe bulge potential
+/// 14. GalPot -- wrapper for Torus GalPot potential
+/// 15. MultiComponentPotential -- sum of potentials
+/// 16. MultiComponentSphericalPotential -- sum of spherical potentials
+/// 17. NFWSpherical -- spherical NFW potential
+/// 18. HernquistSpherical -- spherical Hernquist potential
+/// 19. PowerLawSpherical-- spherical power-law potential
+/// 20. BowdenNFW -- flattened NFW from Bowden et al.(2014)
+/// 21. WrapperTorusPotential -- wraps potentials from Torus code
+///
+//============================================================================
+
 #ifndef POTENTIAL_H
 #define POTENTIAL_H
 
@@ -11,6 +64,7 @@
 #include "coordsys.h"
 #include "coordtransforms.h"
 #include "GSLInterface/GSLInterface.h"
+#include "Torus.h"
 
 //============================================================================
 /// General base class for Potential_JS
@@ -407,7 +461,7 @@ class MiyamotoNagai_JS: public Potential_JS{
 
 //============================================================================
 ///
-///	## Axisymmetric NFW potential
+///	## Triaxial NFW potential
 ///		rs is the scale radius
 ///		GM is G times the mass M
 ///		qy and qz are the y and z flattenings respectively
@@ -465,11 +519,14 @@ class Hernquist: public Potential_JS{
 };
 
 //============================================================================
-/// bulge
+/// Triaxial Jaffe bulge potential
 //============================================================================
-
 class Bulge: public Potential_JS{
 	private:
+		const std::string desc =
+		"Bulge potential:Phi ="
+			"GM/b_bulge*log(r/(r+b_bulge))"
+		"\n\tTakes four parameters:\n\t\tG*mass: GM, the scale radius: b_bulge and the axis ratios q_y, q_z";
 		double b_bulge, GM, q1, q2;
 	public:
 		Bulge(double b_bulge, double gm, double qy, double qz): b_bulge(b_bulge), GM(gm), q1(qy*qy), q2(qz*qz){}

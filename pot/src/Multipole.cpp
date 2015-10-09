@@ -1,8 +1,40 @@
+// ============================================================================
+/// \file src/Multipole.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Multipole expansion for general densities
+///
+/// Main class is MultipoleExpansion that implements the multipole expansion.
+/// There are inherited classes that are specific for spherical, axisymmetric
+/// , triaxial and up-down symmetric density profiles.
+/// Also some test density profiles.
+//============================================================================
+
 #include <Python.h>
 #include "coordtransforms.h"
 #include "potential.h"
 #include "GSLInterface/GSLInterface.h"
 #include "Multipole.h"
+#include "cubature/cubature.h"
 #include "gnuplot/gnuplot_i.h"
 // =====
 // NOTE: cuba and openmp don't like each other so must set CUBACORES=0
