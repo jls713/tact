@@ -44,17 +44,17 @@
 /*! Action finding in axisymmetric Staeckel potential */
 class Actions_AxisymmetricStackel : public Action_Finder{
 	private:
-		StackelProlate_PerfectEllipsoid *Pot; /*< Staeckel potential */
+		StackelOblate_PerfectEllipsoid *Pot; /*< Staeckel potential */
 		std::vector<VecDoub> dtau01dint;
 
 		VecDoub find_limits(const VecDoub& x, const VecDoub& ints);
 	public:
 		//! Actions_AxisymmetricStackel constructor.
 	    /*!
-	      \param pot StackelProlate_PerfectEllipsoid potential in which to
+	      \param pot StackelOblate_PerfectEllipsoid potential in which to
 	      compute the actions
 	    */
-		Actions_AxisymmetricStackel(StackelProlate_PerfectEllipsoid *pot): Pot(pot){}
+		Actions_AxisymmetricStackel(StackelOblate_PerfectEllipsoid *pot): Pot(pot){}
 		//! Finds actions
 	    /*!
 	      \param x phase-space point (x,v)
@@ -84,9 +84,9 @@ class Actions_AxisymmetricStackel : public Action_Finder{
 /*! Helper structure for finding limits of action integrals for axisymmetric
 	Stackel */
 struct root_struct_axi{
-	StackelProlate_PerfectEllipsoid *P;
+	StackelOblate_PerfectEllipsoid *P;
 	VecDoub Ints;
-	root_struct_axi(StackelProlate_PerfectEllipsoid *PP, VecDoub ints)
+	root_struct_axi(StackelOblate_PerfectEllipsoid *PP, VecDoub ints)
 		:P(PP),Ints(ints){}
 };
 
@@ -94,7 +94,7 @@ struct root_struct_axi{
 struct action_struct_axi{
 	root_struct_axi RS;
 	double taubargl, Deltagl, tiny_number;
-	action_struct_axi(StackelProlate_PerfectEllipsoid *PP, VecDoub ints, double tb, double Dl, double tn)
+	action_struct_axi(StackelOblate_PerfectEllipsoid *PP, VecDoub ints, double tb, double Dl, double tn)
 		:RS(PP,ints),taubargl(tb),Deltagl(Dl), tiny_number(tn){}
 };
 
@@ -104,7 +104,7 @@ struct hess_struct_axi{
 	VecDoub ints,limits;
 	double taubargl, Deltagl;
 	root_struct_axi RS;
-	hess_struct_axi(Actions_AxisymmetricStackel *ASS, StackelProlate_PerfectEllipsoid *pot, VecDoub ints, VecDoub limits,double tb, double Dl)
+	hess_struct_axi(Actions_AxisymmetricStackel *ASS, StackelOblate_PerfectEllipsoid *pot, VecDoub ints, VecDoub limits,double tb, double Dl)
 		:ASS(ASS),ints(ints),limits(limits),taubargl(tb),Deltagl(Dl),RS(pot,ints){}
 };
 
@@ -120,7 +120,7 @@ class Actions_AxisymmetricStackel_Fudge : public Action_Finder{
 		VecDoub find_limits(const VecDoub& x);/*!<Find tau limits 		   */
 		void integrals(const VecDoub& tau);	/*!< Find E, I2 and Kt 		   */
 	public:
-		std::unique_ptr<OblateSpheroidCoordSys> CS;/*!< Coordinate system   */
+		std::unique_ptr<ProlateSpheroidCoordSys> CS;/*!< Coordinate system   */
 		//! Actions_AxisymmetricStackel_Fudge constructor.
 	    /*!
 	      \param pot Potential (axisymmetric) in which to compute the actions
@@ -128,11 +128,11 @@ class Actions_AxisymmetricStackel_Fudge : public Action_Finder{
 	      overridden by actions and angles if required)
 	    */
 		Actions_AxisymmetricStackel_Fudge(Potential_JS *pot,double a): Pot(pot){
-			CS = std::unique_ptr<OblateSpheroidCoordSys>(new OblateSpheroidCoordSys(a));
+			CS = std::unique_ptr<ProlateSpheroidCoordSys>(new ProlateSpheroidCoordSys(a));
 			Kt.resize(2,0);
 		}
 		//! Actions_AxisymmetricStackel_Fudge copy constructor.
-		Actions_AxisymmetricStackel_Fudge(const Actions_AxisymmetricStackel_Fudge& a):Pot(a.Pot),CS(new OblateSpheroidCoordSys(*a.CS)){
+		Actions_AxisymmetricStackel_Fudge(const Actions_AxisymmetricStackel_Fudge& a):Pot(a.Pot),CS(new ProlateSpheroidCoordSys(*a.CS)){
 			Kt.resize(2,0);
 		}
 		inline void reset(Potential_JS *pot){Pot = pot;}

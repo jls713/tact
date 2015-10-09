@@ -131,7 +131,7 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
         bool alpha_guess;
     public:
         Potential_JS *Pot;          /*! Potential (axisymmetric)             */
-        std::unique_ptr<OblateSpheroidCoordSys> CS;
+        std::unique_ptr<ProlateSpheroidCoordSys> CS;
         bool no_energy_correction;  /*! if true, no radial-vertical coupling */
 
         const int NGRID = 60;       /*! number of grid points for Enu        */
@@ -181,7 +181,7 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
 
             if(alpha>0.) alpha_guess=false;
             else {alpha_guess = true; alpha=-2;}
-            CS =std::unique_ptr<OblateSpheroidCoordSys>(new OblateSpheroidCoordSys(alpha));
+            CS =std::unique_ptr<ProlateSpheroidCoordSys>(new ProlateSpheroidCoordSys(alpha));
 
             if(filename!="" and !write)
                 load_grids(filename);
@@ -190,7 +190,7 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
         };
         //! Actions_SpheroidalAdiabaticApproximation copy constructor.
     	Actions_SpheroidalAdiabaticApproximation(const Actions_SpheroidalAdiabaticApproximation& s):
-		Pot(s.Pot),CS(new OblateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX){
+		Pot(s.Pot),CS(new ProlateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX){
             Lmin=Pot->L_circ(Rmin);Lmax=Pot->L_circ(Rmax);
         }
         //! Finds actions

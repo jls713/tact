@@ -21,34 +21,34 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ============================================================================
-/// \brief Potential classes
-///
-/// We give a list of the available potentials. Most potentials are
-/// self-documented, in that they contain a string that outputs their info.
-///
-/// 1. Potential_JS -- Base class
-/// 2. SphericalPotential -- Base spherical class
-/// 3. IsochronePotential -- Isochrone spherical potential
-/// 4. StackelProlate_PerfectEllipsoid -- axisymmetric Stackel potential perfect ellipsoid
-/// 5. StackelTriaxial -- triaxial perfect ellipsoid
-/// 6. Logarithmic -- triaxial logarithmic potential
-/// 7. PowerLaw -- triaxial power-law potential
-/// 8. Isochrone -- triaxial isochrone potential
-/// 9. HarmonicOscillator -- triaxial harmonic oscillator
-/// 10. Dehnen -- spherical Dehnen potential
-/// 11. MiyamotoNagai_JS -- axisymmetric Miyamoto-Nagai potential
-/// 11. NFW -- triaxial NFW potential
-/// 12. Hernquist -- triaxial Hernquist potential
-/// 13. Bulge -- triaxial Jaffe bulge potential
-/// 14. GalPot -- wrapper for Torus GalPot potential
-/// 15. MultiComponentPotential -- sum of potentials
-/// 16. MultiComponentSphericalPotential -- sum of spherical potentials
-/// 17. NFWSpherical -- spherical NFW potential
-/// 18. HernquistSpherical -- spherical Hernquist potential
-/// 19. PowerLawSpherical-- spherical power-law potential
-/// 20. BowdenNFW -- flattened NFW from Bowden et al.(2014)
-/// 21. WrapperTorusPotential -- wraps potentials from Torus code
-///
+/*! \brief Potential classes
+ *
+ *  We give a list of the available potentials. Most potentials are
+ *  self-documented, in that they contain a string that outputs their info.
+
+ *  1. Potential_JS -- Base class
+ *  2. SphericalPotential -- Base spherical class
+ *  3. IsochronePotential -- Isochrone spherical potential
+ *  4. StackelOblate_PerfectEllipsoid -- axisymmetric oblate Stackel potential perfect ellipsoid
+ *  5. StackelTriaxial -- triaxial perfect ellipsoid
+ *  6. Logarithmic -- triaxial logarithmic potential
+ *  7. PowerLaw -- triaxial power-law potential
+ *  8. Isochrone -- triaxial isochrone potential
+ *  9. HarmonicOscillator -- triaxial harmonic oscillator
+ *  10. Dehnen -- spherical Dehnen potential
+ *  11. MiyamotoNagai_JS -- axisymmetric Miyamoto-Nagai potential
+ *  11. NFW -- triaxial NFW potential
+ *  12. Hernquist -- triaxial Hernquist potential
+ *  13. Bulge -- triaxial Jaffe bulge potential
+ *  14. GalPot -- wrapper for Torus GalPot potential
+ *  15. MultiComponentPotential -- sum of potentials
+ *  16. MultiComponentSphericalPotential -- sum of spherical potentials
+ *  17. NFWSpherical -- spherical NFW potential
+ *  18. HernquistSpherical -- spherical Hernquist potential
+ *  19. PowerLawSpherical-- spherical power-law potential
+ *  20. BowdenNFW -- flattened NFW from Bowden et al.(2014)
+ *  21. WrapperTorusPotential -- wraps potentials from Torus code
+ */
 //============================================================================
 
 #ifndef POTENTIAL_H
@@ -231,20 +231,20 @@ class IsochronePotential: public SphericalPotential{
 //============================================================================
 /// Axisymmetric Stackel potential with perfect ellipsoidal density
 ///
-/// Requires an oblate spheroidal coordinate system instance
+/// Requires an prolate spheroidal coordinate system instance
 //============================================================================
-class StackelProlate_PerfectEllipsoid: public Potential_JS{
+class StackelOblate_PerfectEllipsoid: public Potential_JS{
 	private:
 		const std::string desc =
-		"Axisymmetric prolate perfect ellipsoid.\nThis potential is of St\"ackel form and is most simply defined by its density:\n\trho(R,z) = -frac{rho0}{1+m^2}^2\n\tm^2 = (R/a)^2+(z/b)^2\n\tTakes two parameters:\t	the central density: rho0 and the parameter alpha such that ... hmm   ";
-		std::unique_ptr<OblateSpheroidCoordSys> CS;
+		"Axisymmetric oblate perfect ellipsoid.\nThis potential is of St\"ackel form and is most simply defined by its density:\n\trho(R,z) = -frac{rho0}{1+m^2}^2\n\tm^2 = (R/a)^2+(z/b)^2\n\tTakes two parameters:\t	the central density: rho0 and the parameter alpha such that ... hmm   ";
+		std::unique_ptr<ProlateSpheroidCoordSys> CS;
 		double Const;
 	public:
-		StackelProlate_PerfectEllipsoid(double Rho0, double alpha)
-		 :CS(new OblateSpheroidCoordSys(alpha)),
+		StackelOblate_PerfectEllipsoid(double Rho0, double alpha)
+		 :CS(new ProlateSpheroidCoordSys(alpha)),
 		  Const(2.*PI*conv::G*Rho0*(-CS->alpha())){}
-		StackelProlate_PerfectEllipsoid(const StackelProlate_PerfectEllipsoid& s):
-			CS(new OblateSpheroidCoordSys(*s.CS)),Const(s.Const){}
+		StackelOblate_PerfectEllipsoid(const StackelOblate_PerfectEllipsoid& s):
+			CS(new ProlateSpheroidCoordSys(*s.CS)),Const(s.Const){}
 		inline std::string name(void) const {return desc;}
 		inline double alpha(){return CS->alpha();}
 		inline void newalpha(double alp){CS->newalpha(alp);}

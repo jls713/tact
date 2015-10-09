@@ -41,7 +41,7 @@
 //============================================================================
 
 double Actions_AxisymmetricFudge_InterpTables::Phiuv(const VecDoub& uv,double Delta){
-    UVOblateSpheroidCoordSys UVV(Delta);
+    UVProlateSpheroidCoordSys UVV(Delta);
     VecDoub Rz = UVV.uv2Rz(uv);
     return Pot->Phi({Rz[0],0.,Rz[1]});
 }
@@ -56,7 +56,7 @@ double Actions_AxisymmetricFudge_InterpTables::dV(double v,double u,double shu2,
 
 double Actions_AxisymmetricFudge_InterpTables::dPhiu(const VecDoub& uv,double *f,double Delta){
     //returns Phiu(u) and dPhi/dR etc
-    UVOblateSpheroidCoordSys UVV(Delta);
+    UVProlateSpheroidCoordSys UVV(Delta);
     VecDoub Rz = UVV.uv2Rz(uv);
     VecDoub F = Pot->Forces({Rz[0],0.,Rz[1]});
     f[0]=-F[0];f[1]=-F[2];

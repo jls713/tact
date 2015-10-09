@@ -66,7 +66,7 @@ HEADERS = $(wildcard inc/*.h)
 
 default: all
 
-all: lib/libaa.so mains/test_actions.exe
+all: lib/libaa.so mains/test_actions.exe mains/test_angles.exe mains/many_tori.exe
 
 forceall: clean all
 
@@ -95,6 +95,9 @@ test.exe: $(OBJECTS) $(OBJ)test.o
 
 mains/test_actions.exe: $(OBJECTS) $(OBJ)test_actions.o
 	$(CCOMPILER) $(OPTS) -o mains/test_actions.exe $(OBJECTS) $(OBJ)test_actions.o $(LIB) $(CUBA) -static-libstdc++
+
+mains/test_angles.exe: $(OBJECTS) $(OBJ)test_angles.o
+	$(CCOMPILER) $(OPTS) -o mains/test_angles.exe $(OBJECTS) $(OBJ)test_angles.o $(LIB) $(CUBA) -static-libstdc++
 
 mains/many_tori.exe: $(OBJECTS) $(OBJ)many_tori.o
 	$(CCOMPILER) $(OPTS) -o mains/many_tori.exe $(OBJECTS) $(OBJ)many_tori.o $(LIB) $(CUBA)

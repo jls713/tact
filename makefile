@@ -36,3 +36,6 @@ pot_code:
 
 aa_code:
 	$(MAKE) -C $(AA_DIR)
+
+docs:
+	doxygen doxygen.config

@@ -12,3 +12,5 @@ build/*
 *.so
 *.eps
 *.a
+doc/html/*
+doc/latex/*

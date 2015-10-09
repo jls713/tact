@@ -21,11 +21,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ============================================================================
-/// \brief Interpolation grids for axisymmetric Staeckel fudge
-///
-/// Actions_AxisymmetricFudge_InterpTables: Constructs grids for interpolating
-/// the results of the axisymmetric Staeckel fudge
-///
+/*! \brief Interpolation grids for axisymmetric Staeckel fudge
+ *
+ *  Actions_AxisymmetricFudge_InterpTables: Constructs grids for interpolating
+ *  the results of the axisymmetric Staeckel fudge
+ */
 //============================================================================
 
 #ifndef TABLES_H
@@ -168,7 +168,7 @@ public:
     double shu2,sv2,pu,pv;
     CartesianToUVCoords(VecDoub X,double Delta){
         Delta2 = Delta*Delta;
-        UVOblateSpheroidCoordSys UVV(Delta);
+        UVProlateSpheroidCoordSys UVV(Delta);
         VecDoub cc = UVV.xv2uv(X);
         u=cc[0];v=cc[2];
         pu=cc[3];pv=cc[5];
