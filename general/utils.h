@@ -1,3 +1,29 @@
+// ============================================================================
+/// \file inc/potential.h
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Utility functions
+//============================================================================
+
 /*======================================*/
 /*		  A few utility functions 	  	*/
 /*======================================*/
@@ -32,12 +58,6 @@ const double TINY = 1e-10;
 #define MIN(A,B) ((A)<(B)?(A):(B))
 #define SIGN(A) ((A)>0.?(1.0):(-1.0))
 
-template<class c>
-inline double sign(c a){
-    if(a>0.)return 1.;
-    else return -1.;
-}
-
 extern rand_uniform *rn;
 extern rand_gaussian *rnGauss;
 extern rand_exponential *rnExp;
@@ -45,6 +65,16 @@ extern rand_exponential *rnExp;
 // ============================================================================
 #define OUTPUT(x) #x<<" = "<<(x)<<", "
 #define OUTPUTE(x) #x<<" = "<<(x)<<std::endl
+
+inline double sign(double a){
+    if(a>0.)return 1.;
+    else return -1.;
+}
+
+inline int sign(int a){
+    if(a>0.)return 1.;
+    else return -1.;
+}
 
 template<class c>
 c Max(const std::vector<c> &a){
@@ -147,6 +177,14 @@ double SD(const std::vector<c> &a){
 }
 
 template<class c>
+double RMS(const std::vector<c> &a){
+    double R2=0.;
+    for_each(begin(a),end(a),[&R2](c p){R2+=p*p;});
+    int N=a.size();
+    return sqrt(R2/N);
+}
+
+template<class c>
 double Median(const std::vector<c> &a){
 	std::vector<c> a2 = a;
 	size_t midIndex = a2.size()/2;
@@ -168,6 +206,12 @@ std::vector<c> rowSD(const std::vector<std::vector<c>> &a){
 	return rM;
 }
 
+template<class c>
+std::vector<c> rowRMS(const std::vector<std::vector<c>> &a){
+    std::vector<c> rM(a.size());
+    for(unsigned int i=0;i<a.size();i++) rM[i] = RMS<c>(a[i]);
+    return rM;
+}
 template<class c>
 std::vector<c> rowMedian(const std::vector<std::vector<c>> &a){
 	std::vector<c> rM(a.size());
@@ -193,6 +237,11 @@ std::vector<c> columnMean(const std::vector<std::vector<c>> &a){
 template<class c>
 std::vector<c> columnSD(const std::vector<std::vector<c>> &a){
 	return rowSD<c>(transpose(a));
+}
+
+template<class c>
+std::vector<c> columnRMS(const std::vector<std::vector<c>> &a){
+    return rowRMS<c>(transpose(a));
 }
 
 template<class c>
@@ -493,3 +542,5 @@ inline VecDoub GaussianQuad_Weights_8(int i){
 inline double GFunction(double Foff,double sigF){return exp(-Foff*Foff/(2.0*sigF*sigF))/(sqrt(TPI)*sigF);}
 
 #endif
+
+//============================================================================
