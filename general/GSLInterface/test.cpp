@@ -1,10 +1,34 @@
-// test file for GSLInterface
-// Performs tests on algorithms
+// ============================================================================
+/// \file GSLInterface/test.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief test file for GSLInterface -- Performs tests on algorithms
+///
+//============================================================================
 
 #include "GSLInterface.h"
 #include <iostream>
 
-//==================================================================================================
+//=============================================================================
 // Test Functions
 double Offset=25.0;
 
@@ -38,7 +62,8 @@ double g (double *k, size_t dim, void *params){
 	// return 3.7796447*sqrt(A)*exp(-k[0]*k[0]/0.25/2.-k[1]*k[1]/0.7/2.-k[2]*k[2]/0.4/2.);
 }
 
-//==================================================================================================
+//=============================================================================
+
 int main(){
 
 	// 1. Random Numbers
@@ -182,4 +207,4 @@ int main(){
 		std::cout<<", Pi(0.5,0.1,2) = "<<ellint_third(0.5,0.1,2.)<<std::endl;
 
 }
-//==================================================================================================
+//=============================================================================

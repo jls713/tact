@@ -1,5 +1,30 @@
-// An interface to GSL - hides all the gsl calls behind easier to use functions
-// Jason Sanders
+// ============================================================================
+/// \file GSLInterface/GSLInterface.h
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief An interface to GSL - hides all the gsl calls behind easier to use functions
+///
+//============================================================================
+
 #ifndef GSLINTERFACE_H
 #define GSLINTERFACE_H
 
@@ -30,7 +55,7 @@
 
 const double SQRT2 = sqrt(2.);
 
-//=================================================================================================
+//=============================================================================
 // RANDOM NUMBERS //
 // random number generators - rand_uniform returns random numbers uniformly distributed in the
 // interval [0,1], rand_gaussian returns gaussian distributed random numbers with sd = sigma
@@ -85,7 +110,7 @@ class rand_exponential:public rand_base{
         void new_scale(double newscale){scale=newscale;}
 };
 
-//=================================================================================================
+//=============================================================================
 // ROOT FINDING	  //
 // finds root by Brent's method. Constructor initialises function and tolerances, findroot finds
 // root in given interval. Function must be of form double(*func)(double,void*)
@@ -136,7 +161,7 @@ class root_find{
 
 };
 
-//=================================================================================================
+//=============================================================================
 // INTEGRATION //
 // Simple 1d numerical integration using adaptive Gauss-Kronrod which can deal with singularities
 // constructor takes function and tolerances and integrate integrates over specified region.
@@ -231,7 +256,7 @@ class MCintegrator{
  		}
 };
 
-//=================================================================================================
+//=============================================================================
 // 1D INTERPOLATION //
 // Interpolation using cubic splines
 
@@ -261,7 +286,7 @@ class interpolator{
         }
 };
 
-//=================================================================================================
+//=============================================================================
 // SORTING //
 // sorting algorithm
 // sort2 sorts first argument and then applies the sorted permutation to second list
@@ -287,7 +312,7 @@ class sorter{
 
 };
 
-//=================================================================================================
+//=============================================================================
 // ODE SOLVER //
 // Simple ODE integrator using Runge-Kutta Dormand-Prince 8 adaptive stepping
 // dy_i/dt = f_i(t) where int (*f)(double t, const double y, double f, void *params)
@@ -400,7 +425,7 @@ class bracketer{
 			else return 1;
 		}
 };
-//=================================================================================================
+//=============================================================================
 // MINIMISER //
 // finds a minimum of a function of the form double(*func)(const gsl_vector *v, void *params)
 // using a downhill simplex algorithm. Setup minimiser with initial guesses and required tolerance
@@ -576,7 +601,7 @@ class sim_anneal{
     	}
 };*/
 
-//=================================================================================================
+//=============================================================================
 // SPECIAL FUNCTIONS //
 inline double erf(double x){return gsl_sf_erf (x);}
 inline double erfc(double x){return gsl_sf_erfc (x);}
@@ -698,3 +723,4 @@ inline void real_spherical_harmonic_2l_1_deriv_array(double ctheta, double phi, 
 
 }
 #endif
+//=============================================================================
