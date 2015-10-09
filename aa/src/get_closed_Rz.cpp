@@ -1,7 +1,39 @@
+// ============================================================================
+/// \file src/get_closed_Rz.cpp
+// ============================================================================
+/// \author Jason Sanders, based on James Binney (2014)
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Finding best coordinate system from shell orbits
+///
+/// Routines for determining Delta = gamma-alpha = a^2-c^2 by fitting ellipses
+/// in the meridional plane (R,z) to shell orbits
+
+//============================================================================
+
 #include "potential.h"
 #include "utils.h"
 #include "jamestools/numrec/press.h"
 #include "get_closed_Rz.h"
+
+//============================================================================
 
 static double ds2dv0(double v, void*p){
     closed_approach_st *P = (closed_approach_st*)p;
@@ -76,9 +108,9 @@ double delta_st::get_delta2(void){
 static void derivs(double t,double *y,double *dydt, void*params){
     find_best_delta *P = (find_best_delta *) params;
     double dP[2];
-    VecDoub f = P->Pot->Forces({y[0],0.,y[1]});
+    VecDoub f = P->pot()->Forces({y[0],0.,y[1]});
     dP[0]=-f[0];dP[1]=-f[2];
-    dP[0]-=P->Lzsq/pow(y[0],3);
+    dP[0]-=P->Lz2()/pow(y[0],3);
     for(int i=0;i<2;i++){
         dydt[i]=y[i+2];
         dydt[i+2]=-dP[i];

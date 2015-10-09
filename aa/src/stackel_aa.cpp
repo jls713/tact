@@ -1,3 +1,39 @@
+// ============================================================================
+/// \file src/stackel_aa.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Action finding in Staeckel potentials and Staeckel fudges
+///
+/// Four classes are implemented:
+/// 1. Actions_AxisymmetricStackel: Action finding in axisymmetric Staeckel
+///    potentials (currently accepts perfect ellipsoid potential)
+/// 2. Actions_TriaxialStackel: Action finding in triaxial Staeckel potential
+/// 3. Actions_AxisymmetricStackel_Fudge: Action estimation in axisymmetric
+///    potential using Staeckel fudge (as in Binney (2012))
+/// 4. Actions_TriaxialStackel_Fudge :Action estimation in triaxial potential
+///    using Staeckel fudge (as in Sanders & Binney (2014))
+///
+//============================================================================
+
 /*======================================*/
 /*Actions, Angles, Frequencies & Hessian*/
 /*======================================*/
@@ -63,20 +99,20 @@ double J_integrand_AxiSym(double theta, void *params){
 double dJdEint_AxiSym(double theta, void *params){
 	action_struct_axi * AS = (action_struct_axi *) params;
 	double tau=AS->taubargl+AS->Deltagl*sin(theta);
-	double P = 0.25*cos(theta)/((tau+AS->RS.P->alpha())*sqrt(MAX(TINY,ptau2_AxiSym(tau,&(AS->RS)))));
+	double P = 0.25*cos(theta)/((tau+AS->RS.P->alpha())*sqrt(MAX(AS->tiny_number,ptau2_AxiSym(tau,&(AS->RS)))));
 	return P;
 }
 
 double dJdI2int_AxiSym(double theta, void *params){
 	action_struct_axi * AS = (action_struct_axi *) params;
 	double tau=AS->taubargl+AS->Deltagl*sin(theta);
-	return -0.25*cos(theta)/((tau+AS->RS.P->alpha())*(tau+AS->RS.P->alpha())*sqrt(MAX(TINY,ptau2_AxiSym(tau,&(AS->RS)))));
+	return -0.25*cos(theta)/((tau+AS->RS.P->alpha())*(tau+AS->RS.P->alpha())*sqrt(MAX(AS->tiny_number,ptau2_AxiSym(tau,&(AS->RS)))));
 }
 
 double dJdI3int_AxiSym(double theta, void *params){
 	action_struct_axi * AS = (action_struct_axi *) params;
 	double tau=AS->taubargl+AS->Deltagl*sin(theta);
-	return -0.25*cos(theta)/((tau+AS->RS.P->alpha())*(tau+AS->RS.P->gamma())*sqrt(MAX(TINY,ptau2_AxiSym(tau,&(AS->RS)))));
+	return -0.25*cos(theta)/((tau+AS->RS.P->alpha())*(tau+AS->RS.P->gamma())*sqrt(MAX(AS->tiny_number,ptau2_AxiSym(tau,&(AS->RS)))));
 }
 
 double d2Jlamd2Eint_AxiSym(double theta, void *params){
@@ -305,14 +341,14 @@ VecDoub Actions_AxisymmetricStackel::actions(const VecDoub& x, void *params){
 	// JR
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
-	action_struct_axi AS(Pot,integrals,taubar,Delta);
+	action_struct_axi AS(Pot,integrals,taubar,Delta,0.);
 	actions.push_back(Delta*GaussLegendreQuad(&J_integrand_AxiSym,-.5*PI,.5*PI,&AS)/PI);
 	// Lz
 	actions.push_back(sqrt(2.0*integrals[1]));
 	// Jz
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);
-	AS = action_struct_axi (Pot,{integrals[0],integrals[1],integrals[3]},taubar,Delta);
+	AS = action_struct_axi (Pot,{integrals[0],integrals[1],integrals[3]},taubar,Delta,0.);
 	actions.push_back(2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym,-.5*PI,.5*PI,&AS)/PI);
 	return actions;
 }
@@ -320,6 +356,7 @@ VecDoub Actions_AxisymmetricStackel::actions(const VecDoub& x, void *params){
 VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, bool with_hess){
 // calculates angles, also freqs at end.
 	VecDoub tau = Pot->xv2tau(x);
+	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e8;
 	VecDoub integrals = Pot->x2ints(x,&tau);
 	VecDoub limits = find_limits(tau,integrals);
 
@@ -329,7 +366,7 @@ VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, bool with_hess){
 	double dJdI[3][3]; double dIdJ[3][3];
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
-	action_struct_axi AS(Pot,integrals,taubar,Delta);
+	action_struct_axi AS(Pot,integrals,taubar,Delta, tn);
 
 	double lamFactor = 1.;
 	if(Pot->alpha()>Pot->gamma()) lamFactor = 2.;
@@ -355,7 +392,7 @@ VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, bool with_hess){
 	//Nu
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta=0.5*(limits[3]-limits[2]);
-	AS = action_struct_axi(Pot,{integrals[0],integrals[1],integrals[3]},taubar,Delta);
+	AS = action_struct_axi(Pot,{integrals[0],integrals[1],integrals[3]},taubar,Delta,tn);
 	double nuFactor = 1.;
 	if(limits[2]==-Pot->gamma()+TINY and Pot->alpha()<Pot->gamma()) nuFactor = 2.;
 
@@ -589,7 +626,7 @@ double dJdE_integrand_AxiSym_Fudge(double theta, void *params){
 	double Alpha = AS->ASF->CS->alpha(), Gamma = AS->ASF->CS->gamma();
 	double ptau2 = AS->Ints[0]*(tau+Gamma)-AS->Ints[1]*(tau+Gamma)/(tau+Alpha)-AS->Ints[2]+phi;
 	ptau2 /= (tau+Alpha)*(tau+Gamma)*2.;
-	return 0.25*cos(theta)/(sqrt(MAX(SMALL,ptau2))*(tau+Alpha));
+	return 0.25*cos(theta)/(sqrt(MAX(AS->tiny_number,ptau2))*(tau+Alpha));
 }
 
 double dJdI2_integrand_AxiSym_Fudge(double theta, void *params){
@@ -602,7 +639,7 @@ double dJdI2_integrand_AxiSym_Fudge(double theta, void *params){
 	double Alpha = AS->ASF->CS->alpha(), Gamma = AS->ASF->CS->gamma();
 	double ptau2 = AS->Ints[0]*(tau+Gamma)-AS->Ints[1]*(tau+Gamma)/(tau+Alpha)-AS->Ints[2]+phi;
 	ptau2 /= (tau+Alpha)*(tau+Gamma)*2.;
-	return -0.25*cos(theta)/(sqrt(MAX(SMALL,ptau2))*(tau+Alpha)*(tau+Alpha));
+	return -0.25*cos(theta)/(sqrt(MAX(AS->tiny_number,ptau2))*(tau+Alpha)*(tau+Alpha));
 }
 
 double dJdI3_integrand_AxiSym_Fudge(double theta, void *params){
@@ -615,7 +652,7 @@ double dJdI3_integrand_AxiSym_Fudge(double theta, void *params){
 	double Alpha = AS->ASF->CS->alpha(), Gamma = AS->ASF->CS->gamma();
 	double ptau2 = AS->Ints[0]*(tau+Gamma)-AS->Ints[1]*(tau+Gamma)/(tau+Alpha)-AS->Ints[2]+phi;
 	ptau2 /= (tau+Alpha)*(tau+Gamma)*2.;
-	return -0.25*cos(theta)/(sqrt(MAX(SMALL,ptau2))*(tau+Alpha)*(tau+Gamma));
+	return -0.25*cos(theta)/(sqrt(MAX(AS->tiny_number,ptau2))*(tau+Alpha)*(tau+Gamma));
 }
 
 VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& xx, void *params){
@@ -625,13 +662,12 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& xx, void *para
 
 	if(params){
 		double *deltaguess = (double *) params;
-		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)-1.);
+		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
 	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
 
 	VecDoub tau = CS->xv2tau(x);
-
 	E = Pot->H(x);
 	if(E>0){
 		std::cout<<"You have passed an unbound orbit:"<<std::endl;
@@ -646,7 +682,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& xx, void *para
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
 	VecDoub ints = {E,I2,Kt[0]};
-	action_struct_axi_fudge AS(this,ints,tau,taubar,Delta,0);
+	action_struct_axi_fudge AS(this,ints,tau,taubar,Delta,0, 0.);
 	actions.push_back(Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI);
 	// Lz
 	actions.push_back(sqrt(2.0*I2));
@@ -654,7 +690,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& xx, void *para
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);
 	ints[2]=Kt[1];
-	AS = action_struct_axi_fudge(this,ints,tau,taubar,Delta,1);
+	AS = action_struct_axi_fudge(this,ints,tau,taubar,Delta,1, 0.);
 	actions.push_back(2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI);
 	if(x[2]==0. and x[5]==0.) actions[2]=0.;
 	return actions;
@@ -664,12 +700,16 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 
 	if(params){
 		double *deltaguess = (double *) params;
-		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)-1.);
+		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
 
-	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
+	if(CS->alpha()>CS->gamma()){
+	    std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
+        CS->newalpha(CS->gamma()-0.1);
+	}
 	VecDoub tau = CS->xv2tau(x);
+	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e8;
 	E = Pot->H(x); I2 = 0.5*(x[0]*x[4]-x[1]*x[3])*(x[0]*x[4]-x[1]*x[3]);
 	integrals(tau);
 	VecDoub limits = find_limits(tau);
@@ -678,7 +718,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
 	VecDoub ints = {E,I2,Kt[0]};
-	action_struct_axi_fudge AS(this,ints,tau,taubar,Delta,0);
+	action_struct_axi_fudge AS(this,ints,tau,taubar,Delta,0, tn);
 	VecDoub dJdIl(3,0);
 	dJdIl[0] = Delta*GaussLegendreQuad(&dJdE_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
 	dJdIl[1] = Delta*GaussLegendreQuad(&dJdI2_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
@@ -696,7 +736,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);
 	ints[2]=Kt[1];
-	AS = action_struct_axi_fudge(this,ints,tau,taubar,Delta,1);
+	AS = action_struct_axi_fudge(this,ints,tau,taubar,Delta,1, tn);
 	VecDoub dJdIn(3,0);
 	dJdIn[0] = 2.*Delta*GaussLegendreQuad(&dJdE_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
 	dJdIn[1] = 2.*Delta*GaussLegendreQuad(&dJdI2_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;

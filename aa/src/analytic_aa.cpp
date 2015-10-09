@@ -1,4 +1,35 @@
 // ============================================================================
+/// \file src/analytic_aa.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Action finders for potentials in which actions are analytic
+///
+/// Defines action-finding routines for the two potentials in which the actions
+/// , angles and frequencies are analytic. These are
+/// 1. Isochrone potential given by Phi(r) = -GM/(b+sqrt(b**2+r**2))
+/// 2. 3D harmonic oscillator given by Phi(\bs{x})=0.5 \omega_i^2 x^2
+// ============================================================================
+
+// ============================================================================
 // Action calculation for a few analytic cases
 // ============================================================================
 
@@ -47,10 +78,10 @@ VecDoub Actions_Isochrone::actions(const VecDoub& x, void *params){
 }
 
 VecDoub Actions_Isochrone::freq(const VecDoub& x){
-    double LL = L(x);
+    double LL = L(x), Lz_=Lz(x);
     double Omegar=pow(-2*H(x),1.5)/GM;
     double Omegap=0.5*Omegar*(1.+LL/sqrt(LL*LL+4*GM*b));
-    return {Omegar,Omegap};
+    return {Omegar,SIGN(Lz_)*Omegap,Omegap};
 }
 
 VecDoub Actions_Isochrone::Hessian(const VecDoub& x){
@@ -100,6 +131,7 @@ VecDoub Actions_Isochrone::angles(const VecDoub& x, void *params){
         u = asin(sinu);
     if(Sph[5]>0.)
         u=PI-u;
+
     Theta[1]=Sph[1]-u+SIGN(Lz_)*Theta[2];
     for(int i=0;i<3;i++){
         while(Theta[i]<0.) Theta[i]+=2.*PI;

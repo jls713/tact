@@ -1,5 +1,35 @@
 // ============================================================================
-// Action calculation using generating function from orbit integration
+/// \file src/genfunc_aa.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Action finding routines using Generating function
+///
+/// Computes actions via orbit integration. There are two classes given:
+/// 1. Actions_Genfunc computes Fourier coefficients of the generating function
+///    from a toy action system (isochrone or harmonic oscillator). This
+///    procedure is detailed in Sanders \& Binney (2014).
+/// 2. Actions_Genfunc_Average computes the actions by averaging the toy
+///    actions over the toy angles (as in Fox (2014) and Bovy (2014)).
+///
 // ============================================================================
 
 #include <iostream>
@@ -14,12 +44,10 @@
 #include "genfunc_aa.h"
 #include "debug.h"
 #include "orbit.h"
-#include "Torus.h"
 
-static int sign(double a){
-	if(a>=0.) return 1;
-	else return -1;
-}
+// ============================================================================
+// Action calculation using generating function from orbit integration
+// ============================================================================
 
 static void orient_orbit(VecDoub& x, const std::vector<int> &loop){
     // given which sign of the angular momentum is conserved, orients the orbit
@@ -694,6 +722,12 @@ VecDoub Actions_Genfunc::full_angles(const VecDoub &x,int NT,int Nsamp,int Nmax)
     return angles(x,AA);
 }
 
+// ============================================================================
+
+// ============================================================================
+// Action calculation by averaging toy actions over toy angles
+// ============================================================================
+
 VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
 
     // Set the parameters -- N_T, N_max, Total_T
@@ -701,7 +735,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     if(params!=nullptr) AA = (Actions_Genfunc_data_structure *)params;
     else{
         double timescale = TargetPot->torb(x);
-        AA = new Actions_Genfunc_data_structure(timescale*8., 200, 6, 1e-3,500,32.*timescale,symmetry=="axisymmetric"?true:false);
+        AA = new Actions_Genfunc_data_structure(timescale*8., 300, 6, 1e-8,500,32.*timescale,symmetry=="axisymmetric"?true:false);
     }
     // Integrate the orbit
     Orbit orbit(TargetPot,AA->orbit_eps);
@@ -901,3 +935,5 @@ VecDoub PhaseSpacePoint(VecDoub actions, VecDoub angles, Potential_JS *Pot){
 //     outfile.close();
 //     return 0;
 //  }
+
+// ============================================================================

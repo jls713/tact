@@ -1,79 +1,181 @@
+// ============================================================================
+/// \file inc/adiabatic_aa.h
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Action finders for adiabatic approximations
+///
+/// There are two adiabatic approximations -- polar and spheroidal
+/// The two classes are very similar in that the actions are estimated by
+/// assuming the potential is separable in either a polar or spheroidal
+/// coordinate system.
+///
+/// The polar method is taken from Schoenrich \& Binney (2012).
+/// The spheroidal method is from Sanders \& Binney (2015).
+///
+/// Both classes first construct grids of the vertical energy as a function
+/// of vertical action, angular momentum and radius. The properties of the
+/// grids are governed by the parameters Rmin (minimum radius), Rmax (maximum
+/// radius), ZMAX (maximum z height), NGRID (number of gridpoints in R and Jz),
+/// NL (number of grid points in Lz)
+// ============================================================================
+
 #ifndef ADIABATIC_H
 #define ADIABATIC_H
 
 #include "potential.h"
 #include "aa.h"
 // ============================================================================
-// Polar Adiabatic Approximation
+/*! Polar Adiabatic Approximation */
 // ============================================================================
-
 class Actions_PolarAdiabaticApproximation : public Action_Finder{
     private:
-        Potential_JS *Pot;
-        bool no_energy_correction;
+        Potential_JS *Pot;          /*! Potential (axisymmetric)             */
+        bool no_energy_correction;  /*! if true, no radial-vertical coupling */
+        const int NGRID = 60;       /*! number of grid points for Ez         */
+        double Rmin, Rmax, ZMAX;/*!min and max radius, max z height for grids*/
+        VecDoub Rgrid, Ezmaxgrid;   /*! radius and energy grids              */
+        std::vector<VecDoub> Ezgrid;/*! vertical energy grid                 */
+        std::vector<VecDoub> Jzgrid;/*! vertical action grid                 */
 
-        const int NGRID = 60;
-        const double Rmin = 1., Rmax = 40.;
-        VecDoub Rgrid, Ezmaxgrid;
-        std::vector<VecDoub> Ezgrid, Jzgrid;
-    public:
-        Actions_PolarAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false)
-            : Pot(pot), no_energy_correction(no_energy_corr){
-            if(filename!="" and !write)
-                load_grids(filename);
-            else
-                make_grids(write?filename:"");
-        };
         double actions_Jz(double R, double Ez, double z, double *zlim);
-        VecDoub actions(const VecDoub& x, void*params=nullptr);
-        inline double Phi_z(VecDoub Polar){
-            return Pot->Phi({Polar[0],0.,Polar[2]})-Pot->Phi({Polar[0],0.,0.});
-        }
-        inline double PhiR_eff(double R, double Lz2, double Jz){
-            return Pot->Phi({R,0.,0.})+.5*Lz2/(R*R)+Ez_from_grid(R,Jz);
-        }
         double find_zlimit(double Ez, VecDoub Polar);
         VecDoub find_Rlimits(double R, double Etot, double Lz2,double Jz);
         void load_grids(std::string filename);
         void make_grids(std::string filename);
         double Ez_from_grid(double R, double Jz);
-};
+        double estimate_tiny(double Ez, double R);
 
+    public:
+        //! Actions_PolarAdiabaticApproximation constructor.
+        /*!
+          \param pot Potential (axisymmetric) in which to compute the actions
+          \param filename -- output file for Ez grid
+          \param write -- output file if true
+          \param no_energy_corr -- if true, no coupling between radial and vertical motion
+          \param Rm -- minimum radius for grid
+          \param Rn -- maximum radius for grid
+          \param zmax -- maximum z height for grid
+        */
+        Actions_PolarAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false, double Rm=1., double Rn=40.,double zmax=40.)
+            : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax){
+            if(filename!="" and !write)
+                load_grids(filename);
+            else
+                make_grids(write?filename:"");
+        };
+        /*! Effective vertical potential */
+        inline double Phi_z(VecDoub Polar){
+            return Pot->Phi({Polar[0],0.,Polar[2]})-Pot->Phi({Polar[0],0.,0.});
+        }
+        /*! Effective radial potential */
+        inline double PhiR_eff(double R, double Lz2, double Jz){
+            return Pot->Phi({R,0.,0.})+.5*Lz2/(R*R)+Ez_from_grid(R,Jz);
+        }
+        //! Finds actions
+        /*!
+          \param x phase-space point (x,v)
+          \param params does nothing
+          \return actions -- 3D vector J=(J_R,J_phi,J_z)
+        */
+        VecDoub actions(const VecDoub& x, void*params=nullptr);
+        //! Finds angles
+        /*!
+          \param x phase-space point (x,v)
+          \param params -- does nothing
+
+          \return angles and frequencies --
+                6D vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)
+        */
+        VecDoub angles(const VecDoub& x, void *params=nullptr);
+};
+/*! Helper structure for Jz polar adiabatic approx integration */
 struct PolarAA_zactions_struct{
     Actions_PolarAdiabaticApproximation *AA;
-    double Ez, R, zlim;
-    PolarAA_zactions_struct(Actions_PolarAdiabaticApproximation *AA,double Ez, double R,double zlim)
-        :AA(AA),Ez(Ez), R(R), zlim(zlim){}
+    double Ez, R, zlim, tiny_number;
+    PolarAA_zactions_struct(Actions_PolarAdiabaticApproximation *AA,double Ez, double R,double zlim, double tn)
+        :AA(AA),Ez(Ez), R(R), zlim(zlim), tiny_number(tn){}
 };
 
+/*! Helper structure for JR polar adiabatic approx integration */
 struct PolarAA_Ractions_struct{
     Actions_PolarAdiabaticApproximation *AA;
-    double Etot, Lz2, Jz, Delta,taubar;
-    PolarAA_Ractions_struct(Actions_PolarAdiabaticApproximation *AA,double Etot, double Lz2, double Jz, double Delta,double taubar)
-        :AA(AA),Etot(Etot), Lz2(Lz2), Jz(Jz), Delta(Delta), taubar(taubar){}
+    double Etot, Lz2, Jz, Delta,taubar, tiny_number;
+    PolarAA_Ractions_struct(Actions_PolarAdiabaticApproximation *AA,double Etot, double Lz2, double Jz, double Delta,double taubar, double tn)
+        :AA(AA),Etot(Etot), Lz2(Lz2), Jz(Jz), Delta(Delta), taubar(taubar), tiny_number(tn){}
 };
 
 // ============================================================================
-// Spheroidal Adiabatic Approximation
+/*! Spheroidal Adiabatic Approximation */
 // ============================================================================
-
 class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
     private:
         bool alpha_guess;
     public:
-        Potential_JS *Pot;
+        Potential_JS *Pot;          /*! Potential (axisymmetric)             */
         std::unique_ptr<OblateSpheroidCoordSys> CS;
-        bool no_energy_correction;
+        bool no_energy_correction;  /*! if true, no radial-vertical coupling */
 
-        const int NGRID = 60, NL = 5;
-        const double Rmin = 1., Rmax = 40.;
-        double Lmin, Lmax;
-        VecDoub Rgrid, Lgrid;
-        std::vector<VecDoub> Ezmaxgrid;
-        std::vector<std::vector<VecDoub>> Ezgrid, Jzgrid;
+        const int NGRID = 60;       /*! number of grid points for Enu        */
+        const int NL = 10;          /*! number of grid points for Lz         */
+        double Rmin, Rmax, ZMAX;/*!min and max radius, max z height for grids*/
+        double Lmin, Lmax;          /*! min and max ang mom for grids        */
+        VecDoub Rgrid, Lgrid;       /*! radius and ang mom grids             */
+        std::vector<VecDoub> Ezmaxgrid;/*! max vertical energy grid          */
+        std::vector<std::vector<VecDoub>> Ezgrid;/*! vertical energy grid    */
+        std::vector<std::vector<VecDoub>> Jzgrid;/*! vertical action grid    */
+
+        /*! Effective vertical potential */
+        inline double Phi_nu(VecDoub tau, double Lz2){
+            VecDoub x = CS->tau2x(tau);
+            return Pot->Phi(x)-Pot->Phi({sqrt(tau[0]+CS->alpha()),0.,0.})
+                    +.5*Lz2*(1./normsq<double>({x[0],x[1]})-1./(tau[0]+CS->alpha()));
+        }
+        /*! Effective radial potential */
+        inline double Philam_eff(VecDoub tau, double Lz2, double Jz){
+            double R = sqrt(tau[0]+CS->alpha());
+            return Pot->Phi({R,0.,0.})+.5*Lz2/(R*R)+Ez_from_grid(Lz2,R,Jz);
+        }
+
+        double find_nulimit(double ENu, double Lz2, VecDoub tau);
+        VecDoub find_lamlimits(double Etot, double Lz2,double Jz,VecDoub tau);
+        void load_grids(std::string filename);
+        void make_grids(std::string filename);
+        double Ez_from_grid(double Lz2, double R, double Jz);
+        double estimate_tiny(double Ez, double l, double n, double Lz2);
+        double actions_Jz(double ENu, double Lz2, VecDoub tau, double *nulim);
     public:
-        Actions_SpheroidalAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false,double alpha = 100.)
-            : Pot(pot), no_energy_correction(no_energy_corr){
+        //! Actions_SpheroidalAdiabaticApproximation constructor.
+        /*!
+          \param pot Potential (axisymmetric) in which to compute the actions
+          \param filename -- output file for Ez grid
+          \param write -- output file if true
+          \param no_energy_corr -- if true, no coupling between radial and vertical motion
+          \param alpha - alpha estimate (can be overridden in actions & angles)
+          \param Rm -- minimum radius for grid
+          \param Rn -- maximum radius for grid
+          \param zmax -- maximum z height for grid
+        */
+        Actions_SpheroidalAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false,double alpha = 100., double Rm=1., double Rn=40.,double zmax=40.)
+            : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax){
 
             Lmin=Pot->L_circ(Rmin);Lmax=Pot->L_circ(Rmax);
 
@@ -86,40 +188,49 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
             else
                 make_grids(write?filename:"");
         };
-	Actions_SpheroidalAdiabaticApproximation(const Actions_SpheroidalAdiabaticApproximation& s):
-		Pot(s.Pot),CS(new OblateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid){
+        //! Actions_SpheroidalAdiabaticApproximation copy constructor.
+    	Actions_SpheroidalAdiabaticApproximation(const Actions_SpheroidalAdiabaticApproximation& s):
+		Pot(s.Pot),CS(new OblateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX){
             Lmin=Pot->L_circ(Rmin);Lmax=Pot->L_circ(Rmax);
         }
-        double actions_Jz(double ENu, double Lz2, VecDoub tau, double *nulim);
+        //! Finds actions
+        /*!
+          \param x phase-space point (x,v)
+          \param params -- if null, use alpha specified in constructor
+                        -- if >0, estimate using derivatives of potential eq(8) Sanders (2012)
+                        -- if <0, use value passed as new alpha
+
+          \return actions -- 3D vector J=(J_R,J_phi,J_z)
+        */
         VecDoub actions(const VecDoub& x, void*params=nullptr);
-        inline double Phi_nu(VecDoub tau, double Lz2){
-            VecDoub x = CS->tau2x(tau);
-            return Pot->Phi(x)-Pot->Phi({sqrt(tau[0]+CS->alpha()),0.,0.})
-                    +.5*Lz2*(1./normsq<double>({x[0],x[1]})-1./(tau[0]+CS->alpha()));
-        }
-        inline double Philam_eff(VecDoub tau, double Lz2, double Jz){
-            double R = sqrt(tau[0]+CS->alpha());
-            return Pot->Phi({R,0.,0.})+.5*Lz2/(R*R)+Ez_from_grid(Lz2,R,Jz);
-        }
-        double find_nulimit(double ENu, double Lz2, VecDoub tau);
-        VecDoub find_lamlimits(double Etot, double Lz2,double Jz,VecDoub tau);
-        void load_grids(std::string filename);
-        void make_grids(std::string filename);
-        double Ez_from_grid(double Lz2, double R, double Jz);
+        //! Finds angles
+        /*!
+          \param x phase-space point (x,v)
+          \param params -- if null, use alpha specified in constructor
+                        -- if >0, estimate using derivatives of potential eq(8) Sanders (2012)
+                        -- if <0, use value passed as new alpha
+
+          \return angles and frequencies --
+                6D vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)
+        */
+        VecDoub angles(const VecDoub& x, void *params=nullptr);
 };
 
+/*! Helper structure for Jz spheroidal adiabatic approx integration */
 struct SpheroidalAA_zactions_struct{
     Actions_SpheroidalAdiabaticApproximation *AA;
-    double ENu, Lz2, lam, Delta, taubar;
-    SpheroidalAA_zactions_struct(Actions_SpheroidalAdiabaticApproximation *AA,double ENu, double Lz2, double lam, double Delta, double taubar)
-        :AA(AA),ENu(ENu), Lz2(Lz2), lam(lam), Delta(Delta), taubar(taubar){}
+    double ENu, Lz2, lam, Delta, taubar, tiny_number;
+    SpheroidalAA_zactions_struct(Actions_SpheroidalAdiabaticApproximation *AA,double ENu, double Lz2, double lam, double Delta, double taubar, double tn)
+        :AA(AA),ENu(ENu), Lz2(Lz2), lam(lam), Delta(Delta), taubar(taubar), tiny_number(tn){}
 };
 
+/*! Helper structure for JR spheroidal adiabatic approx integration */
 struct SpheroidalAA_Ractions_struct{
     Actions_SpheroidalAdiabaticApproximation *AA;
-    double Elam, Lz2, Jz, nu, Delta,taubar;
-    SpheroidalAA_Ractions_struct(Actions_SpheroidalAdiabaticApproximation *AA,double Elam, double Lz2, double Jz, double nu, double Delta,double taubar)
-        :AA(AA),Elam(Elam), Lz2(Lz2), Jz(Jz), nu(nu), Delta(Delta), taubar(taubar){}
+    double Elam, Lz2, Jz, nu, Delta,taubar, tiny_number;
+    SpheroidalAA_Ractions_struct(Actions_SpheroidalAdiabaticApproximation *AA,double Elam, double Lz2, double Jz, double nu, double Delta,double taubar, double tn)
+        :AA(AA),Elam(Elam), Lz2(Lz2), Jz(Jz), nu(nu), Delta(Delta), taubar(taubar), tiny_number(tn){}
 };
 
 #endif
+// ============================================================================

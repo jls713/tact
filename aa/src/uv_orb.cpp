@@ -1,3 +1,33 @@
+// ============================================================================
+/// \file src/uv_orb.cpp
+// ============================================================================
+/// \author Jason Sanders (and James Binney 2012)
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Axisymmetric Staeckel fudge using Delta estimation from shells
+///
+/// uv_orb: Wraps axisymmetric Staeckel fudge using the Delta estimation
+/// routine from Binney (2014)
+///
+//============================================================================
+
 #include <iostream>
 #include <vector>
 #include <algorithm>

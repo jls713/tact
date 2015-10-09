@@ -1,3 +1,34 @@
+// ============================================================================
+/// \file src/spherical_aa.cpp
+// ============================================================================
+/// \author Jason Sanders
+/// \date 2014-2015
+/// Institute of Astronomy, University of Cambridge (and University of Oxford)
+// ============================================================================
+
+// ============================================================================
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// ============================================================================
+/// \brief Action finding in spherical potentials
+///
+/// In all spherical potentials the actions are J_R, L_z, L-|L_z| where
+/// J_R is a 1D quadrature. Actions_Spherical provides routines for performing
+/// the 1D quadratures.
+///
+//============================================================================
+
 /*======================================*/
 /*Actions, Angles, Frequencies & Hessian*/
 /*======================================*/
@@ -136,12 +167,15 @@ VecDoub Actions_Spherical::angles_and_freqs(const VecDoub &x){
         u = asin(sinu);
     if(SPol[5]>0.)
         u=PI-u;
+
     double Thetat=SPol[1]-u+sign(Lz)*Thetap;
 
     if(ThetaR>2.*PI) ThetaR-=2.*PI;
     if(ThetaR<0.) ThetaR+=2.*PI;
+
     if(Thetap>2.*PI) Thetap-=2.*PI;
     if(Thetap<0.) Thetap+=2.*PI;
+
     if(Thetat>2.*PI) Thetat-=2.*PI;
     if(Thetat<0.) Thetat+=2.*PI;
     if(Thetat<0.) Thetat+=2.*PI;
@@ -196,12 +230,14 @@ void simple_isochrone_orbit_for_movie(void){
         std::cout<<i*0.004<<" "<<QQ[0]<<" "<<QQ[1]<<" "<<PP2[0]<<" "<<PP2[1]<<" "<<PP[0]+fac*2*PI<<" "<<PP[1]<<std::endl;
     }
 }
+// #include "analytic_aa.h"
 
 // int main(){
 //     IsochronePotential Iso(1000000.,3.64);
 //     // NFWSpherical Iso(1000000.,3.64);
 //     Actions_Spherical AS(&Iso);
-//     VecDoub X ={2.67519,1.04903,-3.08583,10.,50.,10.};
+//     Actions_Isochrone AI(1000000.,3.64);
+//     VecDoub X ={0.458705,-0.780193,-0.145687,-97.7602,-148.195,156.642};
 //     // VecDoub X = {-0.779383,0.586109,0.00117222,-0.263395,-0.443456 };
 //     // printVector(AS.actions(X));
 //     // printVector(AS.angles_and_freqs(X));
@@ -217,9 +253,10 @@ void simple_isochrone_orbit_for_movie(void){
 //         // printVector(AS.actions(QQ));
 //         VecDoub PP2 = AS.actions(QQ);
 //         VecDoub PP = AS.angles_and_freqs(QQ);
+//         VecDoub P32 = AI.angles(QQ);
 //         if(PP[0]<PPtmp){PPtmp = PP[0];fac+=1.;}
 //         else PPtmp = PP[0];
-//         std::cout<<i*0.004<<" "<<QQ[0]<<" "<<QQ[1]<<" "<<PP2[0]<<" "<<PP2[1]<<" "<<PP[3]<<" "<<PP[4]<<std::endl;
+//         std::cout<<i*0.004<<" "<<QQ[0]<<" "<<QQ[1]<<" "<<QQ[2]<<" "<<QQ[3]<<" "<<QQ[4]<<" "<<QQ[5]<<" "<<PP2[0]<<" "<<PP2[1]<<" "<<PP[3]<<" "<<PP[4]<<" "<<PP[0]<<" "<<PP[1]<<" "<<PP[2]<<" "<<P32[0]<<" "<<P32[1]<<" "<<P32[2]<<std::endl;
 //         // printVector(AS.Hessian({QQ[3],QQ[4]}));
 //     }
 // }
