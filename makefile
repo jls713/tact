@@ -38,4 +38,4 @@ aa_code:
 	$(MAKE) -C $(AA_DIR)
 
 docs:
-	doxygen doxygen.config
+	doxygen doc/doxygen.config
