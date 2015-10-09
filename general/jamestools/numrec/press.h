@@ -40,7 +40,7 @@ double ran1(long *);
 double gasdev(long *);
 void sort(unsigned long, double*);
 void sort2(unsigned long, double*,double*);
-double probks(double);
+double probks_NR(double);
 double ksone(double*,unsigned long,double (*)(double),double*);
 
 void mrqmin(double*,double*,double*,int,double*,int*,int,double**,

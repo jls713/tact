@@ -23,7 +23,7 @@ NUMRECLIBPATH = $(GENERALPATH)jamestools/numrec/
 JAMESLIBPATH = $(GENERALPATH)jamestools/jamestools/
 POTLIBPATH = ../pot/
 
-TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)WDlib/inc/
+TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
 TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
 
 CUBALIBPATH = -L$(GENERALPATH)cuba
@@ -42,7 +42,7 @@ LIB = $(LIBPATHS) -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) -lpot_js -lcoords \
-	  -lpress_cp -lTorus -lOther -lPot -lWD -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -lblas -ljamestools
+	  -lpress_cp -lTorus -lOther -lPot -lWD -L$(EBFPATH) -lebf_cpp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 

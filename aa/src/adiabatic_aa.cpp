@@ -65,7 +65,7 @@ void Actions_SpheroidalAdiabaticApproximation::make_grids(std::string filename){
 		double Lz2 = Lgrid[nL];Lz2*=Lz2;
 		for(int nR=0; nR<NGRID; nR++){
 			VecDoub xx = {Rgrid[nR],0.,0.1};
-			double a = Pot->DeltaGuess(xx)+CS->gamma();
+			double a = -Pot->DeltaGuess(xx)+CS->gamma();
 			CS->newalpha(a>CS->gamma()?CS->gamma()-0.1:a);
 			double zmax = 1.5+0.25*Rgrid[nR];
 			double Rmax = sqrt(MAX((1.0-zmax*zmax/(Rgrid[nR]*Rgrid[nR]-CS->alpha()+CS->gamma()))*Rgrid[nR]*Rgrid[nR],0.0));
