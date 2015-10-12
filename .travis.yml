@@ -10,7 +10,7 @@ language: cpp
 compiler:
   - gcc
 #  - clang
-script: make -j4
+script: make
 
 # need to install the Boost libraries to the sandbox
 before_script:
