@@ -14,6 +14,8 @@ Code for calculating actions, angles and frequencies in various ways
 * Specify path to gsl in Makefile.inc
 * Run make
 
+This will install the basic package. To access all the features one should also install Torus and LAPACK:
+
 * Some code uses [Torus](https://github.com/PaulMcMillan-Astro/Torus). To use this install Torus, add path to Torus to Makefile.inc and run 'make TORUS=1'
 * Some code uses [LAPACK](http://www.netlib.org/lapack/). To use this install LAPACK, add path to LAPACK to Makefile.inc and run 'make LAPACK=1'
 * To do both run 'make TORUS=1 LAPACK=1'
