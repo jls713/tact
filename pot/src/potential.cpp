@@ -27,7 +27,7 @@
 /*======================================*/
 /* 			    Potential_JS 			*/
 /*======================================*/
-#include <Python.h>
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -152,21 +152,21 @@ double Potential_JS::find_potential_intercept(double Phi0, int direction,double 
 }
 
 // ============================================================================
-// Prolate Stackel Perfect Ellipsoid Potential
+// Oblate Stackel Perfect Ellipsoid Potential
 // ============================================================================
 
-double StackelProlate_PerfectEllipsoid::G(double tau){
+double StackelOblate_PerfectEllipsoid::G(double tau){
 	/* de Zeeuw's G(tau) function */
 	double Gamma = CS->gamma(), sqG =sqrt(-Gamma/(tau+Gamma));
 	return Const*sqG*atan(1./sqG);
 }
-double StackelProlate_PerfectEllipsoid::GPrime(double tau){
+double StackelOblate_PerfectEllipsoid::GPrime(double tau){
 	/* derivative of G wrt tau */
 	double Gamma = CS->gamma(), sqG =sqrt(-Gamma/(tau+Gamma));
 	return 0.5*Const*sqG*sqG*(sqG*atan(1./sqG)/Gamma+1./tau);
 }
 
-VecDoub StackelProlate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
+VecDoub StackelOblate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
 	/* Calculates the derivatives of the Potential_JS wrt tau given tau=(l,v) */
 	double Gl = G(tau[0]), Gv = G(tau[1]), Gamma = CS->gamma();
 	double dVdl = 	(-GPrime(tau[0])*(tau[0]+Gamma)-Gl
@@ -180,7 +180,7 @@ VecDoub StackelProlate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
 }
 
 
-VecDoub StackelProlate_PerfectEllipsoid::Forces(const VecDoub& x){
+VecDoub StackelOblate_PerfectEllipsoid::Forces(const VecDoub& x){
 	/* forces at Cartesian x */
 	VecDoub derivs = CS->derivs(x);
 	VecDoub tau = {derivs[0],derivs[1]};
@@ -193,19 +193,19 @@ VecDoub StackelProlate_PerfectEllipsoid::Forces(const VecDoub& x){
 	return result;
 }
 
-double StackelProlate_PerfectEllipsoid::Phi_tau(const VecDoub& tau){
+double StackelOblate_PerfectEllipsoid::Phi_tau(const VecDoub& tau){
 	/* Potential at tau */
 	double Gamma = CS->gamma();
 	return -((tau[0]+Gamma)*G(tau[0])-(tau[2]+Gamma)*G(tau[2]))/(tau[0]-tau[2]);
 }
 
-double StackelProlate_PerfectEllipsoid::Phi(const VecDoub& x){
+double StackelOblate_PerfectEllipsoid::Phi(const VecDoub& x){
 	/* potential at Cartesian x */
 	VecDoub tau = CS->x2tau(x);
 	return Phi_tau(tau);
 }
 
-VecDoub StackelProlate_PerfectEllipsoid::x2ints(const VecDoub& x, VecDoub *tau){
+VecDoub StackelOblate_PerfectEllipsoid::x2ints(const VecDoub& x, VecDoub *tau){
 	VecDoub Ints = {H(x), 0.5*pow(Lz(x),2.)};
 	if(!tau) (*tau) = CS->xv2tau(x);
 	Ints.push_back(
@@ -534,6 +534,7 @@ VecDoub Hernquist::Forces(const VecDoub& x){
 	Force = Force*(-dpdr/r);
 	return Force;
 }
+#ifdef TORUS
 // ============================================================================
 // GalPot Potential for interface with Walter Dehnen's code
 // ============================================================================
@@ -575,6 +576,7 @@ double GalPot::Vc(double R){
 	return sqrt(R*-Forces({R,0.,0.})[0]);
 }
 
+#endif
 // ============================================================================
 // Bowden NFW Potential
 // ============================================================================
@@ -616,6 +618,7 @@ VecDoub BowdenNFW::Forces(const VecDoub &x){
 }
 // ============================================================================
 
+#ifdef TORUS
 VecDoub torusPSPT2cartvec(PSPT FF){
 	VecDoub X = {FF[0]*cos(FF[2]),FF[0]*sin(FF[2]),FF[1],FF[3]*cos(FF[2])-FF[5]*sin(FF[2]),FF[3]*sin(FF[2])+FF[5]*cos(FF[2]),FF[4]};
 	for(int i=3;i<6;++i)X[i]*=conv::kpcMyr2kms;
@@ -677,7 +680,7 @@ Frequencies WrapperTorusPotential::KapNuOm(            // returns kappa,nu,Om
   epi[0] = sqrt(.5*(dPR-dPR2)/delR+3*tmp);
   return epi;
 }
-
+#endif
 // ============================================================================
 
 // potential.cpp

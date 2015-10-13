@@ -23,7 +23,7 @@
 // ============================================================================
 /// \brief Coordinate systems
 ///
-/// 1. Implements prolate spheroidal coordinate systems (UVOblateSpheroidCoordSys and OblateSpheroidCoordSys)
+/// 1. Implements prolate spheroidal coordinate systems (UVProlateSpheroidCoordSys and ProlateSpheroidCoordSys)
 /// 2. Implements full ellipsoidal coordinate system
 ///
 //=============================================================================
@@ -37,16 +37,16 @@
 
 //=============================================================================
 /*! Prolate spheroidal coordinate system using u, v coordinates */
-class UVOblateSpheroidCoordSys{
+class UVProlateSpheroidCoordSys{
 	// (u,v) coords
 	private:
 		double Delta, Delta2; /*! focal length and its square */
 	public:
-		//! UVOblateSpheroidCoordSys constructor.
+		//! UVProlateSpheroidCoordSys constructor.
 		/*!
 			\param Delta -- focal length
 		*/
-		UVOblateSpheroidCoordSys(double Delta): Delta(Delta),Delta2(Delta*Delta){}
+		UVProlateSpheroidCoordSys(double Delta): Delta(Delta),Delta2(Delta*Delta){}
 		/*! output focal length */
 		inline double delta(void){ return Delta;}
 		//! convert x to prolate spheroidal coordinates
@@ -65,17 +65,17 @@ class UVOblateSpheroidCoordSys{
 /*! Prolate spheroidal coordinate system using lambda, nu coordinates
 	Delta = sqrt(Gamma-Alpha)
 */
-class OblateSpheroidCoordSys{
+class ProlateSpheroidCoordSys{
 	// (lam,nu) coords
 	private:
 		double Alpha; 		/*! coordinate system parameter Alpha 		*/
 		const double Gamma; /*! coordinate system parameter Gamma = -1. */
 	public:
-		//! OblateSpheroidCoordSys constructor.
+		//! ProlateSpheroidCoordSys constructor.
 		/*!
 			\param Alpha -- coord sys param. focal length, Delta = sqrt(Gamma-Alpha)
 		*/
-		OblateSpheroidCoordSys(double alpha): Alpha(alpha), Gamma(-1.){}
+		ProlateSpheroidCoordSys(double alpha): Alpha(alpha), Gamma(-1.){}
 		inline double alpha(void){ return Alpha;}
 		inline double gamma(void){ return Gamma;}
 		/*! reset Alpha */

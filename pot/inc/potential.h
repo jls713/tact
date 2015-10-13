@@ -60,11 +60,14 @@
 #include <algorithm>
 #include <memory>
 #include <cmath>
-#include "falPot.h"
 #include "coordsys.h"
 #include "coordtransforms.h"
 #include "GSLInterface/GSLInterface.h"
+
+#ifdef TORUS
+#include "falPot.h"
 #include "Torus.h"
+#endif
 
 //============================================================================
 /// General base class for Potential_JS
@@ -534,6 +537,7 @@ class Bulge: public Potential_JS{
 		VecDoub Forces(const VecDoub& x);
 };
 
+#ifdef TORUS
 //============================================================================
 /// Wrapper for potentials produced by the GalPot code
 //============================================================================
@@ -557,6 +561,7 @@ class GalPot: virtual public Potential_JS{
 		VecDoub freqs(double R);
 		GalaxyPotential *PWD(){return PhiWD;}
 };
+#endif
 //============================================================================
 
 //============================================================================
@@ -717,6 +722,7 @@ public:
 	VecDoub Forces(const VecDoub& x);
 };
 
+#ifdef TORUS
 template<class c>
 void vec2torus(VecDoub a, c &C){
 	C[0]=a[0];C[2]=a[1];C[1]=a[2];
@@ -737,6 +743,6 @@ class WrapperTorusPotential: public Potential{
     double LfromRc(const double R, double* dR=0) const;
 
 };
-
+#endif
 // potential.h
 #endif

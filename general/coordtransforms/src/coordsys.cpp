@@ -23,7 +23,7 @@
 // ============================================================================
 /// \brief Coordinate systems
 ///
-/// 1. Implements prolate spheroidal coordinate systems (UVOblateSpheroidCoordSys and OblateSpheroidCoordSys)
+/// 1. Implements prolate spheroidal coordinate systems (UVProlateSpheroidCoordSys and ProlateSpheroidCoordSys)
 /// 2. Implements full ellipsoidal coordinate system
 ///
 //=============================================================================
@@ -41,10 +41,10 @@
 #include "coordsys.h"
 
 // ============================================================================
-// (u,v) Oblate Spheroidal Coordinate System
+// (u,v) Prolate Spheroidal Coordinate System
 // ============================================================================
 
-VecDoub UVOblateSpheroidCoordSys::xv2uv(const VecDoub& X){
+VecDoub UVProlateSpheroidCoordSys::xv2uv(const VecDoub& X){
 	/* Calculates (u,v) given Cartesian x */
 	assert(X.size()==6);
  	double R2 = X[0]*X[0]+X[1]*X[1], phi = atan2(X[1],X[0]);
@@ -62,7 +62,7 @@ VecDoub UVOblateSpheroidCoordSys::xv2uv(const VecDoub& X){
     return {u,phi,v,pu,vp,pv,shu2,sv2};
 }
 
-VecDoub UVOblateSpheroidCoordSys::uv2Rz(const VecDoub& uv){
+VecDoub UVProlateSpheroidCoordSys::uv2Rz(const VecDoub& uv){
 	/* Calculates Cartesian x given (u,v)*/
 	assert(uv.size()==2);
 	return {(uv[1]==0. || uv[1]==PI)?0.:Delta*sinh(uv[0])*sin(uv[1]),
@@ -70,10 +70,10 @@ VecDoub UVOblateSpheroidCoordSys::uv2Rz(const VecDoub& uv){
 }
 
 // ============================================================================
-// Oblate Spheroidal Coordinate System
+// Prolate Spheroidal Coordinate System
 // ============================================================================
 
-VecDoub OblateSpheroidCoordSys::x2tau(const VecDoub& x){
+VecDoub ProlateSpheroidCoordSys::x2tau(const VecDoub& x){
 	/* Calculates tau given Cartesian x */
  	double R2 = x[0]*x[0]+x[1]*x[1];
  	double b = Alpha+Gamma-R2-x[2]*x[2];
@@ -85,7 +85,7 @@ VecDoub OblateSpheroidCoordSys::x2tau(const VecDoub& x){
  	return tau;
 }
 
-VecDoub OblateSpheroidCoordSys::tau2polar(const VecDoub& tau){
+VecDoub ProlateSpheroidCoordSys::tau2polar(const VecDoub& tau){
 	/* Calculates x given tau */
  	double R = sqrt((tau[0]+Alpha)*(tau[2]+Alpha)/(Alpha-Gamma));
  	double z = sqrt((tau[0]+Gamma)*(tau[2]+Gamma)/(Gamma-Alpha));
@@ -93,7 +93,7 @@ VecDoub OblateSpheroidCoordSys::tau2polar(const VecDoub& tau){
  	return X;
 }
 
-VecDoub OblateSpheroidCoordSys::tau2x(const VecDoub& tau){
+VecDoub ProlateSpheroidCoordSys::tau2x(const VecDoub& tau){
 	/* Calculates x given tau */
 	VecDoub pol(3,0.);
 	pol[0] = sqrt((tau[0]+Alpha)*(tau[2]+Alpha)/(Alpha-Gamma));
@@ -102,7 +102,7 @@ VecDoub OblateSpheroidCoordSys::tau2x(const VecDoub& tau){
  	return pol;
 }
 
-VecDoub OblateSpheroidCoordSys::xv2tau(const VecDoub& x){
+VecDoub ProlateSpheroidCoordSys::xv2tau(const VecDoub& x){
 	/* Calculates tau & tau_dot given Cartesian (x,v) */
 	double R2 = x[0]*x[0]+x[1]*x[1];
   	double b = Alpha+Gamma-R2-x[2]*x[2];
@@ -119,7 +119,7 @@ VecDoub OblateSpheroidCoordSys::xv2tau(const VecDoub& x){
 	return tau;
 }
 
-VecDoub OblateSpheroidCoordSys::derivs(const VecDoub& x){
+VecDoub ProlateSpheroidCoordSys::derivs(const VecDoub& x){
 	/* Calculates tau & derivatives of tau wrt to R and z given Cartesian x */
 
 	double Rsq=x[0]*x[0]+x[1]*x[1], zsq=x[2]*x[2], A=-Alpha-Gamma+Rsq+zsq,
@@ -134,7 +134,7 @@ VecDoub OblateSpheroidCoordSys::derivs(const VecDoub& x){
 
 	return derivs;
 }
-VecDoub OblateSpheroidCoordSys::tau2p(const VecDoub& tau){
+VecDoub ProlateSpheroidCoordSys::tau2p(const VecDoub& tau){
 	/* Calculates p(tau) given 6D tau vector */
 	double P2 = (tau[0]-tau[2])/(4.*(tau[0]+Alpha)*(tau[0]+Gamma));
 	double R2 = (tau[2]-tau[0])/(4.*(tau[2]+Alpha)*(tau[2]+Gamma));

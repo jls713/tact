@@ -22,7 +22,7 @@ $(OBJ)%.o : $(SRC)%.cpp
 	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC)
 
 libcoords.so: $(OBJECTS)
-	$(CCOMPILER) -shared $(OPTS) -o libcoords.so -Wl,-soname,libcoords.so $(OPTS) $(OBJECTS) $(INC)
+	$(CCOMPILER) -shared $(OPTS) -o libcoords.so -Wl,-$(LIBNAME),libcoords.so $(OPTS) $(OBJECTS) $(INC) -lgsl -lgslcblas
 
 clean:
 	rm -rf obj/*.o; rm -rf *.so; rm -rf *.exe
