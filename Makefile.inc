@@ -10,8 +10,8 @@
 CCOMPILER=/opt/ioa/software/gcc/4.7.2/bin/g++
 GSLPATH = /opt/ioa/software/gsl/1.16/
 LAPACKPATH = general/lapack/
-TORUSPATH = /home/jls/work/code/Torus/
-EBFPATH = /home/jls/work/code/Torus/libebf_c_cpp-0.0.3/
+TORUSPATH = /home/jls/work/code/Torus_github/Torus/
+EBFPATH = /data/jls/libebf_c_cpp-0.0.3/
 
 ####################################################################
 DEBUG = -ggdb3 #-ffast-math -Ofast

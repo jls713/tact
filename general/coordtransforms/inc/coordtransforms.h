@@ -21,11 +21,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ============================================================================
-/// \brief Coordinate Transformations
-///
-/// 1. Contains definitions of constants and conventions
-/// 2. Contains Transformations between different coordinate systems
-///
+/*! \brief Coordinate Transformations
+ *
+ *  1. Contains definitions of constants and conventions
+ *  2. Contains Transformations between different coordinate systems
+ */
 //=============================================================================
 
 #ifndef COORDTRANSFORMS_H

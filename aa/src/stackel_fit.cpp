@@ -45,14 +45,15 @@
 #include "debug.h"
 #include "orbit.h"
 #include "stackel_fit.h"
-#include "cubature/cubature.h"
+#include "cuba/cuba.h"
 #include "stackel_aa.h"
 #include "aa.h"
 
 struct chi_integrals{
     Stackel_Fitted_Potential *SFP;
     double tau;
-    chi_integrals(Stackel_Fitted_Potential *SFP, double tau): SFP(SFP), tau(tau){};
+    VecDoub x2min,x2max;
+    chi_integrals(Stackel_Fitted_Potential *SFP, double tau,VecDoub x2min={0.}, VecDoub x2max={0.}): SFP(SFP), tau(tau),x2min(x2min),x2max(x2max){};
 };
 
 static double *dmatrix(int n){// creates array of length n and fills with zeroes
@@ -61,10 +62,13 @@ static double *dmatrix(int n){// creates array of length n and fills with zeroes
     return m1;
 }
 
-static int ChiBarIntCubature(unsigned ndim, const double *x, void *fdata, unsigned fdim, double *fval) {
+static int ChiBarIntCubature(const int ndim[],const double y[], const int*fdim, double fval[], void *fdata) {
     chi_integrals * SFP = (chi_integrals *) fdata;
-    // interface to integrand for chibar for use with cubature code
-    fval[0] = SFP->SFP->chibarint(x[0],x[1]);
+    double y2[2];
+    for(int i=0;i<2;i++)
+        y2[i]=(SFP->x2max[i]-SFP->x2min[i])*y[i]+SFP->x2min[i];
+     // interface to integrand for chibar for use with cuba code
+    fval[0] = SFP->SFP->chibarint(y2[0],y2[1]);
     return 0;
 }
 
@@ -294,14 +298,19 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
     L = (1./(cl-1.))*(pow(limits[0]+B,-(cl-1))-pow(limits[1]+B,-(cl-1)));
     N = (pow((limits[3]+gamma()),cv+1)-pow((limits[2]+gamma()),cv+1))/((cv+1.)*pow(fabs(gamma()-alpha()),cv));
 
-    double xmin[2] = {limits[0],limits[2]}, xmax[2] = {limits[1],limits[3]}, val, err;
+    VecDoub xmin = {limits[0],limits[2]}, xmax = {limits[1],limits[3]};
+    double integral[1],error[1],prob[1];
 
-    chi_integrals SFP(this,0.);
+    chi_integrals SFP(this,0.,xmin,xmax);
+    double prod = 1.;int neval,fail,nregions;
+    for(int i=0;i<2;i++) prod*=(SFP.x2max[i]-SFP.x2min[i]);
 
-    hcubature(1, ChiBarIntCubature, &SFP,2, xmin,xmax, 1000, 0, 1e-6,
-          ERROR_INDIVIDUAL,
-          &val, &err);
-    chibar = val/(L*N);
+    Cuhre(2,1,ChiBarIntCubature,&SFP,1,1e-6,0,0,
+    MINEVAL, MAXEVAL, 0, STATEFILE,SPIN,
+    &nregions, &neval, &fail, integral, error, prob);
+
+    integral[0]*=prod;
+    chibar = integral[0]/(L*N);
 
     // Grids for interpolation
     lambdagrid=dmatrix(DATAPOINTS);

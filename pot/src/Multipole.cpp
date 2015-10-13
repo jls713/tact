@@ -34,7 +34,6 @@
 #include "potential.h"
 #include "GSLInterface/GSLInterface.h"
 #include "Multipole.h"
-#include "cubature/cubature.h"
 #include "gnuplot/gnuplot_i.h"
 // =====
 // NOTE: cuba and openmp don't like each other so must set CUBACORES=0

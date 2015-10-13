@@ -37,11 +37,12 @@
 
 #include "utils.h"
 #include "potential.h"
+#include "aa.h"
 
 // ============================================================================
 /*! Potential class that finds the best-fitting Staeckel potential to a
     axisymmetric potential */
-class Stackel_Fitted_Potential: public StackelProlate_PerfectEllipsoid{
+class Stackel_Fitted_Potential: public StackelOblate_PerfectEllipsoid{
     private:
         const int DATAPOINTS = 40; /*< Number of gridpoints             */
         const int STEPMAX = 300;   /*< Max number of integrations       */
@@ -76,7 +77,7 @@ class Stackel_Fitted_Potential: public StackelProlate_PerfectEllipsoid{
 
         */
         Stackel_Fitted_Potential(Potential_JS *TruePot)
-            :StackelProlate_PerfectEllipsoid(10.,-30.),TruePot(TruePot){
+            :StackelOblate_PerfectEllipsoid(10.,-30.),TruePot(TruePot){
                 Orb = std::unique_ptr<Orbit>(new Orbit(TruePot,1e-8));
             };
         //! Stackel_Fitted_Potential destructor.

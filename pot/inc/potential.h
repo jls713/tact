@@ -738,5 +738,26 @@ class WrapperTorusPotential: public Potential{
 
 };
 
+#ifdef GALPY
+#include <galpy_potentials.h>
+
+/*! Galpy wrapper -- adapted from Bovy */
+class galpyPotential_JS : public Potential_JS {
+	int nargs;
+	struct potentialArg * potentialArgs;
+	void  error(const char*) const;
+	public:
+		galpyPotential(int,struct potentialArg *);
+		double Phi(const VecDoub& x);
+		VecDoub Forces(const VecDoub& x);
+};
+
+inline galpyPotential::galpyPotential(int na,
+				      struct potentialArg * inPotentialArgs) :
+		      nargs(na), potentialArgs(inPotentialArgs)
+{
+parse_actionAngleArgs(nargs,potentialArgs,pot_type,pot_args,false);
+}
+#endif
 // potential.h
 #endif

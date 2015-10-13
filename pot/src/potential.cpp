@@ -155,18 +155,18 @@ double Potential_JS::find_potential_intercept(double Phi0, int direction,double 
 // Prolate Stackel Perfect Ellipsoid Potential
 // ============================================================================
 
-double StackelProlate_PerfectEllipsoid::G(double tau){
+double StackelOblate_PerfectEllipsoid::G(double tau){
 	/* de Zeeuw's G(tau) function */
 	double Gamma = CS->gamma(), sqG =sqrt(-Gamma/(tau+Gamma));
 	return Const*sqG*atan(1./sqG);
 }
-double StackelProlate_PerfectEllipsoid::GPrime(double tau){
+double StackelOblate_PerfectEllipsoid::GPrime(double tau){
 	/* derivative of G wrt tau */
 	double Gamma = CS->gamma(), sqG =sqrt(-Gamma/(tau+Gamma));
 	return 0.5*Const*sqG*sqG*(sqG*atan(1./sqG)/Gamma+1./tau);
 }
 
-VecDoub StackelProlate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
+VecDoub StackelOblate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
 	/* Calculates the derivatives of the Potential_JS wrt tau given tau=(l,v) */
 	double Gl = G(tau[0]), Gv = G(tau[1]), Gamma = CS->gamma();
 	double dVdl = 	(-GPrime(tau[0])*(tau[0]+Gamma)-Gl
@@ -180,7 +180,7 @@ VecDoub StackelProlate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
 }
 
 
-VecDoub StackelProlate_PerfectEllipsoid::Forces(const VecDoub& x){
+VecDoub StackelOblate_PerfectEllipsoid::Forces(const VecDoub& x){
 	/* forces at Cartesian x */
 	VecDoub derivs = CS->derivs(x);
 	VecDoub tau = {derivs[0],derivs[1]};
@@ -193,19 +193,19 @@ VecDoub StackelProlate_PerfectEllipsoid::Forces(const VecDoub& x){
 	return result;
 }
 
-double StackelProlate_PerfectEllipsoid::Phi_tau(const VecDoub& tau){
+double StackelOblate_PerfectEllipsoid::Phi_tau(const VecDoub& tau){
 	/* Potential at tau */
 	double Gamma = CS->gamma();
 	return -((tau[0]+Gamma)*G(tau[0])-(tau[2]+Gamma)*G(tau[2]))/(tau[0]-tau[2]);
 }
 
-double StackelProlate_PerfectEllipsoid::Phi(const VecDoub& x){
+double StackelOblate_PerfectEllipsoid::Phi(const VecDoub& x){
 	/* potential at Cartesian x */
 	VecDoub tau = CS->x2tau(x);
 	return Phi_tau(tau);
 }
 
-VecDoub StackelProlate_PerfectEllipsoid::x2ints(const VecDoub& x, VecDoub *tau){
+VecDoub StackelOblate_PerfectEllipsoid::x2ints(const VecDoub& x, VecDoub *tau){
 	VecDoub Ints = {H(x), 0.5*pow(Lz(x),2.)};
 	if(!tau) (*tau) = CS->xv2tau(x);
 	Ints.push_back(
@@ -678,6 +678,27 @@ Frequencies WrapperTorusPotential::KapNuOm(            // returns kappa,nu,Om
   return epi;
 }
 
-// ============================================================================
+#ifdef GALPY
+// Implementation
+void  galpyPotential_JS::error(const char* msgs) const
+{
+  cerr << " Error in class galpyPotential_JS: " << msgs << '\n';
+  exit(1);
+}
 
+double galpyPotential_JS::Phi (const VecDoub&x)
+{
+	double R = sqrt(x[0]*x[0]+x[1]*x[1]);
+	return evaluatePotentials(R,x[2],nargs,potentialArgs);
+}
+
+VecDoub galpyPotential_JS::Forces (const VecDoub&x)
+{
+	double R = sqrt(x[0]*x[0]+x[1]*x[1]);
+	dPdR= calcRforce(R,x[2],0.,0.,nargs,potentialArgs);
+	dPdz= calczforce(R,x[2],0.,0.,nargs,potentialArgs);
+	return {dPdR*x/R,dPdR*y/R,dPdz};
+}
+// ============================================================================
+#endif
 // potential.cpp
