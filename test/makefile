@@ -83,7 +83,7 @@ $(OBJ)%.o : %.cpp ${HEADERS}
 ## TESTS
 
 tests.exe: $(OBJ)test.o
-	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(LIBPY) $(CUBA) -L$(GTESTLIB) -lgtest -Wl,-R,$(GTESTLIB)
+	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(LIBPY) $(CUBA) -L../ -L$(GTESTLIB) -lgtest -Wl,-R,$(GTESTLIB)
 
 .PHONY: clean
 clean:
