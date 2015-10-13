@@ -372,7 +372,7 @@ class bracketer{
 		void shift(f a,f b,f c,f d){ a=b; b=c; c=d;}
 	public:
 		int bracket(double *ax, double *bx, double *cx, double *fa, double *fb, double *fc, double (*func)(double, void*), void*params,int NMAX=100){
-			double ulim,u,r,q,fu,dum;
+			double ulim,u,r,q,fu,dum=0.;
 
 			*fa=(*func)(*ax,params);
 			*fb=(*func)(*bx,params);
