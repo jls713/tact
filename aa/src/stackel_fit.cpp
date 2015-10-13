@@ -45,7 +45,7 @@
 #include "debug.h"
 #include "orbit.h"
 #include "stackel_fit.h"
-#include "cubature/cubature.h"
+#include "cuba/cuba.h"
 #include "stackel_aa.h"
 #include "aa.h"
 

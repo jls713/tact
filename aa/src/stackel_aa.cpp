@@ -1323,7 +1323,7 @@ VecDoub Actions_TriaxialStackel_Fudge::angles(const VecDoub& x, void *params){
 }
 
 double Actions_TriaxialStackel_Fudge::sos(const VecDoub& x, int comp, const std::string& file){
-	std::ofstream outfile; outfile.open(file, ios::app);
+	std::ofstream outfile; outfile.open(file, std::ios::app);
 	outfile<<x[comp]/*sqrt(x[0]*x[0]+x[1]*x[1]/0.95/0.95+x[2]*x[2]/0.85/0.85)*/<<" "<<x[comp+3]<<std::endl;
 
 	VecDoub tau = CS->xv2tau(x);
