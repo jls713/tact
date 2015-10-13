@@ -42,15 +42,16 @@ INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include
 
 INCPY = -I$(PYTHONINCPATH) -I$(BOOSTINCPATH)
 
-LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
-		   -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
-		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH)
+LIBPATHS =  -Wl,-rpath=$(POTLIBPATH)
+# -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
+		   # -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
+		   # -Wl,-R$(GSLPATH)lib/ -Wl,-R$(CTPATH)
 
-LIB = $(LIBPATHS) -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
+LIB = -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) $(TORUSLIBS) -lpot_js -lcoords \
-	  -lpress_cp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools $(TORUSFLAG)
+	  -lpress_cp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools $(TORUSFLAG) $(LIBPATHS)
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 
@@ -66,7 +67,7 @@ FALCONLIB = -L$(FALCONPATH)lib/ -lfalcON.P -L$(FALCONPATH)utils/lib/ -lWDutils -
 
 LIBRARY = libaa.so
 
-OBJECTS = $(OBJ)debug.o $(OBJ)spherical_aa.o $(OBJ)stackel_aa.o  $(OBJ)get_closed_Rz.o $(OBJ)uv_orb.o $(OBJ)lmn_orb.o $(OBJ)stackel_fit.o $(OBJ)analytic_aa.o $(OBJ)genfunc_aa.o $(OBJ)adiabatic_aa.o $(OBJ)tables_aa.o
+OBJECTS = $(OBJ)utils.o $(OBJ)debug.o $(OBJ)spherical_aa.o $(OBJ)stackel_aa.o  $(OBJ)get_closed_Rz.o $(OBJ)uv_orb.o $(OBJ)lmn_orb.o $(OBJ)stackel_fit.o $(OBJ)analytic_aa.o $(OBJ)genfunc_aa.o $(OBJ)adiabatic_aa.o $(OBJ)tables_aa.o
 ifeq ($(TORUS), 1)
 	OBJECTS += $(OBJ)it_torus.o
 endif
@@ -84,6 +85,9 @@ forceall: clean all
 
 $(OBJ)aa_py.o : $(SRC)aa_py.cpp ${HEADERS}
 	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(INCPY) $(TORUSFLAG)
+
+$(OBJ)utils.o : ../general/utils.cpp ${HEADERS}
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
 
 $(OBJ)%.o : $(SRC)%.cpp ${HEADERS}
 	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
@@ -126,13 +130,13 @@ lmnnew_test.exe: $(OBJECTS)
 ## LIBRARY
 
 lib/libaa.so: $(OBJECTS)
-	$(CCOMPILER) -fPIC -shared $(CFL) $(OBJECTS) $(INC) -o lib/libaa.so
+	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -o lib/libaa.so
 
 triax_py.so: $(OBJECTS) $(OBJ)triax_py.o
-	$(CCOMPILER) -fPIC -shared $(CFL) $(OBJECTS) $(OBJ)triax_py.o $(INC) $(LIB)  -o triax_py.so
+	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(OBJ)triax_py.o $(INC) $(LIB)  -o triax_py.so
 
 lib/aa_py.so: $(OBJECTS) $(OBJ)aa_py.o
-	$(CCOMPILER) -fPIC -shared $(OPTS) $(OBJECTS) $(OBJ)aa_py.o $(INC) $(LIB) $(LIBPY) $(CUBA) -o lib/aa_py.so
+	$(CCOMPILER) -fPIC $(LIBFLAG) $(OPTS) $(OBJECTS) $(OBJ)aa_py.o $(INC) $(LIB) $(LIBPY) $(CUBA) -o lib/aa_py.so
 
 ## OTHER
 
