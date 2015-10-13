@@ -78,9 +78,9 @@ TEST(ActionTest,StackelFit){
   VecDoub AngsTrue = {1.8104951133863227,6.0951452351556137,6.1521997033776064,39.443007528837896,27.741995155048556,30.810000871423856};
   // VecDoub Angs = AA.angles(X);
   VecDoub Acs = AA.actions(X);
-  EXPECT_DOUBLE_EQ(ActsTrue[0],Acs[0]);
-  EXPECT_DOUBLE_EQ(ActsTrue[1],Acs[1]);
-  EXPECT_DOUBLE_EQ(ActsTrue[2],Acs[2]);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],1e-10);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],1e-10);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],1e-10);
   // EXPECT_DOUBLE_EQ(AngsTrue[0],Angs[0]);
   // EXPECT_DOUBLE_EQ(AngsTrue[1],Angs[1]);
   // EXPECT_DOUBLE_EQ(AngsTrue[2],Angs[2]);
