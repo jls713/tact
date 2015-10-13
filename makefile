@@ -8,8 +8,9 @@ NR_DIR = general/jamestools/numrec
 JT_DIR = general/jamestools/jamestools
 OCTINT_DIR = general/jamestools/octint
 GNUPLOT_DIR = general/gnuplot
+TEST_DIR = test/
 
-.PHONY: aa_code ct_code pot_code cuba_code octint_code jt_code nr_code gnuplot_code
+.PHONY: aa_code ct_code pot_code cuba_code octint_code jt_code nr_code gnuplot_code test
 
 all: cuba_code ct_code jt_code nr_code octint_code gnuplot_code pot_code aa_code
 
@@ -36,6 +37,9 @@ pot_code:
 
 aa_code:
 	$(MAKE) -C $(AA_DIR)
+
+test:
+	$(MAKE) -C $(TEST_DIR)
 
 docs:
 	doxygen doc/doxygen.config

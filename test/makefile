@@ -74,15 +74,14 @@ forceall: clean all
 #------------------------------------------------------
 
 $(OBJ)%.o : %.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) -I$(GTESTINC)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) -I$(GTESTINC) $(TORUSFLAG) $(LAPACKFLAG)
 
 #------------------------------------------------------
 
 ## TESTS
 
 tests.exe: $(OBJ)test.o
-	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(CUBA) -L$(GTESTLIB) -lgtest
-	# -Wl,-R,$(GTESTLIB)
+	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(CUBA) -L$(GTESTLIB) -lgtest $(TORUSFLAG) $(LAPACKFLAG)
 
 .PHONY: clean
 clean:
