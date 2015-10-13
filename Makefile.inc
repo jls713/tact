@@ -61,7 +61,7 @@ PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 ####################################################################
 ## Compiler flags
 DEBUG = -ggdb3 #-ffast-math -Ofast
-OPTS = -std=c++0x -Wall -O2 -fopenmp -fPIC
+OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC
 
 ####################################################################
 
