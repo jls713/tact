@@ -79,7 +79,7 @@ double linterp3d(double ***f,double *xm,int nx,double *ym,int ny,double *zm,
 		+f[topx][topy][botz]*dx*dy*dzb + f[topx][topy][topz]*dx*dy*dz;
 }
 double trapzd(double (*func)(double), double a, double b,double *s,int *it, int n){
-	double x,tnm,sum,del;
+	double x,sum,del;
 	int j;
 	if (n == 0) {
 		*s=0.5*(b-a)*((*func)(a)+(*func)(b));
@@ -115,7 +115,7 @@ double qsimp(double (*func)(double), double a, double b){
 #undef JMAX
 
 double trapzdi(double (*func)(double), double a, double b,double *s,int *it, int n){
-	double x,tnm,sum,del;
+	double x,sum,del;
 	int j;
 	if (n == 0) {
 		*s=0.5*(b-a)*((*func)(a)+(*func)(b));
@@ -413,7 +413,7 @@ void rkqs(double *y,double *dydx,int N,double *x,double htry,double eps,
 
 double zbrent(double (*func)(double,void*), double x1, double x2,double fa,double fb,double tol,int itmax,void* params){
 	int iter;
-	double a=x1,b=x2,c=x2,d,e,min1,min2;
+	double a=x1,b=x2,c=x2,d,e=0.,min1,min2;
 	double fc,p,q,r,s,tol1,xm;
 
 	if ((fa > 0.0 && fb > 0.0) || (fa < 0.0 && fb < 0.0)){
@@ -842,7 +842,7 @@ double kstwo(double *data1, unsigned long n1, double *data2, unsigned long n2, d
 	double probks_NR(double alam);
 	void sort(unsigned long n, double *arr);
 	unsigned long j1=0,j2=0;
-	double dt,en1,en2,d1,d2,fn1,fn2;
+	double dt,en1,en2,d1,d2,fn1=0.,fn2=0.;
 
 	sort(n1,data1);sort(n2,data2);
 	en1=n1;en2=n2;

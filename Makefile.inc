@@ -8,7 +8,8 @@ CCOMPILER=$(CXX)
 
 ## 3. You will need to set the path to gsl
 
-GSLPATH =/usr/local/Cellar/gsl/1.16/
+GSLPATH =/opt/ioa/software/gsl/1.16/
+<!-- GSLPATH =/usr/local/Cellar/gsl/1.16/ -->
 
 ####################################################################
 ## Optional
