@@ -6,15 +6,17 @@ Code for calculating actions, angles and frequencies in various ways
 
 ## Requirements
 
-1. [Torus](https://github.com/PaulMcMillan-Astro/Torus)
-2. [LAPACK](http://www.netlib.org/lapack/)
-3. [gsl](http://www.gnu.org/software/gsl/)
+1. [gsl](http://www.gnu.org/software/gsl/)
 
 ## Installation
 
-* Specify compiler path in Makefile.inc (need a C++-11 compatible compiler, currently compiles with g++ 4.9)
-* Specify path to Torus, LAPACK and gsl in Makefile.inc
+* Make sure environment variable $(CXX) gives c++ compiler or specify compiler path in Makefile.inc (need a C++-11 compatible compiler, currently compiles with g++ 4.9)
+* Specify path to gsl in Makefile.inc
 * Run make
+
+* Some code uses [Torus](https://github.com/PaulMcMillan-Astro/Torus). To use this install Torus, add path to Torus to Makefile.inc and run 'make TORUS=1'
+* Some code uses [LAPACK](http://www.netlib.org/lapack/). To use this install LAPACK, add path to LAPACK to Makefile.inc and run 'make LAPACK=1'
+* To do both run 'make TORUS=1 LAPACK=1'
 
 ## Methods
 

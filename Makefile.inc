@@ -62,8 +62,16 @@ else
 	TORUSFLAG=
 endif
 
+ifeq ($(LAPACK),1)
+	LACPAKFLAG=-DLAPACK
+else
+	LAPACKFLAG=
+endif
+
 export TORUSFLAG
 export TORUS
+export LAPACK
+export LAPACKFLAG
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)

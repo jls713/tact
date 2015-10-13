@@ -44,7 +44,9 @@
 #include "genfunc_aa.h"
 #include "debug.h"
 #include "orbit.h"
-
+#ifndef LAPACK
+#include <gsl/gsl_linalg.h>
+#endif
 // ============================================================================
 // Action calculation using generating function from orbit integration
 // ============================================================================
@@ -379,6 +381,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         if(finer_sampling and longer_int_window) break;
     }
 
+    #ifdef LAPACK
     // Now we use LAPACK to solve
     char uplo = 'U'; // shape of matrix a ==> Upper triangular
     int nrhs = 1;    // width of b
@@ -386,6 +389,32 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     int info;        // error report -- info=0 ==> successful
     int ipiv[N_SIZE];// indicates what has been switched around in factorize
     dspsv_(&uplo, &N_SIZE, &nrhs, & *a.begin(), ipiv, & *b.begin(), &LDB,&info);
+    #else
+
+    VecDoub a_data(N_SIZE*N_SIZE,0.);
+    int k=0;
+    for(int i=0;i<N_SIZE;++i)
+    for(int j=i;j<N_SIZE;++j){
+        a_data[i*N_SIZE+j]=a[k];
+        a_data[j*N_SIZE+i]=a_data[i*N_SIZE+j];
+        k++;
+    }
+    gsl_matrix_view m
+        = gsl_matrix_view_array (&a_data[0], N_SIZE, N_SIZE);
+
+    gsl_vector_view bout
+        = gsl_vector_view_array (&b[0], N_SIZE);
+
+    gsl_vector *XX = gsl_vector_alloc (N_SIZE);
+    int s;
+    gsl_permutation * p = gsl_permutation_alloc (N_SIZE);
+    gsl_linalg_LU_decomp (&m.matrix, p, &s);
+    gsl_linalg_LU_solve (&m.matrix, p, &bout.vector, XX);
+    gsl_permutation_free (p);
+    for(unsigned i=0;i<6;++i)b[i]=gsl_vector_get(XX,i);
+    gsl_vector_free (XX);
+
+    #endif
 
     // Now check the results
 
@@ -651,6 +680,7 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
         if(finer_sampling and longer_int_window) break;
     }
 
+    #ifdef LAPACK
     // Now we use LAPACK to solve
     char uplo = 'U'; // shape of matrix a ==> Upper triangular
     int nrhs = 1;    // width of b
@@ -658,6 +688,33 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
     int info;        // error report -- info=0 ==> successful
     int ipiv[N_SIZE];// indicates what has been switched around in factorize
     dspsv_(&uplo, &N_SIZE, &nrhs, & *a.begin(), ipiv, & *b.begin(), &LDB,&info);
+    #else
+
+    VecDoub a_data(N_SIZE*N_SIZE,0.);
+    int k=0;
+    for(int i=0;i<N_SIZE;++i)
+    for(int j=i;j<N_SIZE;++j){
+        a_data[i*N_SIZE+j]=a[k];
+        a_data[j*N_SIZE+i]=a_data[i*N_SIZE+j];
+        k++;
+    }
+    gsl_matrix_view m
+        = gsl_matrix_view_array (&a_data[0], N_SIZE, N_SIZE);
+
+    gsl_vector_view bout
+        = gsl_vector_view_array (&b[0], N_SIZE);
+
+    gsl_vector *XX = gsl_vector_alloc (N_SIZE);
+    int s;
+    gsl_permutation * p = gsl_permutation_alloc (N_SIZE);
+    gsl_linalg_LU_decomp (&m.matrix, p, &s);
+    gsl_linalg_LU_solve (&m.matrix, p, &bout.vector, XX);
+    gsl_permutation_free (p);
+    for(unsigned i=0;i<6;++i)b[i]=gsl_vector_get(XX,i);
+    gsl_vector_free (XX);
+
+    #endif
+
 
     // Now check the results
 
