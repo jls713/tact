@@ -10,13 +10,16 @@ forceall:	clean all
 SRC = src/
 POT = pot/
 OBJ = obj/
-OBJECTS = $(OBJ)coordtransforms.o $(OBJ)coordsys.o
+OBJECTS = $(OBJ)coordtransforms.o $(OBJ)coordsys.o $(OBJ)utils.o
 
 #------------------------------------------------------
 
 INC = -Iinc/ -I../ -I. -I$(GSLPATH)include/
 
 #------------------------------------------------------
+
+$(OBJ)utils.o : ../utils.cpp
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC)
 
 $(OBJ)%.o : $(SRC)%.cpp
 	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC)

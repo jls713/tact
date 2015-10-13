@@ -156,8 +156,8 @@ private:
     double GM, rs;
     VecDoub a;
 public:
-    TestDensity_NFW(double GM, double rs)
-        :TriaxialDensity({1.,0.7,0.3}),GM(GM),rs(rs),a(a){};
+    TestDensity_NFW(double GM, double rs, VecDoub a = {1.,0.7,0.3})
+        :TriaxialDensity(a),GM(GM),rs(rs),a(a){};
     double density_m2(double m){
         double sqm = sqrt(m);
         return GM/sqm/(sqm+rs)/(sqm+rs)/conv::FPG;
