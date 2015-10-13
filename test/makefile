@@ -23,8 +23,23 @@ NUMRECLIBPATH = $(GENERALPATH)jamestools/numrec/
 JAMESLIBPATH = $(GENERALPATH)jamestools/jamestools/
 POTLIBPATH = ../pot/
 
-TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
-TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
+ifeq ($(TORUS), 1)
+	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
+	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/ -L$(EBFPATH)lib/
+	TORUSLIBS = -lTorus -lOther -lPot -lWD -lebf_cpp
+else
+	TORUSINCPATH =
+	TORUSLIBPATH =
+	TORUSLIBS =
+endif
+
+ifeq ($(LAPACK), 1)
+	LAPACKPATH=$(LAPACKPATH)
+	LAPACKLIBS=-llapack -lblas
+else
+	LAPACKLIBPATH=
+	LAPACKLIBS=
+endif
 
 CUBALIBPATH = -L$(GENERALPATH)cuba
 CUBA = $(CUBALIBPATH) -lcuba
@@ -42,7 +57,7 @@ LIB = $(LIBPATHS) -L../aa/lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBP
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) -laa -lpot_js -lcoords \
-	  -lpress_cp -lTorus -lOther -lPot -lWD -L$(EBFPATH)lib/ -lebf_cpp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools
+	  -lpress_cp  $(TORUSLIBPATH) $(TORUSLIBS) -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) $(LAPACKLIBS) -ljamestools
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 
@@ -76,14 +91,14 @@ forceall: clean all
 #------------------------------------------------------
 
 $(OBJ)%.o : %.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) -I$(GTESTINC)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) -I$(GTESTINC) $(TORUSFLAG) $(LAPACKFLAG)
 
 #------------------------------------------------------
 
 ## TESTS
 
 tests.exe: $(OBJ)test.o
-	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(LIBPY) $(CUBA) -L../ -L$(GTESTLIB) -lgtest -Wl,-R,$(GTESTLIB)
+	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(LIBPY) $(CUBA) -L../ -L$(GTESTLIB) -lgtest -Wl,-R,$(GTESTLIB) $(TORUSFLAG) $(LAPACKFLAG)
 
 .PHONY: clean
 clean:
