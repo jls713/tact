@@ -1,0 +1,31 @@
+##
+# @file
+#
+# Travis CI script for tact -- action, angle & frequency estimation
+#
+# @author Jason Sanders
+#
+
+language: cpp
+compiler:
+  - gcc
+#  - clang
+script: make
+
+# need to install the Boost libraries to the sandbox
+before_script:
+  - sudo apt-get install libboost-python-dev
+  - sudo apt-get install gsl-bin libgsl0-dev
+  - sudo apt-get install liblapack-dev
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  - sudo apt-get install python2.7-dev
+  - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+
+notifications:
+  email:
+    recipients: jls@ast.cam.ac.uk
+    on_success: change
+    on_failure: always

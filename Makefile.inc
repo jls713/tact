@@ -7,7 +7,7 @@
 
 ## You will need to change the compiler and the path to gsl
 
-CCOMPILER=/opt/ioa/software/gcc/4.7.2/bin/g++
+CCOMPILER=$(CXX)
 GSLPATH = /opt/ioa/software/gsl/1.16/
 LAPACKPATH = general/lapack/
 TORUSPATH = /home/jls/work/code/Torus_github/Torus/

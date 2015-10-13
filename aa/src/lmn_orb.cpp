@@ -37,7 +37,6 @@
 #include "GSLInterface/GSLInterface.h"
 #include "gnuplot/gnuplot_i.h"
 #include <gsl/gsl_poly.h>
-#include "falPot.h"
 #include "utils.h"
 #include "coordsys.h"
 #include "coordtransforms.h"

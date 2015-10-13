@@ -1,5 +1,7 @@
 # tact
 
+[![Build Status](https://travis-ci.org/jls713/tact.svg?branch=master)](https://travis-ci.org/jls713/tact)
+
 Code for calculating actions, angles and frequencies in various ways
 
 ## Requirements
