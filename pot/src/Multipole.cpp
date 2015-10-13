@@ -29,7 +29,7 @@
 /// Also some test density profiles.
 //============================================================================
 
-#include <Python.h>
+// #include <Python.h>
 #include "coordtransforms.h"
 #include "potential.h"
 #include "GSLInterface/GSLInterface.h"
@@ -569,8 +569,6 @@ void test_multipole_spherical(int p=0){
     TestDensity_Hernquist rho(1.,1.,{1.,1.,1.});
     MultipoleExpansion_Spherical ME(&rho,100,1.,0.01,200.);
     VecDoub X = {1e-5,1e-5,1e-5};
-    double centre2 = rho.Phi(X);
-    double centre3 = ME.Phi(X);
 
     int NMAX = 200;
     VecDoub xx(NMAX,0), exact(NMAX,0), triaxial(NMAX,0), multipole(NMAX,0);

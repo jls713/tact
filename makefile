@@ -39,3 +39,4 @@ aa_code:
 
 docs:
 	doxygen doc/doxygen.config
+

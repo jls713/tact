@@ -27,7 +27,7 @@
 /*======================================*/
 /* 			    Potential_JS 			*/
 /*======================================*/
-#include <Python.h>
+// #include <Python.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -534,6 +534,7 @@ VecDoub Hernquist::Forces(const VecDoub& x){
 	Force = Force*(-dpdr/r);
 	return Force;
 }
+#ifdef TORUS
 // ============================================================================
 // GalPot Potential for interface with Walter Dehnen's code
 // ============================================================================
@@ -575,6 +576,7 @@ double GalPot::Vc(double R){
 	return sqrt(R*-Forces({R,0.,0.})[0]);
 }
 
+#endif
 // ============================================================================
 // Bowden NFW Potential
 // ============================================================================
@@ -615,7 +617,7 @@ VecDoub BowdenNFW::Forces(const VecDoub &x){
 	return f*(conv::FPG);
 }
 // ============================================================================
-
+#ifdef TORUS
 VecDoub torusPSPT2cartvec(PSPT FF){
 	VecDoub X = {FF[0]*cos(FF[2]),FF[0]*sin(FF[2]),FF[1],FF[3]*cos(FF[2])-FF[5]*sin(FF[2]),FF[3]*sin(FF[2])+FF[5]*cos(FF[2]),FF[4]};
 	for(int i=3;i<6;++i)X[i]*=conv::kpcMyr2kms;
@@ -677,6 +679,7 @@ Frequencies WrapperTorusPotential::KapNuOm(            // returns kappa,nu,Om
   epi[0] = sqrt(.5*(dPR-dPR2)/delR+3*tmp);
   return epi;
 }
+#endif
 
 #ifdef GALPY
 // Implementation
