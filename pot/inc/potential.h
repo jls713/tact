@@ -63,6 +63,7 @@
 #include "coordsys.h"
 #include "coordtransforms.h"
 #include "GSLInterface/GSLInterface.h"
+
 #ifdef TORUS
 #include "falPot.h"
 #include "Torus.h"
@@ -535,6 +536,7 @@ class Bulge: public Potential_JS{
 		double Phi(const VecDoub& x);
 		VecDoub Forces(const VecDoub& x);
 };
+
 #ifdef TORUS
 //============================================================================
 /// Wrapper for potentials produced by the GalPot code
@@ -740,7 +742,6 @@ class WrapperTorusPotential: public Potential{
     double RfromLc(const double L_in, double* dR=0) const;
     double LfromRc(const double R, double* dR=0) const;
 
-};
 
 #endif
 

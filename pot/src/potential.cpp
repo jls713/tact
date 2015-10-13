@@ -27,7 +27,9 @@
 /*======================================*/
 /* 			    Potential_JS 			*/
 /*======================================*/
+
 // #include <Python.h>
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -152,7 +154,7 @@ double Potential_JS::find_potential_intercept(double Phi0, int direction,double 
 }
 
 // ============================================================================
-// Prolate Stackel Perfect Ellipsoid Potential
+// Oblate Stackel Perfect Ellipsoid Potential
 // ============================================================================
 
 double StackelOblate_PerfectEllipsoid::G(double tau){
@@ -617,6 +619,7 @@ VecDoub BowdenNFW::Forces(const VecDoub &x){
 	return f*(conv::FPG);
 }
 // ============================================================================
+
 #ifdef TORUS
 VecDoub torusPSPT2cartvec(PSPT FF){
 	VecDoub X = {FF[0]*cos(FF[2]),FF[0]*sin(FF[2]),FF[1],FF[3]*cos(FF[2])-FF[5]*sin(FF[2]),FF[3]*sin(FF[2])+FF[5]*cos(FF[2]),FF[4]};

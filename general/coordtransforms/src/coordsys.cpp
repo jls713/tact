@@ -41,7 +41,7 @@
 #include "coordsys.h"
 
 // ============================================================================
-// (u,v) Oblate Spheroidal Coordinate System
+// (u,v) Prolate Spheroidal Coordinate System
 // ============================================================================
 
 VecDoub UVProlateSpheroidCoordSys::xv2uv(const VecDoub& X){
@@ -70,7 +70,7 @@ VecDoub UVProlateSpheroidCoordSys::uv2Rz(const VecDoub& uv){
 }
 
 // ============================================================================
-// Oblate Spheroidal Coordinate System
+// Prolate Spheroidal Coordinate System
 // ============================================================================
 
 VecDoub ProlateSpheroidCoordSys::x2tau(const VecDoub& x){

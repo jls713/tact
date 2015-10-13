@@ -8,6 +8,7 @@
 ## You will need to change the compiler and the path to gsl
 
 CCOMPILER=$(CXX)
+CCOMPILER=g++-4.9
 GSLPATH = /opt/ioa/software/gsl/1.16/
 LAPACKPATH = general/lapack/
 TORUSPATH = /home/jls/work/code/Torus_github/Torus/
@@ -23,12 +24,3 @@ BOOSTINCPATH =/opt/ioa/software/boost/1.55.0/include
 BOOSTLIBPATH =-L/opt/ioa/software/boost/1.55.0/lib
 PYTHONINCPATH=/opt/ioa/software/python/2.7.8/include/python2.7/
 PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
-
-ifeq ($(TORUS),1)
-	TORUSFLAG=-DTORUS
-else
-	TORUSFLAG=
-endif
-
-export TORUSFLAG
-export TORUS
