@@ -184,8 +184,9 @@ struct action_struct_axi_fudge{
 	Actions_AxisymmetricStackel_Fudge *ASF;
 	VecDoub Ints;
 	VecDoub tau_i;
-	double taubargl, Deltagl, tiny_number;
+	double taubargl, Deltagl;
 	int swit;
+	double tiny_number;
 	action_struct_axi_fudge(Actions_AxisymmetricStackel_Fudge *ASF, VecDoub ints, VecDoub tau_i,double tb, double Dl,int swit, double tn)
 		:ASF(ASF),Ints(ints),tau_i(tau_i),taubargl(tb),Deltagl(Dl),swit(swit), tiny_number(tn){}
 };

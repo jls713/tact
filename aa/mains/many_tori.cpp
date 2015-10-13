@@ -33,7 +33,6 @@
 #include "GSLInterface/GSLInterface.h"
 #include "gnuplot/gnuplot_i.h"
 #include <gsl/gsl_poly.h>
-#include "falPot.h"
 #include "utils.h"
 #include "coordsys.h"
 #include "coordtransforms.h"
@@ -46,7 +45,6 @@
 #include "adiabatic_aa.h"
 #include "uv_orb.h"
 #include "lmn_orb.h"
-#include "it_torus.h"
 #include "stackel_fit.h"
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_linalg.h>
@@ -54,6 +52,11 @@
 #include <ctime>
 #include <ratio>
 #include <chrono>
+
+#ifdef TORUS
+#include "it_torus.h"
+#include "falPot.h"
+#endif
 
 MatDoub dvdJ(VecDoub X, double dv, Actions_Genfunc *AG){
 	VecDoub Y = X, uJ,dJ;MatDoub mat(3,VecDoub(3,0.));
@@ -69,14 +72,17 @@ MatDoub dvdJ(VecDoub X, double dv, Actions_Genfunc *AG){
 
 using namespace std::chrono;
 
-
-
 int main(int argc, char*argv[]){
 
-	// GalPot Pot("../Torus/pot/PJM11_best.Tpot");
+	#ifdef TORUS
 	GalPot Pot("../Torus/pot/Piffl14.Tpot");
 	WrapperTorusPotential TPot(&Pot);
-	// Logarithmic Pot(220.,1.,0.9);
+	// GalPot Pot("../Torus/pot/PJM11.Tpot");
+	std::cout<<TPot.KapNuOm(8.29)*conv::kpcMyr2kms<<std::endl;
+	#else
+	Logarithmic Pot(220.,1.,0.9);
+	#endif
+
 	VecDoub X(6,1e-4);
 
 	X[0]=conv::StandardSolarPAUL[0];X[2]=conv::StandardSolarPAUL[1];
@@ -87,7 +93,9 @@ int main(int argc, char*argv[]){
 	Actions_AxisymmetricStackel_Fudge AA(&Pot,-30.);
 
 	// Iterative Torus
+	#ifdef TORUS
 	IterativeTorusMachine Tor(&AA,&Pot,1e-8,5,1e-3);
+	#endif
 
 	// Generating Function
 	Actions_Genfunc AG(&Pot,"axisymmetric");
@@ -109,7 +117,11 @@ int main(int argc, char*argv[]){
 
 	std::ofstream outfile;
 	outfile.open(argv[1]);
-	outfile<<"# JRJzLz Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
+	outfile<<"# JR Lz Jz JRJzLz ";
+	#ifdef TORUS
+	outfile<<"Rperi Rapo Zmax ";
+	#endif
+	outfile<<"OmR Omp Omz Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
 	double VMax = sqrt((Pot.Phi({50.,0.,50.})-Pot.Phi(X))-.5*X[4]*X[4]);
 	VecDoub range = create_log_range(0.03*VMax,0.6*VMax,100);
 
@@ -132,11 +144,17 @@ int main(int argc, char*argv[]){
 			GResults.push_back({Genfunc[0],Genfunc[2],aa[3],aa[4],aa[5],0.,0.,0.});
 		}
 		VecDoub acts = {columnMean(GResults)[0],Pot.Lz(X),columnMean(GResults)[1],columnMean(GResults)[2],columnMean(GResults)[3],columnMean(GResults)[4]};
+
+		VecDoub GF_SD = columnSD(GResults);
+		outfile<<acts[0]<<" "<<acts[1]<<" "<<acts[2]<<" "<<(acts[0]+acts[2])/fabs(acts[1])<<" ";
+		#ifdef TORUS
 		Actions J;J[0]=acts[0]/conv::kpcMyr2kms;
 		J[2]=acts[1]/conv::kpcMyr2kms;J[1]=acts[2]/conv::kpcMyr2kms;
 		Torus T; T.AutoFit(J,&TPot,1e-5);
-		VecDoub GF_SD = columnSD(GResults);
-		outfile<<acts[0]<<" "<<acts[1]<<" "<<acts[2]<<" "<<(acts[0]+acts[2])/fabs(acts[1])<<" "<<T.minR()<<" "<<T.maxR()<<" "<<" "<<T.maxz()<<" "<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" ";
+		outfile<<T.minR()<<" "<<T.maxR()<<" "<<" "<<T.maxz()<<" ";
+		#endif
+		outfile<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" ";
+
 		int N=0;
 		for(auto i:O.results()){
 			VecDoub ang = AG.angles(i);
@@ -150,6 +168,7 @@ int main(int argc, char*argv[]){
 				if(FResults[N][k]<-PI) FResults[N][k] = 2.*PI+FResults[N][k];
 			}
 			t1 = high_resolution_clock::now();
+			#ifdef TORUS
 			ITorus = Tor.actions(i);
 			times[1]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
 			ITResults.push_back({ITorus[0]-acts[0],ITorus[2]-acts[2],ITorus[6]-ang[0],ITorus[7]-ang[1],ITorus[8]-ang[2],ITorus[3]-ang[3],ITorus[4]-ang[4],ITorus[5]-ang[5]});
@@ -157,6 +176,7 @@ int main(int argc, char*argv[]){
 				if(ITResults[N][k]>PI) ITResults[N][k]=2.*PI-ITResults[N][k];
 				if(ITResults[N][k]<-PI) ITResults[N][k]=2.*PI+ITResults[N][k];
 			}
+			#endif
 			t1 = high_resolution_clock::now();
 			GenfuncAv = AGav.actions(i);
 			times[3]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);
@@ -200,7 +220,9 @@ int main(int argc, char*argv[]){
 			++N;
 		}
 		for(auto k:columnRMS(FResults)) outfile<<k<<" ";
+		#ifdef TORUS
 		for(auto k:columnRMS(ITResults)) outfile<<k<<" ";
+		#endif
 		for(auto k:columnSD(GResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(GAvResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(UVResults)) outfile<<k<<" ";

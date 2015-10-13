@@ -79,7 +79,7 @@ static double min_distance(double y, void *params){
 std::vector<int> lmn_orb::angular_momentum(const VecDoub &x){
 	VecDoub xx = {x[0],x[1],x[2]}, vv = {x[3],x[4],x[5]};
 	VecDoub ll = cross_product<double>(xx,vv);
-	return {sign(ll[0]),sign(ll[1]),sign(ll[2])};
+	return {(int)sign(ll[0]),(int)sign(ll[1]),(int)sign(ll[2])};
 }
 
 int lmn_orb::check_ang_mom(double y, double E, int swit){

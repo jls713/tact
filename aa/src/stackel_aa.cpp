@@ -870,11 +870,6 @@ double dJdI3_integrand_Triax(double theta, void *params){
 
 VecDoub Actions_TriaxialStackel::actions(const VecDoub& x, void *params){
 
-	int *freq_yes;
-
-	if(params)
-		freq_yes = (int *) params;
-
 	VecDoub tau = Pot->xv2tau(x);
 
 	VecDoub integrals = Pot->tau2ints(tau);
@@ -894,7 +889,7 @@ VecDoub Actions_TriaxialStackel::actions(const VecDoub& x, void *params){
 	action_struct_triax AS(Pot,integrals,taubar,Delta);
 	actions.push_back(2.*circ[0]*Delta*GaussLegendreQuad(&J_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 
-	if(params)if(*freq_yes){
+	if(params){
 		freqs.push_back(0.5*circ[0]*Delta*GaussLegendreQuad(&dJdH_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 		freqs.push_back(0.5*circ[0]*Delta*GaussLegendreQuad(&dJdI2_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 		freqs.push_back(0.5*circ[0]*Delta*GaussLegendreQuad(&dJdI3_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
@@ -907,7 +902,7 @@ VecDoub Actions_TriaxialStackel::actions(const VecDoub& x, void *params){
 	AS = action_struct_triax(Pot,integrals,taubar,Delta);
 	actions.push_back(2.*circ[1]*Delta*GaussLegendreQuad(&J_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 
-	if(params)if(*freq_yes){
+	if(params){
 		freqs.push_back(0.5*circ[1]*Delta*GaussLegendreQuad(&dJdH_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 		freqs.push_back(0.5*circ[1]*Delta*GaussLegendreQuad(&dJdI2_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 		freqs.push_back(0.5*circ[1]*Delta*GaussLegendreQuad(&dJdI3_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
@@ -919,7 +914,7 @@ VecDoub Actions_TriaxialStackel::actions(const VecDoub& x, void *params){
 	AS = action_struct_triax(Pot,integrals,taubar,Delta);
 	actions.push_back(2.*circ[2]*Delta*GaussLegendreQuad(&J_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 
-	if(params)if(*freq_yes){
+	if(params){
 		freqs.push_back(0.5*circ[2]*Delta*GaussLegendreQuad(&dJdH_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 		freqs.push_back(0.5*circ[2]*Delta*GaussLegendreQuad(&dJdI2_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);
 		freqs.push_back(0.5*circ[2]*Delta*GaussLegendreQuad(&dJdI3_integrand_Triax,-.5*PI,.5*PI,&AS)/PI);

@@ -65,7 +65,7 @@ static void orient_orbit(VecDoub& x, const std::vector<int> &loop){
 std::vector<int> Actions_Genfunc::angular_momentum(const VecDoub &x){
 	VecDoub xx = {x[0],x[1],x[2]}, vv = {x[3],x[4],x[5]};
 	VecDoub ll = cross_product<double>(xx,vv);
-	return {sign(ll[0]),sign(ll[1]),sign(ll[2])};
+	return {(int)sign(ll[0]),(int)sign(ll[1]),(int)sign(ll[2])};
 }
 
 std::vector<int> Actions_Genfunc::loop(const std::vector<VecDoub> &orbit_samples){
@@ -627,7 +627,7 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
             a[4+(j+n_vectors.size()+6)*(j+n_vectors.size()+7)/2]-=tm*sd[j];
             a[5+(j+2.*n_vectors.size()+6)*(j+2.*n_vectors.size()+7)/2]-=tm*sd[j];
 
-            for(int k=0;k<j+1;k++){
+            for(unsigned k=0;k<j+1;k++){
                 a[6+k+(j+6)*(j+7)/2]+=sd[j]*sd[k];
                 a[6+n_vectors.size()+k+(j+n_vectors.size()+6)*(j+n_vectors.size()+7)/2]+=sd[j]*sd[k];
                 a[6+2*n_vectors.size()+k+(j+2*n_vectors.size()+6)*(j+2*n_vectors.size()+7)/2]+=sd[j]*sd[k];
@@ -884,7 +884,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     return 0;
 }
 */
-
+#ifdef TORUS
 VecDoub PhaseSpacePoint(VecDoub actions, VecDoub angles, Potential_JS *Pot){
 	Torus T; Actions Acts; Angles Angs;
 	WrapperTorusPotential TPot(Pot);
@@ -893,6 +893,7 @@ VecDoub PhaseSpacePoint(VecDoub actions, VecDoub angles, Potential_JS *Pot){
 	T.AutoFit(Acts,&TPot,1e-7,700,300,15,5,24,200,24,0);
 	return torusPSPT2cartvec(T.Map3D(Angs));
 }
+#endif
 // #include "LogPot.h"
 // int main(){
 // 	double kk = 977.7775;

@@ -190,7 +190,7 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
         };
         //! Actions_SpheroidalAdiabaticApproximation copy constructor.
     	Actions_SpheroidalAdiabaticApproximation(const Actions_SpheroidalAdiabaticApproximation& s):
-		Pot(s.Pot),CS(new ProlateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX){
+		Pot(s.Pot),CS(new ProlateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid){
             Lmin=Pot->L_circ(Rmin);Lmax=Pot->L_circ(Rmax);
         }
         //! Finds actions

@@ -22,12 +22,18 @@ GNUPLOTLIBPATH = $(GENERALPATH)gnuplot
 NUMRECLIBPATH = $(GENERALPATH)jamestools/numrec/
 JAMESLIBPATH = $(GENERALPATH)jamestools/jamestools/
 POTLIBPATH = ../pot/
-
-TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
-TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
-
 CUBALIBPATH = -L$(GENERALPATH)cuba
 CUBA = $(CUBALIBPATH) -lcuba
+
+ifeq ($(TORUS), 1)
+	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
+	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/ -L$(EBFPATH)lib/
+	TORUSLIBS = -lTorus -lOther -lPot -lWD -lebf_cpp
+else
+	TORUSINCPATH =
+	TORUSLIBPATH =
+	TORUSLIBS =
+endif
 
 #------------------------------------------------------
 # Set include and library paths
@@ -41,8 +47,8 @@ LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 LIB = $(LIBPATHS) -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
-	  -L$(CTPATH) -lpot_js -lcoords \
-	  -lpress_cp -lTorus -lOther -lPot -lWD -L$(EBFPATH) -lebf_cpp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools
+	  -L$(CTPATH) $(TORUSLIBS) -lpot_js -lcoords \
+	  -lpress_cp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools $(TORUSFLAG)
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 
@@ -59,7 +65,7 @@ FALCONLIB = -L$(FALCONPATH)lib/ -lfalcON.P -L$(FALCONPATH)utils/lib/ -lWDutils -
 LIBRARY = libaa.so
 
 OBJECTS = $(OBJ)debug.o $(OBJ)spherical_aa.o $(OBJ)stackel_aa.o  $(OBJ)get_closed_Rz.o $(OBJ)uv_orb.o $(OBJ)lmn_orb.o $(OBJ)stackel_fit.o $(OBJ)analytic_aa.o $(OBJ)genfunc_aa.o $(OBJ)adiabatic_aa.o $(OBJ)tables_aa.o
-ifeq ($(TORUS),1)
+ifeq ($(TORUS), 1)
 	$(OBJECTS) += $(OBJ)it_torus.o
 endif
 HEADERS = $(wildcard inc/*.h)
@@ -96,7 +102,7 @@ test.exe: $(OBJECTS) $(OBJ)test.o
 	$(CCOMPILER) $(OPTS) -o test.exe $(OBJECTS) $(OBJ)test.o $(LIB) $(CUBA)
 
 mains/test_actions.exe: $(OBJECTS) $(OBJ)test_actions.o
-	$(CCOMPILER) $(OPTS) -o mains/test_actions.exe $(OBJECTS) $(OBJ)test_actions.o $(LIB) $(CUBA) -static-libstdc++
+	$(CCOMPILER) $(OPTS) -o mains/test_actions.exe $(OBJECTS) $(OBJ)test_actions.o $(LIB) $(CUBA) $(TORUSFLAG) -static-libstdc++
 
 mains/test_angles.exe: $(OBJECTS) $(OBJ)test_angles.o
 	$(CCOMPILER) $(OPTS) -o mains/test_angles.exe $(OBJECTS) $(OBJ)test_angles.o $(LIB) $(CUBA) -static-libstdc++

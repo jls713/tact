@@ -346,7 +346,7 @@ VecDoub Actions_StackelFit::angles(const VecDoub& x, void*params){
     SFP->fit_potential(x);
     Actions_AxisymmetricStackel AS(SFP);
     bool *with_hess = (bool *)params;
-    return AS.angles(x,&with_hess);
+    return AS.angles(x,*with_hess);
 }
 
 VecDoub Actions_StackelFit::angles_with_hessdet(VecDoub x){

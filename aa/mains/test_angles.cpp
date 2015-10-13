@@ -34,7 +34,6 @@
 #include "GSLInterface/GSLInterface.h"
 #include "gnuplot/gnuplot_i.h"
 #include <gsl/gsl_poly.h>
-#include "falPot.h"
 #include "utils.h"
 #include "coordsys.h"
 #include "coordtransforms.h"
@@ -47,17 +46,24 @@
 #include "adiabatic_aa.h"
 #include "uv_orb.h"
 #include "lmn_orb.h"
-#include "it_torus.h"
 #include "stackel_fit.h"
-
+#ifdef TORUS
+#include "falPot.h"
+#include "it_torus.h"
 #include "PJM_cline.h"
+#endif
 int main(int argc, char*argv[]){
+
+	#ifdef TORUS
 	GalPot Pot("../Torus/pot/Piffl14.Tpot");
-	// GalPot Pot("../Torus/pot/PJM11.Tpot");
 	WrapperTorusPotential TPot(&Pot);
 	std::cout<<TPot.KapNuOm(8.29)*conv::kpcMyr2kms<<std::endl;
-	// return 0;
-	// Logarithmic Pot(220.,1.,0.9);
+	std::cerr<<"Using Piffl14 GalPot"<<std::endl;
+	#else
+	Logarithmic Pot(220.,1.,0.9);
+	std::cerr<<"Using logarithmic potential -- to use GalPot need TORUS flag to make"<<std::endl;
+	#endif
+
 	if(argc<8)
 		std::cerr<<"Need to pass phase-space point and filename\n";
 	VecDoub X(6,0.);
@@ -68,16 +74,21 @@ int main(int argc, char*argv[]){
 	Actions_AxisymmetricStackel_Fudge AA(&Pot,100.);
 
 	// Iterative Torus
+	#ifdef TORUS
 	IterativeTorusMachine Tor(&AA,&Pot,1e-8,5,1e-3);
+	#endif
 	// Generating Function
 	Actions_Genfunc AG(&Pot,"axisymmetric");
 	VecDoub acts = AG.actions(X);
+	double Rmin=1.,Rmax=40.,zmax=30.;
+	#ifdef TORUS
 	Actions J;J[0]=acts[0]/conv::kpcMyr2kms;
 	J[2]=acts[1]/conv::kpcMyr2kms;J[1]=acts[2]/conv::kpcMyr2kms;
 	Torus T; T.AutoFit(J,&TPot,1e-5);
-	double Rmin = .9*T.minR();
-	double Rmax = 1.1*T.maxR();
-	double zmax = 1.1*T.maxz();
+	Rmin = .9*T.minR();
+	Rmax = 1.1*T.maxR();
+	zmax = 1.1*T.maxz();
+	#endif
 
 	// Average generating Function
 	Actions_Genfunc_Average AGav(&Pot,"axisymmetric");
