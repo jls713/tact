@@ -138,7 +138,7 @@ lmnnew_test.exe: $(OBJECTS)
 ## LIBRARY
 
 lib/libaa.so: $(OBJECTS)
-	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -Wl,-$(LIBNAME),$(CURDIR)/lib/libaa.so -o lib/libaa.so
+	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -Wl,-$(LIBNAME),$(CURDIR)/lib/libaa.so  $(LIB) $(CUBA) -o lib/libaa.so
 
 triax_py.so: $(OBJECTS) $(OBJ)triax_py.o
 	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(OBJ)triax_py.o $(INC) $(LIB)  -o triax_py.so

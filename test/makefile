@@ -26,6 +26,24 @@ POTLIBPATH = ../pot/
 CUBALIBPATH = -L$(GENERALPATH)cuba
 CUBA = $(CUBALIBPATH) -lcuba
 
+ifeq ($(TORUS), 1)
+	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
+	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/ -L$(EBFPATH)lib/
+	TORUSLIBS = -lTorus -lOther -lPot -lWD -lebf_cpp
+else
+	TORUSINCPATH =
+	TORUSLIBPATH =
+	TORUSLIBS =
+endif
+
+ifeq ($(LAPACK), 1)
+	LAPACKPATH=$(LAPACKPATH)
+	LAPACKLIBS=-llapack -lblas
+else
+	LAPACKPATH=.
+	LAPACKLIBS=
+endif
+
 #------------------------------------------------------
 # Set include and library paths
 

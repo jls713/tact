@@ -72,7 +72,7 @@ else
 endif
 
 ifeq ($(LAPACK),1)
-	LACPAKFLAG=-DLAPACK
+	LAPACKFLAG=-DLAPACK
 else
 	LAPACKFLAG=
 endif
