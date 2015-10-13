@@ -32,4 +32,4 @@ notifications:
     on_failure: always
 
 after_script:
-  - cd test; ./tests.exe; cd ..
+  - cd test; make tests.exe; ./tests.exe; cd ..
