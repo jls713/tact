@@ -42,13 +42,13 @@ LIBPY = #$(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 #------------------------------------------------------
 
 $(OBJ)%.o : $(SRC)%.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
 
 multipole_test.exe: $(OBJECTS)
 	$(CCOMPILER) $(OPTS) -o multipole_test.exe $(OBJECTS) $(LIB) $(LIBPY)
 
 libpot_js.so: $(OBJECTS)
-	$(CCOMPILER) $(LIBFLAG) $(OPTS) -o libpot_js.so -Wl,-$(LIBNAME),libpot_js.so $(OPTS) $(OBJECTS) $(INC)
+	$(CCOMPILER) $(LIBFLAG) $(OPTS) -o libpot_js.so -Wl,-$(LIBNAME),libpot_js.so $(OPTS) $(OBJECTS) $(INC) $(TORUSFLAG)
 
 clean:
 	rm -rf obj/*.o; rm -rf *.so; rm -rf *.exe

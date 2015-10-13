@@ -34,7 +34,6 @@
 #include "GSLInterface/GSLInterface.h"
 #include "gnuplot/gnuplot_i.h"
 #include <gsl/gsl_poly.h>
-#include "falPot.h"
 #include "utils.h"
 #include "coordsys.h"
 #include "coordtransforms.h"
@@ -49,13 +48,16 @@
 #include "adiabatic_aa.h"
 #include "uv_orb.h"
 #include "lmn_orb.h"
-#include "it_torus.h"
 #include "stackel_fit.h"
 #include <boost/python.hpp>
 #include <boost/python/numeric.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <numpy/arrayobject.h>
+#ifdef TORUS
+#include "falPot.h"
+#include "it_torus.h"
+#endif
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 using namespace boost::python;
@@ -165,8 +167,8 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
                                                         init<double, double>());
   class_<PowerLawSpherical, bases<SphericalPotential>>("PowerLawSpherical",
                                                        init<double, double>());
-  class_<StackelProlate_PerfectEllipsoid,
-	bases<Potential_JS>>("StackelProlate_PerfectEllipsoid",init<double,double>());
+  class_<StackelOblate_PerfectEllipsoid,
+	bases<Potential_JS>>("StackelOblate_PerfectEllipsoid",init<double,double>());
   class_<StackelTriaxial,
 	bases<Potential_JS>>("StackelTriaxial",init<double,double,double>());
   class_<Logarithmic, bases<Potential_JS>>("Logarithmic",
@@ -178,7 +180,9 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
   class_<HarmonicOscillator, bases<Potential_JS>>(
       "HarmonicOscillator", init<double, double, double>());
 
+#ifdef TORUS
   class_<GalPot, bases<Potential_JS>>("GalPot", init<std::string>());
+#endif
 
   class_<BowdenNFW, bases<Potential_JS>>("BowdenNFW",init<double,double,double,double,double,double>());
 
@@ -201,7 +205,7 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
 	"Actions_SpheroidalAdiabaticApproximation", init<Potential_JS*, std::string,bool,bool,double>());
 
   class_<Actions_AxisymmetricStackel, bases<Action_Finder> >(
-	"Actions_AxisymmetricStackel", init<StackelProlate_PerfectEllipsoid*>());
+	"Actions_AxisymmetricStackel", init<StackelOblate_PerfectEllipsoid*>());
 
   class_<Actions_AxisymmetricStackel_Fudge, bases<Action_Finder> >(
       "Actions_AxisymmetricStackel_Fudge", init<Potential_JS*, double>());
@@ -223,10 +227,11 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
   class_<Actions_StackelFit, bases<Action_Finder> >(
   "Actions_StackelFit", init<Potential_JS*>());
 
-
+#ifdef TORUS
   class_<IterativeTorusMachine, bases<Action_Finder> >(
       "IterativeTorusMachine",
       init<Actions_AxisymmetricStackel_Fudge*, GalPot*, double, int, double>()).def("set_maxit",&IterativeTorusMachine::set_maxit);
+#endif
 
   class_<uv_orb, bases<Action_Finder> >(
       "Actions_AxisymmetricStackel_Fudge_DeltaGuess",

@@ -741,7 +741,7 @@ class WrapperTorusPotential: public Potential{
                 const double R) const;  // given R at z=0
     double RfromLc(const double L_in, double* dR=0) const;
     double LfromRc(const double R, double* dR=0) const;
-
+};
 
 #endif
 

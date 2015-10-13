@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O3 -fomit-frame-pointer -ffast-math -Wall -DHAVE_CONFIG_H -I$(common) -I. -I$(srcdir)
+CFLAGS = -O3 -fPIC -fomit-frame-pointer -ffast-math -Wall -DHAVE_CONFIG_H -I$(common) -I. -I$(srcdir)
 MCFLAGS =
 F77 = g77
 FFLAGS = -g -O2

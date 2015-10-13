@@ -38,7 +38,9 @@ endif
 #------------------------------------------------------
 # Set include and library paths
 
-INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(PYTHONINCPATH) -I$(BOOSTINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include/ -I$(POTPATH)inc/ -I$(CTPATH)inc/
+INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include/ -I$(POTPATH)inc/ -I$(CTPATH)inc/
+
+INCPY = -I$(PYTHONINCPATH) -I$(BOOSTINCPATH)
 
 LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 		   -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
@@ -66,7 +68,7 @@ LIBRARY = libaa.so
 
 OBJECTS = $(OBJ)debug.o $(OBJ)spherical_aa.o $(OBJ)stackel_aa.o  $(OBJ)get_closed_Rz.o $(OBJ)uv_orb.o $(OBJ)lmn_orb.o $(OBJ)stackel_fit.o $(OBJ)analytic_aa.o $(OBJ)genfunc_aa.o $(OBJ)adiabatic_aa.o $(OBJ)tables_aa.o
 ifeq ($(TORUS), 1)
-	$(OBJECTS) += $(OBJ)it_torus.o
+	OBJECTS += $(OBJ)it_torus.o
 endif
 HEADERS = $(wildcard inc/*.h)
 
@@ -80,14 +82,17 @@ forceall: clean all
 
 #------------------------------------------------------
 
+$(OBJ)aa_py.o : $(SRC)aa_py.cpp ${HEADERS}
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(INCPY) $(TORUSFLAG)
+
 $(OBJ)%.o : $(SRC)%.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
 
 $(OBJ)%.o : mains/%.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
 
 $(FALCONOBJ)%.o : $(SRC)%.cpp
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(FALCONINC)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(FALCONINC) $(TORUSFLAG)
 
 #------------------------------------------------------
 
