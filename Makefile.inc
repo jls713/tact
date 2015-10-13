@@ -1,5 +1,6 @@
 ####################################################################
 ## Makefile
+####################################################################
 ## 1. Need to install gsl (http://www.gnu.org/software/gsl/)
 ## 	  This is necessary
 ## 2. You will need to set the CXX environment variable to c++ compiler
@@ -10,6 +11,14 @@ CCOMPILER=$(CXX)
 
 GSLPATH =/opt/ioa/software/gsl/1.16/
 <!-- GSLPATH =/usr/local/Cellar/gsl/1.16/ -->
+
+####################################################################
+
+## Tests:
+## To run the tests you need google test and to set the path:
+
+<!-- GTESTPATH=/data/jls/gtest-1.7.0/ -->
+GTESTPATH=/Users/jls/work/code/other/gtest-1.7.0/
 
 ####################################################################
 ## Optional
@@ -80,8 +89,10 @@ ifeq ($(UNAME_S),Linux)
 endif
 ifeq ($(UNAME_S),Darwin)
     LIBNAME=install_name
-    LIBFLAG=-dynamic_lib -undefined suppress -flat_namespace
+    LIBFLAG=-dynamiclib -undefined suppress -flat_namespace
 endif
 
 export LIBNAME
 export LIBFLAG
+export UNAME_S
+

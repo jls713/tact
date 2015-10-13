@@ -49,7 +49,8 @@ INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include
 
 INCPY = -I$(PYTHONINCPATH) -I$(BOOSTINCPATH)
 
-LIBPATHS =  -Wl,-rpath=$(POTLIBPATH)
+LIBPATHS =
+# -Wl,-rpath=$(POTLIBPATH)
 # -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 		   # -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
 		   # -Wl,-R$(GSLPATH)lib/ -Wl,-R$(CTPATH)
@@ -137,7 +138,7 @@ lmnnew_test.exe: $(OBJECTS)
 ## LIBRARY
 
 lib/libaa.so: $(OBJECTS)
-	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -o lib/libaa.so
+	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -Wl,-$(LIBNAME),$(CURDIR)/lib/libaa.so -o lib/libaa.so
 
 triax_py.so: $(OBJECTS) $(OBJ)triax_py.o
 	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(OBJ)triax_py.o $(INC) $(LIB)  -o triax_py.so

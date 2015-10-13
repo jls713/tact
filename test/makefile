@@ -23,9 +23,6 @@ NUMRECLIBPATH = $(GENERALPATH)jamestools/numrec/
 JAMESLIBPATH = $(GENERALPATH)jamestools/jamestools/
 POTLIBPATH = ../pot/
 
-TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
-TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
-
 CUBALIBPATH = -L$(GENERALPATH)cuba
 CUBA = $(CUBALIBPATH) -lcuba
 
@@ -34,15 +31,16 @@ CUBA = $(CUBALIBPATH) -lcuba
 
 INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(PYTHONINCPATH) -I$(BOOSTINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include/ -I$(POTPATH)inc/ -I$(CTPATH)inc/
 
-LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
-		   -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
-		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH)
+LIBPATHS =
+ # -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
+		   # -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
+		   # -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH)
 
 LIB = $(LIBPATHS) -L../aa/lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) -laa -lpot_js -lcoords \
-	  -lpress_cp -lTorus -lOther -lPot -lWD -L$(EBFPATH)lib/ -lebf_cpp -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) -llapack -lblas -ljamestools
+	  -lpress_cp $(TORUSLIBS) -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) $(LAPACKLIBS) -ljamestools
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 
@@ -62,8 +60,8 @@ OBJECTS = $(OBJ)debug.o $(OBJ)spherical_aa.o $(OBJ)stackel_aa.o  $(OBJ)get_close
 
 HEADERS = $(wildcard inc/*.h)
 
-GTESTINC=/data/jls/gtest-1.7.0/include/
-GTESTLIB=/data/jls/gtest-1.7.0/lib/.libs/
+GTESTINC=$(GTESTPATH)/include/
+GTESTLIB=$(GTESTPATH)/lib/.libs/
 
 #------------------------------------------------------
 
@@ -83,7 +81,8 @@ $(OBJ)%.o : %.cpp ${HEADERS}
 ## TESTS
 
 tests.exe: $(OBJ)test.o
-	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(LIBPY) $(CUBA) -L$(GTESTLIB) -lgtest -Wl,-R,$(GTESTLIB)
+	$(CCOMPILER) $(OPTS) -o tests.exe $(OBJ)test.o $(LIB) $(CUBA) -L$(GTESTLIB) -lgtest
+	# -Wl,-R,$(GTESTLIB)
 
 .PHONY: clean
 clean:
