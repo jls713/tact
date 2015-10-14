@@ -10,7 +10,7 @@ Code for calculating actions, angles and frequencies in various ways
 
 ## Installation
 
-* Make sure environment variable $(CXX) gives c++ compiler or specify compiler path in Makefile.inc (need a C++-11 compatible compiler, currently compiles with g++ 4.9)
+* Make sure environment variable $(CXX) gives c++ compiler or specify compiler path in Makefile.inc (need a C++-11 compatible compiler, it compiles with clang 3.4 and g++ 4.8 or 4.9)
 * Specify path to gsl in Makefile.inc
 * Run make
 
