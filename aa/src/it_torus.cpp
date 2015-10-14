@@ -102,9 +102,9 @@ VecDoub IterativeTorusMachine::RefineGuess(VecDoub PSP, VecDoub aa, double *min,
 	double sign = SIGN(PSP[0]*PSP[4]-PSP[1]*PSP[3]);
 	VecDoub xout = findXV(theta,T,sign);
 	// Minimise Omega^2(x_i x_i)+v_i v_i w.r.t theta
-	double freqWeight =  T->omegas()[0]*T->omegas()[0]
-						+T->omegas()[1]*T->omegas()[1]
-						+T->omegas()[2]*T->omegas()[2];
+	double freqWeight =  T->omega(0)*T->omega(0)
+						+T->omega(1)*T->omega(1)
+						+T->omega(2)*T->omega(2);
 	Min_ItTorusMac_struct Min(T,PSP,freqWeight,sign);
 	VecDoub sizes = {0.05,0.05,0.05};
 	VecDoub thetav = {theta[0],theta[1],theta[2]};
@@ -146,7 +146,7 @@ VecDoub IterativeTorusMachine::actions(const VecDoub &X, void*params){
 	J[0] = aaGuess[0];	J[1] = aaGuess[2];	J[2] = aaGuess[1];
 	flag = T->AutoFit(J,&TPhi,dJ,700,300,15,5,24,200,24,err);
 	if(flag!=0) std::cerr<<"Non-zero flag in IterativeTorusMachine::actions\n";
-	for(int i=0;i<3;i++) aaGuess[i+3]=T->omegas()[i];
+	for(int i=0;i<3;i++) aaGuess[i+3]=T->omega(i);
 
 	// Return actions in right units
 	for(int i=0;i<6;i++) aaGuess[i]*=conv::kpcMyr2kms;
