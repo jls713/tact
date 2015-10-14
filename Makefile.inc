@@ -28,8 +28,8 @@ GTESTPATH=/Users/jls/work/code/other/gtest-1.7.0/
 ###		with ebf library (http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/)
 ### 1.2. Set Torus and ebf paths
 
-TORUSPATH = /home/jls/work/code/Torus_github/Torus/
-EBFPATH = /data/jls/libebf_c_cpp-0.0.3/
+TORUSPATH = ../Torus/
+EBFPATH = ../libebf_c_cpp-0.0.3/
 
 ### 1.3. Compile with "make TORUS=1"
 
