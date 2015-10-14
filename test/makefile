@@ -37,10 +37,10 @@ else
 endif
 
 ifeq ($(LAPACK), 1)
-	LAPACKPATH=$(LAPACKPATH)
+	LAPACKLIBPATH=$(LAPACKPATH)
 	LAPACKLIBS=-llapack -lblas
 else
-	LAPACKPATH=.
+	LAPACKLIBPATH=.
 	LAPACKLIBS=
 endif
 
@@ -58,7 +58,7 @@ LIB = $(LIBPATHS) -L../aa/lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBP
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) -laa -lpot_js -lcoords \
-	  -lpress_cp $(TORUSLIBS) -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKPATH) $(LAPACKLIBS) -ljamestools
+	  -lpress_cp $(TORUSLIBS) -lplot -lgsl -lgslcblas -lm $(EXTRACLIB) -L$(LAPACKLIBPATH) $(LAPACKLIBS) -ljamestools
 BOOSTLIB = -lboost_python -lpython2.7
 LIBPY = $(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 
