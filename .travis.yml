@@ -11,6 +11,10 @@ compiler:
   - gcc
   - clang
 
+env:
+  - TORUS=0 LAPACK=0
+  - TORUS=0 LAPACK=1
+
 script:
   - cd test; make tests.exe; ./tests.exe; cd ..
 
