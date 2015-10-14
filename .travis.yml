@@ -12,8 +12,8 @@ compiler:
   - clang
 
 env:
-  - TORUS=0 LAPACK=0
-  - TORUS=0 LAPACK=1
+  - TORUS=1 LAPACK=0
+  # - TORUS=0 LAPACK=1
 
 script:
   - cd test; make tests.exe; ./tests.exe; cd ..
@@ -46,6 +46,8 @@ before_script:
   - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
 
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
+  - if [ "$TORUS" == 1 ]; then wget http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/libebf_c_cpp-0.0.3.tar.gz && tar -xvzf libebf_c_cpp-0.0.3.tar.gz && cd libebf_c_cpp-0.3 && ./configure && make && make install && cd ..; fi
+
   - make
 
 notifications:
