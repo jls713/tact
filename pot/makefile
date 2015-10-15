@@ -21,8 +21,8 @@ CTPATH = ../general/coordtransforms/
 GNUPLOTLIBPATH = $(GENERALPATH)gnuplot
 
 ifeq ($(TORUS), 1)
-	TORUSINCPATH = -I../$(TORUSPATH)src/ -I../$(TORUSPATH)src/utils/ -I../$(TORUSPATH)src/pot
-	TORUSLIBPATH = -L../$(TORUSPATH)obj/ -L../$(TORUSPATH)WDlib/obj/
+	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
+	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
 else
 	TORUSINCPATH =
 	TORUSLIBPATH =
