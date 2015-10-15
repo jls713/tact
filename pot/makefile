@@ -33,7 +33,9 @@ COORDLIBPATH = $(CTPATH)
 
 INC = -I../../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include/ -I$(COORDINCPATH)
 
-LIB = -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/ -L$(GENERALPATH) -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ \
+LIBWLRPATH = -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/  -Wl,-rpath,$(EBFPATH)lib/
+
+LIB = $(LIBWLRPATH) -L$(GENERALPATH) -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ \
 	  -L$(COORDLIBPATH) -lcoords $(TORUSLIBS) -lplot -lgsl -lgslcblas \
 	  -lm $(EXTRACLIB)
 
@@ -48,7 +50,7 @@ multipole_test.exe: $(OBJECTS)
 	$(CCOMPILER) $(OPTS) -o multipole_test.exe $(OBJECTS) $(LIB)
 
 libpot_js.so: $(OBJECTS)
-	$(CCOMPILER) $(LIBFLAG) $(OPTS) -o libpot_js.so -Wl,-$(LIBNAME),$(CURDIR)/libpot_js.so $(OPTS) $(OBJECTS) $(INC) $(TORUSFLAG)
+	$(CCOMPILER) $(LIBFLAG) $(OPTS) -o libpot_js.so -Wl,-$(LIBNAME),$(CURDIR)/libpot_js.so $(OPTS) $(OBJECTS) $(INC) $(LIB) $(TORUSFLAG)
 
 clean:
 	rm -rf obj/*.o; rm -rf *.so; rm -rf *.exe
