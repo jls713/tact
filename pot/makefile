@@ -21,8 +21,8 @@ CTPATH = ../general/coordtransforms/
 GNUPLOTLIBPATH = $(GENERALPATH)gnuplot
 
 ifeq ($(TORUS), 1)
-	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
-	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/
+	TORUSINCPATH = -I../$(TORUSPATH)src/ -I../$(TORUSPATH)src/utils/ -I../$(TORUSPATH)src/pot
+	TORUSLIBPATH = -L../$(TORUSPATH)obj/ -L../$(TORUSPATH)WDlib/obj/
 else
 	TORUSINCPATH =
 	TORUSLIBPATH =
@@ -33,7 +33,7 @@ COORDLIBPATH = $(CTPATH)
 
 INC = -I../../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include/ -I$(COORDINCPATH)
 
-LIB = -L$(GENERALPATH) -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ \
+LIB = -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/ -L$(GENERALPATH) -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ \
 	  -L$(COORDLIBPATH) -lcoords $(TORUSLIBS) -lplot -lgsl -lgslcblas \
 	  -lm $(EXTRACLIB)
 
