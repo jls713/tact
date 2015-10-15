@@ -12,10 +12,10 @@ compiler:
   - clang
 
 env:
-  # - TORUS=0 LAPACK=0
+  - TORUS=0 LAPACK=0
   - TORUS=1 LAPACK=0
-  # - TORUS=0 LAPACK=1
-  # - TORUS=1 LAPACK=1
+  - TORUS=0 LAPACK=1
+  - TORUS=1 LAPACK=1
 
 script:
   - cd test; make tests.exe; ./tests.exe; cd ..
