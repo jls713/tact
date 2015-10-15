@@ -71,7 +71,8 @@ TEST(PotentialTest,IsochroneActions){
 }
 
 TEST(ActionTest,StackelFit){
-  Logarithmic Pot(220.,1.,0.9);
+  // Logarithmic Pot(220.,1.,0.9);
+  Isochrone Pot(1.,1.);
   Actions_StackelFit AA(&Pot);
   VecDoub X = {8.29,0.1,0.1,40.,200.,50.};
   VecDoub ActsTrue = {29.357028436047674,1653.9999999999998,44.218614307037832};
