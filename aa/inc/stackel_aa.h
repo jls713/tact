@@ -71,7 +71,7 @@ class Actions_AxisymmetricStackel : public Action_Finder{
 		  \return angles and frequencies --
 		      	6D vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)
 	    */
-		VecDoub angles(const VecDoub& x, bool with_hess=false);
+		VecDoub angles(const VecDoub& x, void *params=nullptr);
 
 		// Unimportant functions that need to be accessed by integration routines
 		void dtaudint(const VecDoub& limits, const VecDoub& ints);
@@ -114,7 +114,7 @@ class Actions_AxisymmetricStackel_Fudge : public Action_Finder{
 	private:
 		Potential_JS *Pot;
 
-		const double tiny_number = 1e-6;/*!< Tolerance for \int 1/p_tau    */
+		const double tiny_number = 1e-10;/*!< Tolerance for \int 1/p_tau    */
 		double E, I2; 					/*!< Energy, I_2 = 0.5 L_z^2       */
 		VecDoub Kt;	  					/*!< Third integrals 			   */
 		VecDoub find_limits(const VecDoub& x);/*!<Find tau limits 		   */

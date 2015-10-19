@@ -51,7 +51,7 @@ INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(PYTHONINCPATH) -I$(BOOSTINCPATH)
 
 LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 		   -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
-		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH)
+		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH) -Wl,-R../aa/lib
 
 LIB = $(LIBPATHS) -L../aa/lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
@@ -91,7 +91,7 @@ forceall: clean all
 #------------------------------------------------------
 
 $(OBJ)%.o : %.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) -I$(GTESTINC) $(TORUSFLAG) $(LAPACKFLAG)
+	$(CCOMPILER) -g $(OPTS) -c $< -o $@ $(INC) -I$(GTESTINC) $(TORUSFLAG) $(LAPACKFLAG)
 
 #------------------------------------------------------
 

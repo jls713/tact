@@ -159,7 +159,9 @@ double Potential_JS::find_potential_intercept(double Phi0, int direction,double 
 
 double StackelOblate_PerfectEllipsoid::G(double tau){
 	/* de Zeeuw's G(tau) function */
-	double Gamma = CS->gamma(), sqG =sqrt(-Gamma/(tau+Gamma));
+	double Gamma = CS->gamma();
+	if(tau+Gamma<SMALL) return Const;
+	double sqG =sqrt(-Gamma/(tau+Gamma));
 	return Const*sqG*atan(1./sqG);
 }
 double StackelOblate_PerfectEllipsoid::GPrime(double tau){

@@ -60,7 +60,7 @@ class IterativeTorusMachine : public Action_Finder{
 		      \param MaxIterations  maximum number of torus fits
 		      \param dJ relative error of torus fits
 		    */
-			IterativeTorusMachine(Actions_AxisymmetricStackel_Fudge *AAA,Potential_JS *Phi, double eta = 1e-8, int MaxIterations=5, double dJ = 1e-5):AAA(AAA),Phi(Phi),TPhi(Phi),eta(eta),MaxIterations(MaxIterations),dJ(dJ),T(new Torus){};
+			IterativeTorusMachine(Actions_AxisymmetricStackel_Fudge *AAA,Potential_JS *Phi, double eta = 1e-8, int MaxIterations=5, double dJ = 1e-5):AAA(AAA),Phi(Phi),TPhi(Phi),T(new Torus),eta(eta),MaxIterations(MaxIterations),dJ(dJ){};
 			//! IterativeTorusMachine destructor.
 			~IterativeTorusMachine(){delete T;}
 			//!< set tolerance in ang fit

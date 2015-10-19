@@ -185,6 +185,19 @@ class SphericalPotential: virtual public Potential_JS{
 		}
 };
 
+class PlanarAxisymPotential: public SphericalPotential{
+private:
+	Potential_JS *Pot;
+public:
+	PlanarAxisymPotential(Potential_JS *Pot): Pot(Pot){}
+	double Phi_r(double r){
+		return Pot->Phi({r,0.,0.});
+	}
+	double dPhi_r(double r){
+		return -Pot->Forces({r,0.,0.})[0];
+	}
+};
+
 class IsochronePotential: public SphericalPotential{
 	private:
 		const std::string desc =

@@ -45,6 +45,7 @@
 // ============================================================================
 #include "coordtransforms.h"
 #include "adiabatic_aa.h"
+#include "debug.h"
 // ============================================================================
 /*======================================================*/
 /* 			Spheroidal Adiabatic Approximation 			*/
@@ -239,7 +240,8 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 	}
 
 	if(CS->alpha()>CS->gamma()){
-	    std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
+	    if(debug_NegativeDelta)
+	    	std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
         CS->newalpha(CS->gamma()-0.1);
 	}
 
@@ -272,7 +274,8 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	}
 
 	if(CS->alpha()>CS->gamma()){
-	    std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
+	    if(debug_NegativeDelta)
+	    	std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
         CS->newalpha(CS->gamma()-0.1);
 	}
 
@@ -511,8 +514,9 @@ double Actions_PolarAdiabaticApproximation::Ez_from_grid(double R,double Jz){
 double Actions_PolarAdiabaticApproximation::find_zlimit(double Ez, VecDoub Polar){
 	PolarAA_zactions_struct RS(this,Ez,Polar[0],0.,0.);
 	double ztry = fabs(Polar[2]);
+	if(ztry==0.)ztry+=SMALL;
 	while(pz_squared(ztry, &RS)>0.) ztry*=1.1;
-	root_find RF(TINY,20);
+	root_find RF(TINY,100);
 	return RF.findroot(&pz_squared,fabs(Polar[2]),ztry,&RS);
 }
 
@@ -521,7 +525,7 @@ VecDoub Actions_PolarAdiabaticApproximation::find_Rlimits(double R, double Etot,
 	double Rin = R, Rout = R;
 	while(pR_squared(Rout, &RS)>0.) Rout*=1.01;
 	while(pR_squared(Rin, &RS)>0.)  Rin*=.99;
-	root_find RF(TINY,20);
+	root_find RF(TINY,100);
 	return {RF.findroot(&pR_squared,Rin,R,&RS),
 			RF.findroot(&pR_squared,R,Rout,&RS)};
 }
@@ -539,7 +543,8 @@ double Actions_PolarAdiabaticApproximation::actions_Jz(double R, double Ez,doubl
 }
 
 VecDoub Actions_PolarAdiabaticApproximation::actions(const VecDoub& x, void*params){
-
+	VecDoub acts(3,0.);
+    if(action_check(x,acts,Pot)) return acts;
 	VecDoub Polar = conv::CartesianToPolar(x);
 
 	double vz = Polar[5], R = Polar[0], z = Polar[2];
@@ -559,6 +564,9 @@ VecDoub Actions_PolarAdiabaticApproximation::actions(const VecDoub& x, void*para
 
 
 VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *params){
+
+    VecDoub angs(6,0.);
+    if(angle_check(x,angs,Pot)) return angs;
 
 	VecDoub Polar = conv::CartesianToPolar(x);
 	VecDoub angles(6,0.);

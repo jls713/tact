@@ -28,5 +28,6 @@
 extern const int debug_triaxial_stackel;
 extern const int debug_find_Delta;
 extern const int debug_genfunc;
+extern const int debug_NegativeDelta;
 #endif
 // ============================================================================

@@ -87,6 +87,7 @@ class Stackel_Fitted_Potential: public StackelOblate_PerfectEllipsoid{
                 delete fnugrid; delete y2Lamgrid; delete y2Nugrid;
             }
         }
+        Potential_JS *potential(void){return TruePot;}
         //! Fits Staeckel potential to target potential
         /*!
           \param x phase-space coordinate (x,v)

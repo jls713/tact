@@ -59,27 +59,44 @@ double ptau2ROOT_AxiSym(double tau, void *params){
 	}
 
 VecDoub Actions_AxisymmetricStackel::find_limits(const VecDoub& tau, const VecDoub& ints){
-
+	double tiny_number=SMALL;
 	double lambda = tau[0], nu = tau[2];
+	root_find RF(TINY,100);
 	VecDoub limits;
 	// create a structure to store parameters for ptau2ROOT
 	root_struct_axi RS(Pot,ints);
 	// find roots of p^2(lam)
-	double laminner=lambda;
-	while(ptau2ROOT_AxiSym(laminner, &RS)>0.0)	laminner-=.1*(laminner+Pot->alpha());
-	double lamouter=lambda;
+	double laminner=lambda, lamouter=lambda;
+	if(ptau2ROOT_AxiSym(lambda, &RS)>0.0){
+		while(ptau2ROOT_AxiSym(laminner, &RS)>0.0
+		      and (laminner+Pot->alpha())>tiny_number)
+			laminner-=.1*(laminner+Pot->alpha());
+		while(ptau2ROOT_AxiSym(lamouter, &RS)>0.)	lamouter*=1.1;
 
-	while(ptau2ROOT_AxiSym(lamouter, &RS)>0.)	lamouter*=1.5;
-	root_find RF(SMALL,100);
-	limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda,&RS));
-	limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,lambda,lamouter,&RS));
+		if((laminner+Pot->alpha())>tiny_number)
+			limits.push_back(
+			    RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda,&RS));
+		else limits.push_back(-Pot->alpha());
+		limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,lambda,lamouter,&RS));
+	}
+	else{
+		limits.push_back(lambda-tiny_number);
+		limits.push_back(lambda+tiny_number);
+	}
+
 	limits.push_back(-Pot->gamma()+TINY);
 	// find root of p^2(nu)
-	RS = root_struct_axi(Pot, {ints[0],ints[1],ints[3]});
 	double nuouter=nu;
-	while(ptau2ROOT_AxiSym(nuouter, &RS)<0.)	nuouter+=0.1*(-Pot->alpha()-nuouter);
-	limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,nu,nuouter,&RS));
-
+	RS = root_struct_axi(Pot, {ints[0],ints[1],ints[3]});
+	if(ptau2ROOT_AxiSym(nu, &RS)<0.0){
+		while(ptau2ROOT_AxiSym(nuouter, &RS)<0.
+		      and -(nuouter+Pot->alpha())>tiny_number)
+			nuouter+=0.1*(-Pot->alpha()-nuouter);
+		if(-(nuouter+Pot->alpha())>tiny_number)
+			limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,nu,nuouter,&RS));
+		else limits.push_back(-Pot->alpha());
+	}
+	else limits.push_back(nu+tiny_number);
 	return limits;
 }
 
@@ -333,7 +350,9 @@ double Actions_AxisymmetricStackel::dp2dtau(double tau, const VecDoub& ints){
 }
 
 VecDoub Actions_AxisymmetricStackel::actions(const VecDoub& x, void *params){
+
 	VecDoub tau = Pot->xv2tau(x);
+	if(tau[2]==-Pot->gamma())tau[2]+=TINY;
 	VecDoub integrals = Pot->x2ints(x,&tau);
 	VecDoub limits = find_limits(tau,integrals);
 
@@ -353,9 +372,13 @@ VecDoub Actions_AxisymmetricStackel::actions(const VecDoub& x, void *params){
 	return actions;
 }
 
-VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, bool with_hess){
+VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, void*params){
 // calculates angles, also freqs at end.
+
+	bool with_hess=false;
+	if(params)with_hess=true;
 	VecDoub tau = Pot->xv2tau(x);
+	if(tau[2]==-Pot->gamma())tau[2]+=TINY;
 	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e8;
 	VecDoub integrals = Pot->x2ints(x,&tau);
 	VecDoub limits = find_limits(tau,integrals);
@@ -561,7 +584,7 @@ void Actions_AxisymmetricStackel_Fudge::integrals(const VecDoub& tau){
 VecDoub Actions_AxisymmetricStackel_Fudge::find_limits(const VecDoub& tau){
 
 	double lambda = tau[0], nu = tau[2];
-	root_find RF(SMALL,100);
+	root_find RF(TINY,100);
 	VecDoub limits;
 	// create a structure to store parameters for ptau2ROOT
 	VecDoub ints = {E,I2,Kt[0]};
@@ -655,10 +678,10 @@ double dJdI3_integrand_AxiSym_Fudge(double theta, void *params){
 	return -0.25*cos(theta)/(sqrt(MAX(AS->tiny_number,ptau2))*(tau+Alpha)*(tau+Gamma));
 }
 
-VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& xx, void *params){
+VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *params){
 
-	VecDoub x = xx;
-	if(x[2]==0.)x[2]=SMALL;
+    VecDoub acts(3,0.);
+    if(action_check(x,acts,Pot)) return acts;
 
 	if(params){
 		double *deltaguess = (double *) params;
@@ -698,6 +721,9 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& xx, void *para
 
 VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params){
 
+    VecDoub angs(6,0.);
+    if(angle_check(x,angs,Pot)) return angs;
+
 	if(params){
 		double *deltaguess = (double *) params;
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
@@ -705,7 +731,8 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 	}
 
 	if(CS->alpha()>CS->gamma()){
-	    std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
+	    if(debug_NegativeDelta)
+	    	std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
         CS->newalpha(CS->gamma()-0.1);
 	}
 	VecDoub tau = CS->xv2tau(x);

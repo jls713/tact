@@ -123,7 +123,7 @@ VecDoub Actions_Spherical::actions(const VecDoub &x, void *params){
     double taubar = 0.5*(limits[0]+limits[1]);
     double Delta = 0.5*(limits[1]-limits[0]);
     Actions_Spherical_data_struct Act(Pot,E,L,Lz,Delta,taubar);
-    double JR = Delta*GaussLegendreQuad(&J_r,-PI/2.,PI/2.,&Act,8)/PI;
+    double JR = Delta*GaussLegendreQuad(&J_r,-PI/2.,PI/2.,&Act)/PI;
     return {JR,Lz,L-fabs(Lz)};
 }
 
@@ -131,7 +131,9 @@ VecDoub Actions_Spherical::angles_and_freqs(const VecDoub &x){
     // call actions before
     double E = Pot->H(x), L = Pot->L(x), Lz = Pot->Lz(x);
     if(E>0.){
-        return {std::numeric_limits<double>::infinity(),L};
+        return {std::numeric_limits<double>::infinity(),
+                std::numeric_limits<double>::infinity(),
+                std::numeric_limits<double>::infinity()};
     }
     double r = sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2]);
     VecDoub limits = find_limits(r,E,L);
@@ -139,20 +141,20 @@ VecDoub Actions_Spherical::angles_and_freqs(const VecDoub &x){
     double Delta = 0.5*(limits[1]-limits[0]);
     Actions_Spherical_data_struct Act(Pot,E,L,Lz,Delta,taubar);
 
-    double OmegaR = Delta*GaussLegendreQuad(&dJrdH,-PI/2.,PI/2.,&Act,8)/PI;
+    double OmegaR = Delta*GaussLegendreQuad(&dJrdH,-PI/2.,PI/2.,&Act)/PI;
     OmegaR = 1./OmegaR;
-    double Omegap = Delta*GaussLegendreQuad(&dJrdL,-PI/2.,PI/2.,&Act,8)/PI;
+    double Omegap = Delta*GaussLegendreQuad(&dJrdL,-PI/2.,PI/2.,&Act)/PI;
     Omegap*=-OmegaR;
 
     VecDoub SPol = conv::CartesianToSphericalPolar(x);
 
     double thetaLim = asin(MAX(-1.,MIN(1.,(SPol[0]-taubar)/Delta)));
-    double dSRdH=sign(SPol[3])*Delta*GaussLegendreQuad(&dJrdH,-PI/2.,thetaLim,&Act,8);
+    double dSRdH=sign(SPol[3])*Delta*GaussLegendreQuad(&dJrdH,-PI/2.,thetaLim,&Act);
     double dSRdL=sign(SPol[3])*Delta*GaussLegendreQuad(&dJrdL,-PI/2.,thetaLim,&Act);
 
     double ThetaR = dSRdH*OmegaR;
 
-    double dStdL=sign(SPol[5])*GaussLegendreQuad(&dLdL,PI/2.,SPol[2],&Act,8);
+    double dStdL=sign(SPol[5])*GaussLegendreQuad(&dLdL,PI/2.,SPol[2],&Act);
     // printVector(x);
     double Thetap=dSRdL+dStdL+dSRdH*Omegap;
     if(SPol[5]>0.) Thetap+=PI;

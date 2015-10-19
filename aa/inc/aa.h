@@ -61,9 +61,22 @@ class Action_Finder{
             std::cerr<<"Action routine not overridden in aa.h"<<std::endl;
             return VecDoub(6,0);
         }
-        inline virtual double L_circ(double R){
-            std::cout<<"You shouldn't be in L_circ"<<std::endl;return 0.;}
-};
-#endif
+    inline virtual double L_circ(double R){
+        std::cout<<"You shouldn't be in L_circ"<<std::endl;
+        return 0.;
+    }
 
+};
+
+VecDoub planar_sphr_actions(const VecDoub &x,Potential_JS* Pot);
+VecDoub planar_sphr_angles(const VecDoub &x,Potential_JS* Pot);
+/*!
+    Checks input for actions
+*/
+int action_check(const VecDoub &x, VecDoub &acts, Potential_JS *Pot);
+/*!
+    Checks input for actions
+*/
+int angle_check(const VecDoub &x, VecDoub &angs, Potential_JS *Pot);
+#endif
 // ============================================================================

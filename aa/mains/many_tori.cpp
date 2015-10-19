@@ -75,7 +75,7 @@ using namespace std::chrono;
 int main(int argc, char*argv[]){
 
 	#ifdef TORUS
-	GalPot Pot("../Torus/pot/Piffl14.Tpot");
+	GalPot Pot("pot/Piffl14.Tpot");
 	WrapperTorusPotential TPot(&Pot);
 	// GalPot Pot("../Torus/pot/PJM11.Tpot");
 	std::cout<<TPot.KapNuOm(8.29)*conv::kpcMyr2kms<<std::endl;

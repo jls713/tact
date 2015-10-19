@@ -103,7 +103,6 @@ struct Actions_Spherical_data_struct{
     : Pot(Pot), E(E), L(L), Lz(Lz), Delta(Delta), taubar(taubar), dDelta(dDelta), dtaubar(dtaubar){}
 };
 
-
 #endif
 
 //============================================================================

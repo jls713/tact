@@ -114,6 +114,7 @@ double Stackel_Fitted_Potential::flam(double lambda){
 }
 
 double Stackel_Fitted_Potential::fnu(double nu){
+    if(nu+gamma()<TINY) nu+=TINY;
     chi_integrals SFP(this,nu);
     return (-(GaussLegendreQuad(&chiLam,limits[0],limits[1],&SFP)/L)+0.5*chibar);
 }
@@ -224,11 +225,10 @@ void Stackel_Fitted_Potential::find_limits(VecDoub x){
     // flags for checking when three edge points are found
     int alldone1=0,alldone2=0,alldone3=0,alldone4=0;
     newalpha(-TruePot->DeltaGuess(y)+gamma()); // Initial guess of alpha
-    if(alpha()>gamma())newalpha(gamma()-0.1);
+    if(alpha()>gamma() or alpha()!=alpha() )newalpha(gamma()-0.1);
     tau = xv2tau(y);
     int n = 2; // counts no. of alpha guesses+1
-    while (alldone1*alldone2*alldone3*alldone4==0
-            && y[0]<300.){
+    while (alldone1*alldone2*alldone3*alldone4==0){
 
         ynew = Orb->integrate(y,step,step);
         // Refine our guess of alpha
@@ -236,7 +236,8 @@ void Stackel_Fitted_Potential::find_limits(VecDoub x){
             double new_alpha = -TruePot->DeltaGuess(ynew)+gamma();
             if(new_alpha>gamma()){
                 new_alpha=gamma()-0.1;
-                std::cerr<<"Negative Delta at R="<<sqrt(y[0]*y[0]+y[1]*y[1])<<", z="<<y[2]<<std::endl;
+                if(debug_NegativeDelta)
+                    std::cerr<<"Negative Delta at R="<<sqrt(y[0]*y[0]+y[1]*y[1])<<", z="<<y[2]<<std::endl;
             }
             newalpha(((n-1)*alpha()+new_alpha)/(double)n);
             n++;
@@ -278,7 +279,7 @@ void Stackel_Fitted_Potential::find_limits(VecDoub x){
         y = ynew; tau = taunew;
         steps++;
     }
-    if(y[0]>300.) limits = {-1.,-1.,-1.,-1.};
+    // if(y[0]>300.) limits = {-1.,-1.,-1.,-1.};
     return;
 }
 
@@ -290,14 +291,14 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
         double tautmp=limits[0];
         limits[0]=limits[1];limits[1]=tautmp;
     }
+    if(fabs(limits[2]-limits[3])<SMALL) limits[3]+=SMALL;
     // std::cout<<alpha()<<std::endl;
     // Fit //
     // Perform integrals which are indep. of R,z
     // can do integrals analytically rather than numerically
     double B = alpha()-gamma();
     L = (1./(cl-1.))*(pow(limits[0]+B,-(cl-1))-pow(limits[1]+B,-(cl-1)));
-    N = (pow((limits[3]+gamma()),cv+1)-pow((limits[2]+gamma()),cv+1))/((cv+1.)*pow(fabs(gamma()-alpha()),cv));
-
+    N = (pow((limits[3]+gamma()),cv+1))/((cv+1.)*pow(fabs(gamma()-alpha()),cv));
     VecDoub xmin = {limits[0],limits[2]}, xmax = {limits[1],limits[3]};
     double integral[1],error[1],prob[1];
 
@@ -338,21 +339,25 @@ Actions_StackelFit::Actions_StackelFit(Potential_JS *Pot){
 };
 
 VecDoub Actions_StackelFit::actions(const VecDoub& x, void*params){
+    VecDoub acts(3,0.);
+    if(action_check(x,acts,SFP->potential())) return acts;
     SFP->fit_potential(x);
     Actions_AxisymmetricStackel AS(SFP);
     return AS.actions(x);
 }
 VecDoub Actions_StackelFit::angles(const VecDoub& x, void*params){
+    VecDoub angs(6,0.);
+    if(angle_check(x,angs,SFP->potential())) return angs;
     SFP->fit_potential(x);
     Actions_AxisymmetricStackel AS(SFP);
-    bool *with_hess = (bool *)params;
-    return AS.angles(x,*with_hess);
+    return AS.angles(x,params);
 }
 
 VecDoub Actions_StackelFit::angles_with_hessdet(VecDoub x){
     SFP->fit_potential(x);
     Actions_AxisymmetricStackel AS(SFP);
-    VecDoub aa = AS.angles(x,true);
+    int bh=1;
+    VecDoub aa = AS.angles(x,&bh);
     VecDoub bb;
     for(int i=0;i<6;i++)
         bb.push_back(aa[i]);
