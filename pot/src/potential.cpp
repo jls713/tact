@@ -354,7 +354,9 @@ VecDoub PowerLaw::Forces(const VecDoub& x){
 	r = -k*GM*pow(r,-.5*k-1);
 	return {x[0]*r,x[1]*r/q1,x[2]*r/q2};
 }
-double PowerLaw::density(double r){
+double PowerLaw::density_spherical(double r){
+	if(q1!=1. or q2!=1.)
+		std::cerr<<"Spherical density called but q1 or q2!=1"<<std::endl;
 	return GM/conv::FPG*k*(1-k)*pow(r,-k-2.);
 }
 // ============================================================================
@@ -371,7 +373,9 @@ VecDoub Isochrone::Forces(const VecDoub& x){
 	r = GM/(b+sqrt(r+b*b))/(b+sqrt(r+b*b))/sqrt(r+b*b);
 	return {-x[0]*r,-x[1]*r/q1,-x[2]*r/q2};
 }
-double Isochrone::density(double r){
+double Isochrone::density_spherical(double r){
+	if(q1!=1. or q2!=1.)
+		std::cerr<<"Spherical density called but q1 or q2!=1"<<std::endl;
 	double a = sqrt(b*b+r*r);
 	return GM/conv::FPG*(3.*(b+a)*a*a-r*r*(b+3.*a))/pow(a*(b+a),3.);
 }

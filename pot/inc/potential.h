@@ -376,7 +376,7 @@ class PowerLaw: public Potential_JS{
 		}
 		double Phi(const VecDoub& x);
 		VecDoub Forces(const VecDoub& x);
-		double density(double r);
+		double density_spherical(double r);
 };
 //============================================================================
 ///
@@ -407,7 +407,7 @@ class Isochrone: public Potential_JS{
 		}
 		double Phi(const VecDoub& x);
 		VecDoub Forces(const VecDoub& x);
-		double density(double r);
+		double density_spherical(double r);
 };
 
 //============================================================================

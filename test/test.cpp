@@ -73,6 +73,7 @@ TEST(PotentialTest,IsochroneActions){
   EXPECT_DOUBLE_EQ(-0.17700703011750593,ISO.Hessian({1.,1.,1.,0.1,0.1,0.1})[2]);
 }
 
+<<<<<<< HEAD
 //=============================================================================
 
 TEST(ActionTest_Iso,StackelFudge){

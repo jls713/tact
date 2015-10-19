@@ -49,12 +49,13 @@ INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include
 
 INCPY = -I$(PYTHONINCPATH) -I$(BOOSTINCPATH)
 
-LIBPATHS =  -Wl,-rpath=$(POTLIBPATH)
+LIBPATHS =
+# -Wl,-rpath=$(POTLIBPATH)
 # -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 		   # -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
 		   # -Wl,-R$(GSLPATH)lib/ -Wl,-R$(CTPATH)
 
-LIB = -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
+LIB = -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/  -Wl,-rpath,$(EBFPATH)lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) $(TORUSLIBS) -lpot_js -lcoords \
@@ -137,7 +138,7 @@ lmnnew_test.exe: $(OBJECTS)
 ## LIBRARY
 
 lib/libaa.so: $(OBJECTS)
-	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -o lib/libaa.so
+	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(INC) -Wl,-$(LIBNAME),$(CURDIR)/lib/libaa.so  $(LIB) $(CUBA) -o lib/libaa.so
 
 triax_py.so: $(OBJECTS) $(OBJ)triax_py.o
 	$(CCOMPILER) -fPIC $(LIBFLAG) $(CFL) $(OBJECTS) $(OBJ)triax_py.o $(INC) $(LIB)  -o triax_py.so

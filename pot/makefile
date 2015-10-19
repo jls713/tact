@@ -33,8 +33,10 @@ COORDLIBPATH = $(CTPATH)
 
 INC = -I../../ -Iinc/ $(TORUSINCPATH) -I$(GENERALPATH) -I$(GSLPATH)include/ -I$(COORDINCPATH)
 
-LIB = -L$(GENERALPATH) -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ \
-	  -L$(COORDLIBPATH) -lcoords -lPot -lWD -lplot -lgsl -lgslcblas \
+LIBWLRPATH = -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/  -Wl,-rpath,$(EBFPATH)lib/
+
+LIB = $(LIBWLRPATH) -L$(GENERALPATH) -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ \
+	  -L$(COORDLIBPATH) -lcoords $(TORUSLIBS) -lplot -lgsl -lgslcblas \
 	  -lm $(EXTRACLIB)
 
 BOOSTLIB = -lboost_python -lpython2.7
@@ -45,10 +47,10 @@ $(OBJ)%.o : $(SRC)%.cpp ${HEADERS}
 	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
 
 multipole_test.exe: $(OBJECTS)
-	$(CCOMPILER) $(OPTS) -o multipole_test.exe $(OBJECTS) $(LIB) $(LIBPY)
+	$(CCOMPILER) $(OPTS) -o multipole_test.exe $(OBJECTS) $(LIB)
 
 libpot_js.so: $(OBJECTS)
-	$(CCOMPILER) $(LIBFLAG) $(OPTS) -o libpot_js.so -Wl,-$(LIBNAME),libpot_js.so $(OPTS) $(OBJECTS) $(INC) $(TORUSFLAG)
+	$(CCOMPILER) $(LIBFLAG) $(OPTS) -o libpot_js.so -Wl,-$(LIBNAME),$(CURDIR)/libpot_js.so $(OPTS) $(OBJECTS) $(INC) $(LIB) $(TORUSFLAG)
 
 clean:
 	rm -rf obj/*.o; rm -rf *.so; rm -rf *.exe

@@ -1,5 +1,6 @@
 ####################################################################
 ## Makefile
+####################################################################
 ## 1. Need to install gsl (http://www.gnu.org/software/gsl/)
 ## 	  This is necessary
 ## 2. You will need to set the CXX environment variable to c++ compiler
@@ -12,6 +13,14 @@ GSLPATH =/opt/ioa/software/gsl/1.16/
 <!-- GSLPATH =/usr/local/Cellar/gsl/1.16/ -->
 
 ####################################################################
+
+## Tests:
+## To run the tests you need google test and to set the path:
+
+<!-- GTESTPATH=/data/jls/gtest-1.7.0/ -->
+GTESTPATH=/Users/jls/work/code/other/gtest-1.7.0/
+
+####################################################################
 ## Optional
 
 ## 1. Use Torus (https://github.com/PaulMcMillan-Astro/Torus)
@@ -19,8 +28,8 @@ GSLPATH =/opt/ioa/software/gsl/1.16/
 ###		with ebf library (http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/)
 ### 1.2. Set Torus and ebf paths
 
-TORUSPATH = /home/jls/work/code/Torus_github/Torus/
-EBFPATH = /data/jls/libebf_c_cpp-0.0.3/
+TORUSPATH = ../Torus/
+EBFPATH = ../libebf_c_cpp-0.0.3/
 
 ### 1.3. Compile with "make TORUS=1"
 
@@ -52,7 +61,7 @@ PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 ####################################################################
 ## Compiler flags
 DEBUG = -ggdb3 #-ffast-math -Ofast
-OPTS = -std=c++0x -Wall -O2 -fopenmp -fPIC
+OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC
 
 ####################################################################
 
@@ -63,7 +72,7 @@ else
 endif
 
 ifeq ($(LAPACK),1)
-	LACPAKFLAG=-DLAPACK
+	LAPACKFLAG=-DLAPACK
 else
 	LAPACKFLAG=
 endif
@@ -80,8 +89,10 @@ ifeq ($(UNAME_S),Linux)
 endif
 ifeq ($(UNAME_S),Darwin)
     LIBNAME=install_name
-    LIBFLAG=-dynamic_lib -undefined suppress -flat_namespace
+    LIBFLAG=-dynamiclib -undefined suppress -flat_namespace
 endif
 
 export LIBNAME
 export LIBFLAG
+export UNAME_S
+

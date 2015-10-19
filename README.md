@@ -10,13 +10,13 @@ Code for calculating actions, angles and frequencies in various ways
 
 ## Installation
 
-* Make sure environment variable $(CXX) gives c++ compiler or specify compiler path in Makefile.inc (need a C++-11 compatible compiler, currently compiles with g++ 4.9)
+* Make sure environment variable $(CXX) gives c++ compiler or specify compiler path in Makefile.inc (need a C++-11 compatible compiler, it compiles with clang 3.4 and g++ 4.8 or 4.9)
 * Specify path to gsl in Makefile.inc
 * Run make
 
 This will install the basic package. To access all the features one should also install Torus and LAPACK:
 
-* Some code uses [Torus](https://github.com/PaulMcMillan-Astro/Torus). To use this install Torus, add path to Torus to Makefile.inc and run 'make TORUS=1'
+* Some code uses [Torus](https://github.com/PaulMcMillan-Astro/Torus). To use this install Torus (use 'make CPP="$CXX -fPIC"' to ensure libraries are compiled with fPIC flag) , add path to Torus to Makefile.inc and run 'make TORUS=1'. Currently there are problems compiling with Torus using clang. This appears to be due to different compiler flags in Torus and tact. If users wish to use clang then they should make sure the compiler flags are the same for both.
 * Some code uses [LAPACK](http://www.netlib.org/lapack/). To use this install LAPACK, add path to LAPACK to Makefile.inc and run 'make LAPACK=1'
 * To do both run 'make TORUS=1 LAPACK=1'
 
