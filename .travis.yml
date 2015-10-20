@@ -17,6 +17,13 @@ env:
   - TORUS=0 LAPACK=1
   - TORUS=1 LAPACK=1
 
+matrix:
+  exclude:
+    - compiler: clang
+      env: TORUS=1 LAPACK=0
+    - compiler: clang
+      env: TORUS=1 LAPACK=1
+
 script:
   - cd test; make tests.exe; ./tests.exe; cd ..
 
