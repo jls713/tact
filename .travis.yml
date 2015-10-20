@@ -49,7 +49,7 @@ before_script:
 
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
   - if [ "$TORUS" == 1 ]; then wget http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/libebf_c_cpp-0.0.3.tar.gz && tar -xvzf libebf_c_cpp-0.0.3.tar.gz && cd libebf_c_cpp-0.0.3 && ./configure --prefix=$(pwd) && make && make install && cd ..; fi
-  - if [ "$TORUS" == 1 ]; then git clone https://github.com/PaulMcMillan-Astro/Torus.git && cd Torus && make CPP="$CXX -fPIC -D__extern_always_inline=inline" && cd ..; fi
+  - if [ "$TORUS" == 1 ]; then git clone https://github.com/PaulMcMillan-Astro/Torus.git && cd Torus && make MAIN_LIBS CPP="$CXX -fPIC -D__extern_always_inline=inline" && cd ..; fi
   - make
 
 notifications:
