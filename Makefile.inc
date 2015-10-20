@@ -17,8 +17,8 @@ GSLPATH =/opt/ioa/software/gsl/1.16/
 ## Tests:
 ## To run the tests you need google test and to set the path:
 
-<!-- GTESTPATH=/data/jls/gtest-1.7.0/ -->
-GTESTPATH=/Users/jls/work/code/other/gtest-1.7.0/
+GTESTPATH=/data/jls/gtest-1.7.0/
+<!-- GTESTPATH=/Users/jls/work/code/other/gtest-1.7.0/ -->
 
 ####################################################################
 ## Optional
@@ -61,7 +61,7 @@ PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 ####################################################################
 ## Compiler flags
 DEBUG = -ggdb3 #-ffast-math -Ofast
-OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC
+OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC -ggdb3
 
 ####################################################################
 

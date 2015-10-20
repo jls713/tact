@@ -334,8 +334,8 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
     spline(nugrid, fnugrid, DATAPOINTS, 1e30, 1e30, y2Nugrid);
 }
 
-Actions_StackelFit::Actions_StackelFit(Potential_JS *Pot){
-    SFP = new Stackel_Fitted_Potential(Pot);
+Actions_StackelFit::Actions_StackelFit(Potential_JS *Pot, double eps){
+    SFP = new Stackel_Fitted_Potential(Pot,eps);
 };
 
 VecDoub Actions_StackelFit::actions(const VecDoub& x, void*params){

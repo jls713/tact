@@ -59,7 +59,7 @@ static double pnu_squared(double nu, void *params){
 static double Jnuint(double theta, void *params){
 	SpheroidalAA_zactions_struct *RS = (SpheroidalAA_zactions_struct *) params;
 	double nu=RS->taubar+RS->Delta*sin(theta);
-	return sqrt(MAX(0.,0.5*(nu-RS->lam)/((nu+RS->AA->CS->alpha())*(nu+RS->AA->CS->gamma()))*pnu_squared(nu,RS)))*cos(theta);
+	return sqrt(MAX(0.,0.5*(nu-RS->lam)/((nu+RS->AA->CS->alpha())*(MAX(TINY,nu+RS->AA->CS->gamma())))*pnu_squared(nu,RS)))*cos(theta);
 }
 
 static double plam_squared(double lam, void *params){
@@ -77,13 +77,13 @@ static double dJnudLzint(double theta, void *params){
 	SpheroidalAA_zactions_struct *RS = (SpheroidalAA_zactions_struct *) params;
 	double nu=RS->taubar+RS->Delta*sin(theta);
 	double R = RS->AA->CS->tau2x({RS->lam,0.,nu})[0];
-	return -.5*sqrt(RS->Lz2)*(1./(R*R)-1./(RS->lam+RS->AA->CS->alpha()))*sqrt(MAX(0.,0.5*(nu-RS->lam)/((nu+RS->AA->CS->alpha())*(nu+RS->AA->CS->gamma()))/MAX(RS->tiny_number,pnu_squared(nu,RS))))*cos(theta);
+	return -.5*sqrt(RS->Lz2)*(1./(R*R)-1./(RS->lam+RS->AA->CS->alpha()))*sqrt(MAX(0.,0.5*(nu-RS->lam)/((nu+RS->AA->CS->alpha())*(MAX(TINY,nu+RS->AA->CS->gamma())))/MAX(RS->tiny_number,pnu_squared(nu,RS))))*cos(theta);
 }
 
 static double dJnudEnuint(double theta, void *params){
 	SpheroidalAA_zactions_struct *RS = (SpheroidalAA_zactions_struct *) params;
 	double nu=RS->taubar+RS->Delta*sin(theta);
-	return .5*sqrt(MAX(0.,0.5*(nu-RS->lam)/((nu+RS->AA->CS->alpha())*(nu+RS->AA->CS->gamma()))/MAX(RS->tiny_number,pnu_squared(nu,RS))))*cos(theta);
+	return .5*sqrt(MAX(0.,0.5*(nu-RS->lam)/((nu+RS->AA->CS->alpha())*(MAX(TINY,nu+RS->AA->CS->gamma())))/MAX(RS->tiny_number,pnu_squared(nu,RS))))*cos(theta);
 }
 
 static double dJlamdEint(double theta, void *params){
@@ -206,7 +206,7 @@ double Actions_SpheroidalAdiabaticApproximation::find_nulimit(double ENu, double
 	SpheroidalAA_zactions_struct RS(this,ENu,Lz2,tau[0],0.,0.,0.);
 	double nutry = tau[2];
 	while(pnu_squared(nutry, &RS)>0.) nutry+=0.1*(-CS->alpha()-nutry);
-	root_find RF(TINY,20);
+	root_find RF(TINY,100);
 	return RF.findroot(&pnu_squared,tau[2],nutry,&RS);
 }
 
@@ -215,7 +215,7 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::find_lamlimits(double Elam, do
 	double lamin = tau[0], lamout = tau[0];
 	while(plam_squared(lamout, &RS)>0.) lamout*=1.1;;
 	while(plam_squared(lamin, &RS)>0.)  lamin-=.1*(lamin+CS->alpha());
-	root_find RF(TINY,20);
+	root_find RF(TINY,100);
 	return {RF.findroot(&plam_squared,lamin,tau[0],&RS),
 			RF.findroot(&plam_squared,tau[0],lamout,&RS)};
 }
@@ -230,6 +230,9 @@ double Actions_SpheroidalAdiabaticApproximation::actions_Jz(double ENu, double L
 }
 
 VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void*params){
+
+	VecDoub acts(3,0.);
+    if(action_check(x,acts,Pot)) return acts;
 
 	if(fabs(x[2])>ZMAX) std::cerr<<"z outside grid range"<<std::endl;
 
@@ -246,9 +249,10 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 	}
 
 	VecDoub tau = CS->xv2tau(x);
+	if(tau[2]==-CS->gamma())tau[2]+=TINY;
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
-	double ENu = (tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
-	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]
+	double ENu = (fabs(tau[5])>TINY?(tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
+	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:0.)
 				 +Phi_nu(tau,Lz2);
 
 	double nulim = tau[2];
@@ -264,6 +268,9 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 }
 
 VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void *params){
+
+	VecDoub angs(6,0.);
+    if(angle_check(x,angs,Pot)) return angs;
 
 	if(fabs(x[2])>ZMAX) std::cerr<<"z outside grid range"<<std::endl;
 
@@ -282,12 +289,14 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	VecDoub angles(6,0.);
 
 	VecDoub tau = CS->xv2tau(x);
+	if(tau[2]==-CS->gamma())tau[2]+=TINY;
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
-	double ENu = (tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
-	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]
+	double ENu = (fabs(tau[5])>TINY?(tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
+	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:0.)
 				 +Phi_nu(tau,Lz2);
 
 	double tn = estimate_tiny(ENu, tau[0], tau[2], Lz2);
+	if(tn==0.)tn=1e-20;
 	double nulim = tau[2];
 	double Jz = actions_Jz(ENu, Lz2, tau, &nulim);
 	double Delta = .5*(nulim+CS->gamma()), taubar = .5*(nulim-CS->gamma());
@@ -306,6 +315,7 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 
 	double Elam = (tau[0]-tau[2])*tau[3]*tau[3]/(8.0*(tau[0]+CS->alpha())*(tau[0]+CS->gamma()))+Philam_eff(tau,Lz2,Jz);
 	VecDoub lamlims = find_lamlimits(Elam,Lz2,Jz,tau);
+
 	Delta = .5*(lamlims[1]-lamlims[0]);
 	taubar = .5*(lamlims[1]+lamlims[0]);
 	SpheroidalAA_Ractions_struct RA(this,Elam,Lz2,Jz,-CS->gamma(),Delta,taubar, tn);
@@ -318,7 +328,6 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJlamdEint,-.5*PI,anglim,&RA);
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJlamdLzint,-.5*PI,anglim,&RA);
 	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJlamdEnuint,-.5*PI,anglim,&RA);
-
 	VecDoub dJdIp = {0.,1.,0.};
 
 	double Determinant = dJdIp[1]*(dJdIl[0]*dJdIn[2]-dJdIl[2]*dJdIn[0]);

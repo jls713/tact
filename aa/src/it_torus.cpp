@@ -145,7 +145,7 @@ VecDoub IterativeTorusMachine::actions(const VecDoub &X, void*params){
 	int flag,err=0; Actions J;
 	J[0] = aaGuess[0];	J[1] = aaGuess[2];	J[2] = aaGuess[1];
 	flag = T->AutoFit(J,&TPhi,dJ,700,300,15,5,24,200,24,err);
-	if(flag!=0) std::cerr<<"Non-zero flag in IterativeTorusMachine::actions\n";
+	if(flag!=0) std::cerr<<"Non-zero flag in IterativeTorusMachine::actions:"<<flag<<"\n";
 	for(int i=0;i<3;i++) aaGuess[i+3]=T->omega(i);
 
 	// Return actions in right units

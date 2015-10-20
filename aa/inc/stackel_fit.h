@@ -76,9 +76,9 @@ class Stackel_Fitted_Potential: public StackelOblate_PerfectEllipsoid{
           \param TruePot Potential_JS (axisymmetric)
 
         */
-        Stackel_Fitted_Potential(Potential_JS *TruePot)
+        Stackel_Fitted_Potential(Potential_JS *TruePot, double eps=1e-8)
             :StackelOblate_PerfectEllipsoid(10.,-30.),TruePot(TruePot){
-                Orb = std::unique_ptr<Orbit>(new Orbit(TruePot,1e-8));
+                Orb = std::unique_ptr<Orbit>(new Orbit(TruePot,eps));
             };
         //! Stackel_Fitted_Potential destructor.
         ~Stackel_Fitted_Potential(){
@@ -116,7 +116,7 @@ class Actions_StackelFit : public Action_Finder{
           \param pot Potential_JS (axisymmetric)
 
         */
-        Actions_StackelFit(Potential_JS *Pot);
+        Actions_StackelFit(Potential_JS *Pot,double eps=1e-8);
         //! Finds actions
         /*!
           \param x phase-space point (x,v)

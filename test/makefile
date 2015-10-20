@@ -51,7 +51,7 @@ INC = -I../../ -I../ -Iinc/ $(TORUSINCPATH) -I$(PYTHONINCPATH) -I$(BOOSTINCPATH)
 
 LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 		   -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
-		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH) -Wl,-R../aa/lib
+		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH) -Wl,-R../aa/lib -Wl,-R$(GTESTLIB)
 
 LIB = $(LIBPATHS) -L../aa/lib/ -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/ -Wl,-rpath,$(EBFPATH)lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
