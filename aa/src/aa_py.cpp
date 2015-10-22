@@ -26,7 +26,7 @@
 /// Wraps the action-finding routines such that they can be used in python
 //============================================================================
 
-#include <Python.h>
+#include <python2.7/Python.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
