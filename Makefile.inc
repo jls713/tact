@@ -54,7 +54,7 @@ LAPACKPATH = general/lapack/
 
 BOOSTINCPATH =/opt/ioa/software/boost/1.55.0/include
 BOOSTLIBPATH =-L/opt/ioa/software/boost/1.55.0/lib
-PYTHONINCPATH=/opt/ioa/software/python/2.7.8/include/python2.7/
+PYTHONINCPATH=/usr/include/python2.7/
 PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 
 
