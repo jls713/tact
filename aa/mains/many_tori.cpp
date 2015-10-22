@@ -265,9 +265,11 @@ int main(int argc, char*argv[]){
 		for(auto k:columnRMS(SAAResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(FITResults)) outfile<<k<<" ";
 		for(unsigned N=0;N<8;++N) outfile<<times[N].count()/range.size()<<" ";
+		#ifdef TORUS
 		for(unsigned kk=0;kk<3;++kk)
 			for(unsigned pp=0;pp<3;++pp)
 				outfile<<Hess[kk][pp]<<" ";
+		#endif
 		outfile<<std::endl;
 	}
 	outfile.close();
