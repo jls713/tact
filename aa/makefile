@@ -85,7 +85,9 @@ HEADERS = $(wildcard inc/*.h)
 
 default: all
 
-all: lib/libaa.so mains/test_actions.exe mains/test_angles.exe mains/many_tori.exe
+all: lib/libaa.so mains/test_actions.exe mains/test_angles.exe mains/many_tori.exe mains/genfunc_converg.exe
+
+python: lib/aa_py.so
 
 forceall: clean all
 
@@ -126,6 +128,9 @@ mains/test_angles.exe: $(OBJECTS) $(OBJ)test_angles.o
 
 mains/many_tori.exe: $(OBJECTS) $(OBJ)many_tori.o
 	$(CCOMPILER) $(OPTS) -o mains/many_tori.exe $(OBJECTS) $(OBJ)many_tori.o $(LIB) $(CUBA)
+
+mains/genfunc_converg.exe: $(OBJECTS) $(OBJ)genfunc_converg.o
+	$(CCOMPILER) $(OPTS) -o mains/genfunc_converg.exe $(OBJECTS) $(OBJ)genfunc_converg.o $(LIB) $(CUBA)
 
 spherical_test.exe: $(OBJECTS)
 	$(CCOMPILER) $(OPTS) -o spherical_test.exe $(OBJECTS) $(LIB)

@@ -70,6 +70,36 @@ MatDoub dvdJ(VecDoub X, double dv, Actions_Genfunc *AG){
 	return inv;
 }
 
+
+#ifdef TORUS
+MatDoub dOmdJ(Actions J, Actions dJ, WrapperTorusPotential *Pot){
+	Torus T; Actions Jp = J; Frequencies Omu, Omd;
+	MatDoub mat(3,VecDoub(3,0.));
+	Jp[0]+=dJ[0];
+	T.AutoFit(Jp,Pot,1e-5); Omu = T.omega();
+	Jp=J; Jp[0]-=dJ[0];
+	T.AutoFit(Jp,Pot,1e-5); Omd = T.omega();
+	mat[0][0]=(Omu[0]-Omd[0])/2./dJ[0];
+	mat[1][0]=(Omu[2]-Omd[2])/2./dJ[0];
+	mat[2][0]=(Omu[1]-Omd[1])/2./dJ[0];
+	Jp=J; Jp[1]+=dJ[1];
+	T.AutoFit(Jp,Pot,1e-5); Omu = T.omega();
+	Jp=J; Jp[2]-=dJ[2];
+	T.AutoFit(Jp,Pot,1e-5); Omd = T.omega();
+	mat[1][1]=(Omu[2]-Omd[2])/2./dJ[2];
+	mat[2][1]=(Omu[1]-Omd[1])/2./dJ[2];
+	Jp=J; Jp[1]+=dJ[1];
+	T.AutoFit(Jp,Pot,1e-5); Omu = T.omega();
+	Jp=J; Jp[1]-=dJ[1];
+	T.AutoFit(Jp,Pot,1e-5); Omd = T.omega();
+	mat[2][2]=(Omu[1]-Omd[1])/2./dJ[1];
+	mat[0][1]=mat[1][0];
+	mat[0][2]=mat[2][0];
+	mat[1][2]=mat[2][1];
+	return mat;
+}
+# endif
+
 using namespace std::chrono;
 
 int main(int argc, char*argv[]){
@@ -128,8 +158,8 @@ int main(int argc, char*argv[]){
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	for(auto j: range){
 		count+=1;
-		if(count<480)
-			continue;
+		// if(count<480)
+		// 	continue;
 		X[3]=j;
 		X[5]=j*.8;
 		O.integrate(X,10.*Pot.torb(X),0.204*Pot.torb(X));
@@ -156,6 +186,7 @@ int main(int argc, char*argv[]){
 		J[2]=acts[1]/conv::kpcMyr2kms;J[1]=acts[2]/conv::kpcMyr2kms;
 		Torus T; T.AutoFit(J,&TPot,1e-5);
 		outfile<<T.minR()<<" "<<T.maxR()<<" "<<" "<<T.maxz()<<" ";
+		MatDoub Hess = dOmdJ(J,.1*J,&TPot);
 		#endif
 		outfile<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" "<<SD(Energy)/Mean(Energy)<<" ";
 
@@ -234,6 +265,9 @@ int main(int argc, char*argv[]){
 		for(auto k:columnRMS(SAAResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(FITResults)) outfile<<k<<" ";
 		for(unsigned N=0;N<8;++N) outfile<<times[N].count()/range.size()<<" ";
+		for(unsigned kk=0;kk<3;++kk)
+			for(unsigned pp=0;pp<3;++pp)
+				outfile<<Hess[kk][pp]<<" ";
 		outfile<<std::endl;
 	}
 	outfile.close();

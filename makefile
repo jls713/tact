@@ -44,3 +44,5 @@ test:
 docs:
 	doxygen doc/doxygen.config
 
+python:
+	$(MAKE) -C $(AA_DIR) python

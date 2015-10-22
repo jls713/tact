@@ -74,7 +74,14 @@ const double PM_Const = 4.74057170372;
 const double sdGP = sin(decGP), cdGP = cos(decGP);
 
 // ============================================================================
-
+// Cartesian = (x,y,z,vx,vy,vz):
+// 		 x away from centre of Galaxy towards Sun
+//		 y opposite to Galactic rotation
+//		 z up towards North Galactic Pole
+// Polar = (R,\phi,z,vR,v\phi,vz)
+// Galactic = (l,b,s,vlos,\mu_l\cos(b),\mu_b)
+// Equatorial =(\alpha,\delta,s,vlos,\mu_\alpha\cos(\delta),mu_\delta)
+// Units: velocities in km/s, positions kpc and proper motions in mas/yr
 // ============================================================================
 /*! Cartesian ==> SphericalPolar */
 VecDoub CartesianToSphericalPolar(const VecDoub& Cartesian);
