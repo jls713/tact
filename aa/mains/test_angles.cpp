@@ -115,13 +115,19 @@ int main(int argc, char*argv[]){
 
 	std::ofstream outfile;
 	outfile.open(argv[7]);
-	outfile<<"# Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
+	outfile<<"# Fudge ";
+	#ifdef TORUS
+	outfile<<"ItTorus ";
+	#endif
+	outfile<<"Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
 
 	int guess_alpha=1; int N=0;
 	VecDoub Fudge, ITorus, Genfunc, GenfuncAv, uvAct, paaAct, saaAct, fitAct;
 	for(auto i:O.results()){
 		Fudge = AA.angles(i,&guess_alpha);
+		#ifdef TORUS
 		ITorus = Tor.angles(i);
+		#endif
 		Genfunc = AG.angles(i);
 		GenfuncAv = AGav.angles(i);
 		uvAct = UV.angles(i);
@@ -130,7 +136,9 @@ int main(int argc, char*argv[]){
 		fitAct = SF.angles(i);
 		outfile << tstep*N<<" ";
 		for(auto k: Fudge) outfile<<k<<" ";
+		#ifdef TORUS
 		for(auto k: ITorus) outfile<<k<<" ";
+		#endif
 		for(auto k: Genfunc) outfile<<k<<" ";
 		for(auto k: GenfuncAv) outfile<<k<<" ";
 		for(auto k: uvAct) outfile<<k<<" ";
