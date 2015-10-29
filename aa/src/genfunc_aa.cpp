@@ -394,9 +394,9 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     VecDoub a_data(N_SIZE*N_SIZE,0.);
     int k=0;
     for(int i=0;i<N_SIZE;++i)
-    for(int j=i;j<N_SIZE;++j){
-        a_data[i*N_SIZE+j]=a[k];
-        a_data[j*N_SIZE+i]=a_data[i*N_SIZE+j];
+    for(int j=0;j<i+1;++j){
+        a_data[i+j*N_SIZE]=a[k];
+        a_data[j+i*N_SIZE]=a_data[j*N_SIZE+i];
         k++;
     }
     gsl_matrix_view m
