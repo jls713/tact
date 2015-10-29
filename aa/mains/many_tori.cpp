@@ -115,7 +115,11 @@ int main(int argc, char*argv[]){
 
 	VecDoub X(6,1e-4);
 
-	X[0]=conv::StandardSolarPAUL[0];X[2]=conv::StandardSolarPAUL[1];
+	if(argc>2)
+		X[0]=atof(argv[2]);
+	else
+		X[0]=conv::StandardSolarPAUL[0];
+	X[2]=0.001;
 	X[4]=sqrt(X[0]*-Pot.Forces(X)[0]);
 	printVector(X);
 	Orbit O(&Pot,1e-8);
@@ -124,7 +128,7 @@ int main(int argc, char*argv[]){
 
 	// Iterative Torus
 	#ifdef TORUS
-	IterativeTorusMachine Tor(&AA,&Pot,1e-4,5,5e-3);
+	IterativeTorusMachine Tor(&AA,&Pot,1e-8,5,1e-3);
 	#endif
 
 	// Generating Function

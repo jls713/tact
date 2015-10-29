@@ -106,6 +106,11 @@ static double dJlamdEnuint(double theta, void *params){
 	double lam=RS->taubar+RS->Delta*sin(theta);
 	return -.5*sqrt(MAX(0.,0.5*(lam-RS->nu)/((lam+RS->AA->CS->alpha())*(lam+RS->AA->CS->gamma()))/MAX(RS->tiny_number,plam_squared(lam, RS))))*cos(theta);
 }
+static double dJlamdJzint(double theta, void *params){
+	SpheroidalAA_Ractions_struct *RS = (SpheroidalAA_Ractions_struct *) params;
+	double lam=RS->taubar+RS->Delta*sin(theta);
+	return -(1./RS->AA->dJzdEz(RS->Lz2,sqrt(lam+RS->AA->CS->alpha()),RS->Jz))*.5*sqrt(MAX(0.,0.5*(lam-RS->nu)/((lam+RS->AA->CS->alpha())*(lam+RS->AA->CS->gamma()))/MAX(RS->tiny_number,plam_squared(lam, RS))))*cos(theta);
+}
 void Actions_SpheroidalAdiabaticApproximation::load_grids(std::string filename){
 	std::ifstream in; in.open(filename);
 	int NG,NLL;	in>>NG>>NLL; assert(NG==NGRID); assert(NLL==NL);
@@ -196,6 +201,52 @@ double Actions_SpheroidalAdiabaticApproximation::Ez_from_grid(double Lz2,double 
 
 		return (1-fac2)*((1-fac)*Ezb+fac*Ezt)+fac2*((1-fac)*Ezb2+fac*Ezt2);
 	}
+}
+
+
+double Actions_SpheroidalAdiabaticApproximation::Jz_from_grid(double Lz2,double R,double Ez){
+	//Jz(R,Ez) by interpolation
+	if(no_energy_correction)
+		return 0;
+	else{
+		int botR,topR;
+		if(R<Rgrid[0]) R = Rgrid[0];
+		if(R>Rgrid[NGRID-1]) R = Rgrid[NGRID-1];
+		topbottom<double>(Rgrid,R,&botR,&topR);
+
+		double Lz = sqrt(Lz2);
+		int botL,topL;
+		if(Lz<Lgrid[0]) Lz = Lgrid[0];
+		if(Lz>Lgrid[NL-1]) Lz = Lgrid[NL-1];
+		topbottom<double>(Lgrid,Lz,&botL,&topL);
+
+		double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
+		double fac2=(Lz-Lgrid[botL])/(Lgrid[topL]-Lgrid[botL]);
+
+		double Jzb=linterp<double>(Ezgrid[botL][botR],Jzgrid[botL][botR],MIN(Ez,Ezgrid[botL][botR][NGRID-1]));
+		double Jzt=linterp(Ezgrid[botL][topR],Jzgrid[botL][topR],MIN(Ez,Ezgrid[botL][topR][NGRID-1]));
+
+		double Jzb2=linterp<double>(Ezgrid[topL][botR],Jzgrid[topL][botR],MIN(Ez,Ezgrid[topL][botR][NGRID-1]));
+		double Jzt2=linterp(Ezgrid[topL][topR],Jzgrid[topL][topR],MIN(Ez,Ezgrid[topL][topR][NGRID-1]));
+
+		return (1-fac2)*((1-fac)*Jzb+fac*Jzt)+fac2*((1-fac)*Jzb2+fac*Jzt2);
+	}
+}
+
+double Actions_SpheroidalAdiabaticApproximation::dJzdEz(double Lz2,double R,double Jz){
+	// dJzdEz at fixed lam and Lz
+	double dJ = 0.1*Jz;
+	double Eu = Ez_from_grid(Lz2,R,Jz+dJ);
+	double Ed = Ez_from_grid(Lz2,R,Jz-dJ);
+	return 2.*dJ/(Eu-Ed);
+}
+
+double Actions_SpheroidalAdiabaticApproximation::dJzdR(double Lz2,double R,double Ez){
+	// dJzdR at fixed Ez and Lz
+	double dR = 0.1*R;
+	double Ju = Jz_from_grid(Lz2,R+dR,Ez);
+	double Jd = Jz_from_grid(Lz2,R-dR,Ez);
+	return (Ju-Jd)/2./dR;
 }
 
 double Actions_SpheroidalAdiabaticApproximation::estimate_tiny(double ENu, double lam, double nu, double Lz2){
@@ -308,10 +359,10 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	double lsign = SIGN(tau[5]);
 	dJdIn[0] = 0.;//2.*Delta*GaussLegendreQuad(&dJnudEint,-.5*PI,.5*PI,&PA)/PI;
 	dJdIn[1] = 2.*Delta*GaussLegendreQuad(&dJnudLzint,-.5*PI,.5*PI,&PA)/PI;
-	dJdIn[2] = 2.*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,.5*PI,&PA)/PI;
+	dJdIn[2] = 1.;//2.*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,.5*PI,&PA)/PI;
 	dSdI[0] += 0.;//lsign*Delta*GaussLegendreQuad(&dJnudEint,-.5*PI,anglim,&PA)/PI;
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJnudLzint,-.5*PI,anglim,&PA);
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,anglim,&PA);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,anglim,&PA)/dJzdEz(Lz2,sqrt(tau[0]+CS->alpha()),Jz);
 
 	double Elam = (tau[0]-tau[2])*tau[3]*tau[3]/(8.0*(tau[0]+CS->alpha())*(tau[0]+CS->gamma()))+Philam_eff(tau,Lz2,Jz);
 	VecDoub lamlims = find_lamlimits(Elam,Lz2,Jz,tau);
@@ -324,10 +375,11 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	lsign = SIGN(tau[3]);
 	dJdIl[0] = Delta*GaussLegendreQuad(&dJlamdEint,-.5*PI,.5*PI,&RA)/PI;
 	dJdIl[1] = Delta*GaussLegendreQuad(&dJlamdLzint,-.5*PI,.5*PI,&RA)/PI;
-	dJdIl[2] = Delta*GaussLegendreQuad(&dJlamdEnuint,-.5*PI,.5*PI,&RA)/PI;
+	dJdIl[2] = Delta*GaussLegendreQuad(&dJlamdJzint,-.5*PI,.5*PI,&RA)/PI;
 	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJlamdEint,-.5*PI,anglim,&RA);
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJlamdLzint,-.5*PI,anglim,&RA);
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJlamdEnuint,-.5*PI,anglim,&RA);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJlamdJzint,-.5*PI,anglim,&RA);
+
 	VecDoub dJdIp = {0.,1.,0.};
 
 	double Determinant = dJdIp[1]*(dJdIl[0]*dJdIn[2]-dJdIl[2]*dJdIn[0]);
@@ -457,6 +509,12 @@ static double dJRdLzint(double theta, void *params){
 	return -sqrt(RS->Lz2)/R/R*cos(theta)/sqrt(MAX(RS->tiny_number,2.*pR_squared(R,RS)));
 }
 
+static double dJRdJzint(double theta, void *params){
+	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
+	double R=RS->taubar+RS->Delta*sin(theta);
+	return -(1./RS->AA->dJzdEz(R,RS->Jz))*cos(theta)/sqrt(MAX(RS->tiny_number,2.*pR_squared(R,RS)));
+}
+
 static double dJRdEzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta);
@@ -518,6 +576,40 @@ double Actions_PolarAdiabaticApproximation::Ez_from_grid(double R,double Jz){
 		double Ezt=linterp(Jzgrid[topR],Ezgrid[topR],MIN(Jz,Jzgrid[topR][NGRID-1]));
 		return (1-fac)*Ezb+fac*Ezt;
 	}
+}
+
+
+double Actions_PolarAdiabaticApproximation::Jz_from_grid(double R,double Ez){
+	//Jz(R,Ez) by interpolation
+	if(no_energy_correction)
+		return 0;
+	else{
+		int botR,topR;
+		if(R<Rgrid[0]){ R = Rgrid[0]; std::cerr<<"Outside R grid in PAA:"<<R<<"\n";}
+		if(R>Rgrid[NGRID-1]){ R = Rgrid[NGRID-1]; std::cerr<<"Outside R grid in PAA:"<<R<<"\n";}
+		topbottom<double>(Rgrid,R,&botR,&topR);
+		double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
+		double Jzb=linterp<double>(Ezgrid[botR],Jzgrid[botR],MIN(Ez,Ezgrid[botR][NGRID-1]));
+		double Jzt=linterp(Ezgrid[topR],Jzgrid[topR],MIN(Ez,Ezgrid[topR][NGRID-1]));
+		return (1-fac)*Jzb+fac*Jzt;
+	}
+}
+
+double Actions_PolarAdiabaticApproximation::dJzdEz(double R, double Jz){
+	// dJzdEz at fixed R_0
+	int bbotJ,btopJ,tbotJ,ttopJ,botR,topR;
+	topbottom<double>(Rgrid,R,&botR,&topR);
+	topbottom<double>(Jzgrid[botR],Jz,&bbotJ,&btopJ);
+	topbottom<double>(Jzgrid[topR],Jz,&tbotJ,&ttopJ);
+	return 0.5*((Jzgrid[topR][ttopJ]-Jzgrid[topR][tbotJ])/(Ezgrid[topR][ttopJ]-Ezgrid[topR][tbotJ])+(Jzgrid[botR][btopJ]-Jzgrid[botR][bbotJ])/(Ezgrid[botR][btopJ]-Ezgrid[botR][bbotJ]));
+}
+
+double Actions_PolarAdiabaticApproximation::dJzdR(double R, double Ez){
+	// dJzdR at fixed Ez
+	double dR = 0.1*R;
+	double Ju = Jz_from_grid(R+dR,Ez);
+	double Jd = Jz_from_grid(R-dR,Ez);
+	return (Ju-Jd)/2./dR;
 }
 
 double Actions_PolarAdiabaticApproximation::find_zlimit(double Ez, VecDoub Polar){
@@ -594,10 +686,10 @@ VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *para
 	double lsign = SIGN(x[5]*x[2]);
 	dJdIn[0] = 0.;
 	dJdIn[1] = 0.;
-	dJdIn[2] = 2.*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,.5*PI,&PA)/PI;
+	dJdIn[2] = 1.;//2.*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,.5*PI,&PA)/PI;
 	dSdI[0] += 0.;
 	dSdI[1] += 0.;
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,anglim,&PA);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,anglim,&PA)/dJzdEz(R,Jz);
 
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
 	double vR = Polar[3];
@@ -611,10 +703,10 @@ VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *para
 	lsign = SIGN(vR);
 	dJdIl[0] = Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,.5*PI,&RA)/PI;
 	dJdIl[1] = Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,.5*PI,&RA)/PI;
-	dJdIl[2] = Delta*GaussLegendreQuad(&dJRdEzint,-.5*PI,.5*PI,&RA)/PI;
+	dJdIl[2] = Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,.5*PI,&RA)/PI;
 	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,anglim,&RA);
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,anglim,&RA);
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJRdEzint,-.5*PI,anglim,&RA);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,anglim,&RA);
 
 	VecDoub dJdIp = {0.,1.,0.};
 
