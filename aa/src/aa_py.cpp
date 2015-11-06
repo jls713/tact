@@ -314,7 +314,11 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
       "param2: output file"
       "param3: write to file bool (if 1 write)"
       "param4: no_energy_corr (if true don't couple radial and vertical energies)"
-      "", init<Potential_JS*, std::string,bool,bool>());
+      "param5 Rm: minimum radius for grid"
+      "param6 Rn: maximum radius for grid"
+      "param7 zmax: maximum z height for grid"
+      "param8 NGRID: number of grid points for Ez"
+      "", init<Potential_JS*, std::string,bool,bool,double,double,double,int>());
 
   class_<Actions_SpheroidalAdiabaticApproximation, bases<Action_Finder> >(
 	"Actions_SpheroidalAdiabaticApproximation",
@@ -326,7 +330,12 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
      " param3: write to file bool (if 1 write)"
       "param4: no_energy_corr (if true don't couple radial and vertical energies)"
       "param5: alpha estimate"
-      "", init<Potential_JS*, std::string,bool,bool,double>());
+      "param6 Rm -- minimum radius for grid"
+      "param7 Rn -- maximum radius for grid"
+      "param8 zmax -- maximum z height for grid"
+      "param9 NGRID -- number of grid points for Enu"
+      "param10 NL -- number of grid points for Lz"
+      "", init<Potential_JS*, std::string,bool,bool,double,double,double,double,int,int>());
 
   class_<Actions_AxisymmetricStackel, bases<Action_Finder> >(
 	"Actions_AxisymmetricStackel","Action finding in axisymmetric Staeckel potential:"

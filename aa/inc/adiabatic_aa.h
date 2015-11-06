@@ -50,11 +50,12 @@ class Actions_PolarAdiabaticApproximation : public Action_Finder{
     private:
         Potential_JS *Pot;          /*! Potential (axisymmetric)             */
         bool no_energy_correction;  /*! if true, no radial-vertical coupling */
-        const int NGRID = 60;       /*! number of grid points for Ez         */
         double Rmin, Rmax, ZMAX;/*!min and max radius, max z height for grids*/
+        int NGRID;            /*! number of grid points for Ez         */
         VecDoub Rgrid, Ezmaxgrid;   /*! radius and energy grids              */
         std::vector<VecDoub> Ezgrid;/*! vertical energy grid                 */
         std::vector<VecDoub> Jzgrid;/*! vertical action grid                 */
+        std::vector<VecDoub> dJzgrid;/*! vertical freq grid                 */
 
         double actions_Jz(double R, double Ez, double z, double *zlim);
         double find_zlimit(double Ez, VecDoub Polar);
@@ -66,6 +67,7 @@ class Actions_PolarAdiabaticApproximation : public Action_Finder{
         double estimate_tiny(double Ez, double R);
         /*! computes derivative of Jz wrt R at fixed Ez */
         double dJzdR(double R, double Jz);
+        double actions_dJzdEz(double R, double Ez,double z, double *zlim);
     public:
         //! Actions_PolarAdiabaticApproximation constructor.
         /*!
@@ -76,9 +78,10 @@ class Actions_PolarAdiabaticApproximation : public Action_Finder{
           \param Rm -- minimum radius for grid
           \param Rn -- maximum radius for grid
           \param zmax -- maximum z height for grid
+          \param NGRID -- number of grid points for Ez
         */
-        Actions_PolarAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false, double Rm=1., double Rn=40.,double zmax=40.)
-            : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax){
+        Actions_PolarAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false, double Rm=1., double Rn=40.,double zmax=40.,int NGRID=60)
+            : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax), NGRID(NGRID){
             if(filename!="" and !write)
                 load_grids(filename);
             else
@@ -136,9 +139,9 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
         Potential_JS *Pot;          /*! Potential (axisymmetric)             */
         bool no_energy_correction;  /*! if true, no radial-vertical coupling */
 
-        const int NGRID = 60;       /*! number of grid points for Enu        */
-        const int NL = 10;          /*! number of grid points for Lz         */
         double Rmin, Rmax, ZMAX;/*!min and max radius, max z height for grids*/
+        int NGRID;            /*! number of grid points for Enu        */
+        int NL;               /*! number of grid points for Lz         */
         double Lmin, Lmax;          /*! min and max ang mom for grids        */
         VecDoub Rgrid, Lgrid;       /*! radius and ang mom grids             */
         std::vector<VecDoub> Ezmaxgrid;/*! max vertical energy grid          */
@@ -165,9 +168,11 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
           \param Rm -- minimum radius for grid
           \param Rn -- maximum radius for grid
           \param zmax -- maximum z height for grid
+          \param NGRID -- number of grid points for Enu
+          \param NL -- number of grid points for Lz
         */
-        Actions_SpheroidalAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false,double alpha = 100., double Rm=1., double Rn=40.,double zmax=40.)
-            : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax){
+        Actions_SpheroidalAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false,double alpha = 100., double Rm=1., double Rn=40.,double zmax=40., int NGRID=60, int NL=10)
+            : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax), NGRID(NGRID), NL(NL){
 
             Lmin=Pot->L_circ(Rmin);Lmax=Pot->L_circ(Rmax);
 
@@ -182,7 +187,7 @@ class Actions_SpheroidalAdiabaticApproximation : public Action_Finder{
         };
         //! Actions_SpheroidalAdiabaticApproximation copy constructor.
     	Actions_SpheroidalAdiabaticApproximation(const Actions_SpheroidalAdiabaticApproximation& s):
-		Pot(s.Pot),CS(new ProlateSpheroidCoordSys(*s.CS)),no_energy_correction(s.no_energy_correction), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid){
+		Pot(s.Pot),no_energy_correction(s.no_energy_correction), Rmin(s.Rmin), Rmax(s.Rmax), ZMAX(s.ZMAX),Rgrid(s.Rgrid),Lgrid(s.Lgrid),Ezmaxgrid(s.Ezmaxgrid),Ezgrid(s.Ezgrid),Jzgrid(s.Jzgrid),CS(new ProlateSpheroidCoordSys(*s.CS)){
             Lmin=Pot->L_circ(Rmin);Lmax=Pot->L_circ(Rmax);
         }
         std::unique_ptr<ProlateSpheroidCoordSys> CS;

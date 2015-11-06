@@ -688,6 +688,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
+
 	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
 
 	VecDoub tau = CS->xv2tau(x);
@@ -729,7 +730,6 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
-
 	if(CS->alpha()>CS->gamma()){
 	    if(debug_NegativeDelta)
 	    	std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;

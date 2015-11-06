@@ -74,14 +74,15 @@ void uv_orb::fillDeltagrids(const std::string& file){
             Delta[i][j]=DD.delta(R*.9);
             if(Delta[i][j]<0. or Delta[i][j]!=Delta[i][j])
             	Delta[i][j]=R/5.;
-            std::cerr<<"DeltaGrid: "
+            if(debug_deltaGrid)
+		std::cerr<<"DeltaGrid: "
             	<<OUTPUT(E_delta[i])
             	<<OUTPUT(L_delta[i][j])
             	<<OUTPUT(R)
             	<<OUTPUTE(Delta[i][j]);
         }
     }
-    std::cerr<<"DeltaGrid calculated: NE = "<<NE<<", NL = "<<NL<<std::endl;
+    if(debug_deltaGrid) std::cerr<<"DeltaGrid calculated: NE = "<<NE<<", NL = "<<NL<<std::endl;
 
     std::ofstream outfile; outfile.open(file);
 	for(int i=0;i<NE;++i)
@@ -119,6 +120,9 @@ double uv_orb::findDelta_interp(double E, double L){
 
 VecDoub uv_orb::actions(const VecDoub& x,void*params){
 
+    VecDoub acts(3,0.);
+    if(action_check(x,acts,Pot)) return acts;
+
 	double En = Pot->H(x), Lz = Pot->Lz(x);
 	if(params!=nullptr){
 		double *alphabeta = (double*)params;
@@ -133,6 +137,10 @@ VecDoub uv_orb::actions(const VecDoub& x,void*params){
 }
 
 VecDoub uv_orb::angles(const VecDoub& x,void *params){
+
+    VecDoub angs(6,0.);
+    if(angle_check(x,angs,Pot)) return angs;
+
 	double En = Pot->H(x), Lz = Pot->Lz(x);
 	if(params!=nullptr){
 		double *alphabeta = (double*)params;

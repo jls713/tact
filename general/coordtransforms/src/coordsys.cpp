@@ -104,12 +104,12 @@ VecDoub ProlateSpheroidCoordSys::tau2x(const VecDoub& tau){
 
 VecDoub ProlateSpheroidCoordSys::xv2tau(const VecDoub& x){
 	/* Calculates tau & tau_dot given Cartesian (x,v) */
+  	VecDoub tau(6);
 	double R2 = x[0]*x[0]+x[1]*x[1];
   	double b = Alpha+Gamma-R2-x[2]*x[2];
   	double c = Alpha*Gamma-Gamma*R2-Alpha*x[2]*x[2];
   	double bdot = -2.0*(x[0]*x[3]+x[1]*x[4]+x[2]*x[5]);
   	double cdot = -2.0*(Gamma*(x[0]*x[3]+x[1]*x[4])+Alpha*x[2]*x[5]);
-  	VecDoub tau(6);
   	tau[0] = 0.5*(-b+sqrt(b*b-4.0*c)); 	/* lambda		*/
  	tau[2] = 0.5*(-b-sqrt(b*b-4.0*c)); 	/* nu			*/
  	tau[1] = atan2(x[1],x[0]); 			/* in radians	*/

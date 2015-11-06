@@ -32,6 +32,11 @@
 #include "../aa/inc/adiabatic_aa.h"
 #include "../aa/inc/stackel_aa.h"
 #include "../aa/inc/stackel_fit.h"
+#include "../aa/inc/genfunc_aa.h"
+#include "../aa/inc/uv_orb.h"
+#ifdef TORUS
+#include "../aa/inc/it_torus.h"
+#endif
 #include "gtest/gtest.h"
 
 namespace {
@@ -175,7 +180,7 @@ TEST(ActionTest_Zero,StackelFudge){
 }
 
 TEST(ActionTest_Small,StackelFudge){
-  Logarithmic Pot(1.,1.,0.99);
+  Logarithmic Pot(1.,1.,0.9);
   Actions_AxisymmetricStackel_Fudge AA(&Pot,1.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
@@ -195,55 +200,56 @@ TEST(ActionTest_Small,StackelFudge){
   // zero z, small vR, small vz
   X = {1.,0.,0.,2e-5,Vc,2e-5};
   Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2],false);
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
   Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
   // small z, small vR, small vz
   X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
   Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
   Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5],false);
-  // small z, small vz
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vz"<<std::endl;
   X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
   Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
   Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5],false);
-  // small z
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z"<<std::endl;
   X = {1.,2e-5,2e-5,.2*Vc,Vc,.3*Vc};
   Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
   Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
 }
 //=============================================================================
 
@@ -263,7 +269,7 @@ TEST(ActionTest_Iso,StackelPAA){
   EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
   EXPECT_NEAR(FreqsTrue[0],Angs[3],0.003);
   EXPECT_NEAR(FreqsTrue[1],Angs[4],0.001);
-  EXPECT_NEAR(FreqsTrue[2],Angs[5],0.004);
+  EXPECT_NEAR(FreqsTrue[2],Angs[5],0.008);
 }
 
 // NANs in Stackel forces on axis
@@ -417,25 +423,384 @@ TEST(ActionTest_Small,StackelPAA){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
 }
-//=============================================================================
-// TEST(ActionTest_Iso,StackelFit){
-//   Isochrone Pot(1.,1.,0.99999);
-//   Actions_StackelFit AA(&Pot);
+
+
+TEST(ActionTest_Small,StackelSF){
+  Logarithmic Pot(1.,1.,0.9);
+  Actions_AxisymmetricStackel_Fudge AA(&Pot,1.);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
+  std::cout<<"small z, zero vR, zero vz"<<std::endl;
+  VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
+  VecDoub Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  VecDoub Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"zero z, small vR, small vz"<<std::endl;
+  X = {1.,0.,0.,2e-5,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vR, small vz"<<std::endl;
+  X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vz"<<std::endl;
+  X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z"<<std::endl;
+  X = {1.,2e-5,2e-5,.2*Vc,Vc,.3*Vc};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+}
+
+
+#ifdef TORUS
+// Memory corruption problem in Torus?
+// TEST(ActionTest_Small,ItTorus){
+//   Logarithmic Pot(1.,1.,0.9);
+//   Actions_AxisymmetricStackel_Fudge AAF(&Pot,100.);
+//   IterativeTorusMachine AA(&AAF,&Pot,1e-8,5,1e-2);
 //   double radius = 1.;
-//   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
-//   VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
-//   Actions_Isochrone Iso(1.,1.);
-//   VecDoub ActsTrue = Iso.actions(X);
-//   VecDoub FreqsTrue = Iso.freq(X);
-//   VecDoub Angs = AA.angles(X);
+//   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
+//   std::cout<<"small z, zero vR, zero vz"<<std::endl;
+//   VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
 //   VecDoub Acs = AA.actions(X);
-//   EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
-//   EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
-//   EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
-//   EXPECT_NEAR(FreqsTrue[0],Angs[3],0.001);
-//   EXPECT_NEAR(FreqsTrue[1],Angs[4],0.001);
-//   EXPECT_NEAR(FreqsTrue[2],Angs[5],0.004);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+//   VecDoub Angs = AA.angles(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+//   std::cout<<"zero z, small vR, small vz"<<std::endl;
+//   X = {1.,0.,0.,2e-5,Vc,2e-5};
+//   Acs = AA.actions(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+//   Angs = AA.angles(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+//   std::cout<<"small z, small vR, small vz"<<std::endl;
+//   X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
+//   Acs = AA.actions(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+//   Angs = AA.angles(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+//   std::cout<<"small z, small vz"<<std::endl;
+//   X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
+//   Acs = AA.actions(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+//   Angs = AA.angles(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+//   std::cout<<"small z"<<std::endl;
+//   X = {1.,2e-5,2e-5,.2*Vc,Vc,.3*Vc};
+//   Acs = AA.actions(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+//   Angs = AA.angles(X);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+//   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
 // }
+#endif
+
+TEST(ActionTest_Small,Genfunc){
+  IsochronePotential Pot(1.,1.);
+  Actions_Genfunc AA(&Pot,"axisymmetric");
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
+  std::cout<<"small z, zero vR, zero vz"<<std::endl;
+  VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
+  VecDoub Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  VecDoub Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"zero z, small vR, small vz"<<std::endl;
+  X = {1.,0.,0.,2e-5,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vR, small vz"<<std::endl;
+  X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vz"<<std::endl;
+  X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z"<<std::endl;
+  X = {1.,2e-5,2e-5,.2*Vc,Vc,.3*Vc};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+}
+//=============================================================================
+
+TEST(ActionTest,StackelSAA){
+  Logarithmic Pot(1.,1.,0.8);
+  Actions_SpheroidalAdiabaticApproximation AA(&Pot,"",false,false,1.,0.02,3.,1.);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  double guess_alpha=1.;
+  VecDoub Angs = AA.angles(X,&guess_alpha);
+  VecDoub Acs = AA.actions(X,&guess_alpha);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.006);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.0075);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.04);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+}
+TEST(ActionTest,StackelPAA){
+  Logarithmic Pot(1.,1.,0.8);
+  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.02);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.0075);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+}
+
+TEST(ActionTest,StackelUV){
+  Logarithmic Pot(1.,1.,0.8);
+  uv_orb AA(&Pot,0.1,3.,10,10,"");
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.003);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.005);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+}
+
+TEST(ActionTest,StackelF){
+  Logarithmic Pot(1.,1.,0.8);
+  Actions_AxisymmetricStackel_Fudge AA(&Pot,100.);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  double guess_alpha=1.;
+  VecDoub Angs = AA.angles(X,&guess_alpha);
+  VecDoub Acs = AA.actions(X,&guess_alpha);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.003);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.005);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.13);
+}
+TEST(ActionTest,StackelFit){
+  Logarithmic Pot(1.,1.,0.8);
+  Actions_StackelFit AA(&Pot);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.003);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.003);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+}
+#ifdef TORUS
+TEST(ActionTest,ItTorus){
+  Logarithmic Pot(1.,1.,0.8);
+  Actions_AxisymmetricStackel_Fudge AAF(&Pot,100.);
+  IterativeTorusMachine AA(&AAF,&Pot,1e-8,5,1e-3);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  double guess_alpha=1.;
+  VecDoub Angs = AA.angles(X,&guess_alpha);
+  VecDoub Acs = AA.actions(X,&guess_alpha);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.002);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.0075);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+}
+#endif
+TEST(ActionTest,AvGenfunc){
+  Logarithmic Pot(1.,1.,0.8);
+  Actions_Genfunc_Average AA(&Pot,"axisymmetric");
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
+  Actions_Genfunc Iso(&Pot,"axisymmetric");
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.002);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.0075);
+  EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
+  EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
+  EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+}
+
+//=============================================================================
+TEST(ActionTest_Iso,StackelFit){
+  Isochrone Pot(1.,1.,0.99999);
+  Actions_StackelFit AA(&Pot);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
+  Actions_Isochrone Iso(1.,1.);
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub FreqsTrue = Iso.freq(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
+  EXPECT_NEAR(FreqsTrue[0],Angs[3],0.001);
+  EXPECT_NEAR(FreqsTrue[1],Angs[4],0.001);
+  EXPECT_NEAR(FreqsTrue[2],Angs[5],0.004);
+}
 
 // TEST(ActionTest_Stack,StackelFit){
 //   StackelOblate_PerfectEllipsoid Pot(100.,-30.);
@@ -605,7 +970,7 @@ TEST(ActionTest_Iso,StackelSAA){
   EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
   EXPECT_NEAR(FreqsTrue[0],Angs[3],0.003);
   EXPECT_NEAR(FreqsTrue[1],Angs[4],0.001);
-  EXPECT_NEAR(FreqsTrue[2],Angs[5],0.004);
+  EXPECT_NEAR(FreqsTrue[2],Angs[5],0.008);
 }
 
 // NANs in Stackel forces on axis
@@ -667,57 +1032,76 @@ TEST(ActionTest_Zero,StackelSAA){
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
 }
 
+TEST(ActionTest_Planar,StackelSAA){
+  IsochronePotential Pot(1.,1.);
+  Actions_SpheroidalAdiabaticApproximation AA(&Pot,"",false,false,-1.1,0.02,3.,2.);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
+  VecDoub X = {1.,0.,0.,0.1*Vc,Vc,0.};
+  VecDoub Acs = AA.actions(X);
+  Actions_Isochrone Iso(1.,1.);
+  VecDoub ActsTrue = Iso.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],1e-10);
+  EXPECT_DOUBLE_EQ(ActsTrue[1],Acs[1]);
+  EXPECT_DOUBLE_EQ(ActsTrue[2],Acs[2]);
+  VecDoub Angs = AA.angles(X);
+  VecDoub AngsTrue = Iso.angles(X);
+  EXPECT_NEAR(AngsTrue[0],Angs[0],2e-4);
+  AngsTrue = Iso.freq(X);
+  EXPECT_NEAR(AngsTrue[0],Angs[3],1e-4);
+  EXPECT_NEAR(AngsTrue[1],Angs[4],1e-4);
+}
 TEST(ActionTest_Small,StackelSAA){
   Logarithmic Pot(1.,1.,0.9);
   Actions_SpheroidalAdiabaticApproximation AA(&Pot,"",false,false,100.,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
-  std::cout<<"small z, zero vR, zero vz"<<std::endl;
-  VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
+  // std::cout<<"small z, zero vR, zero vz"<<std::endl;
+  // VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
+  // VecDoub Acs = AA.actions(X);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  // VecDoub Angs = AA.angles(X);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  // std::cout<<"zero z, small vR, small vz"<<std::endl;
+  // X = {1.,0.,0.,2e-5,Vc,2e-5};
+  // Acs = AA.actions(X);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  // Angs = AA.angles(X);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  // std::cout<<"small z, small vR, small vz"<<std::endl;
+  // X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
+  // Acs = AA.actions(X);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  // Angs = AA.angles(X);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vz"<<std::endl;
+  VecDoub X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
   VecDoub Acs = AA.actions(X);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
   VecDoub Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  std::cout<<"zero z, small vR, small vz"<<std::endl;
-  X = {1.,0.,0.,2e-5,Vc,2e-5};
-  Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
-  Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  std::cout<<"small z, small vR, small vz"<<std::endl;
-  X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
-  Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
-  Angs = AA.angles(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  std::cout<<"small z, small vz"<<std::endl;
-  X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
-  Acs = AA.actions(X);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
-  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
-  Angs = AA.angles(X);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
@@ -737,8 +1121,7 @@ TEST(ActionTest_Small,StackelSAA){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-}
-}  // namespace
+}}  // namespace
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

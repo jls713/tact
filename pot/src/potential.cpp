@@ -128,6 +128,7 @@ VecDoub Potential_JS::dPhidRdz(const VecDoub& Rz){
 double Potential_JS::DeltaGuess(const VecDoub& x){
 	// Returns a guess of Gamma-Alpha = Delta^2 assuming dldv((l-v)V)=0
 	double R = norm<double>({x[0],x[1]}), z = x[2];
+	if(x[2]==0.)z+=TINY; // d2P/dRdz identically zero for up-down sym potential at z=0
 	VecDoub F = Forces({R,0.,z});
 	VecDoub d2P = dPhidRdz({R,z});
 	return z*z-R*R+(-3.0*z*F[0]+3.0*R*F[2]+R*z*(d2P[0]-d2P[2]))/d2P[1];

@@ -141,10 +141,10 @@ int main(int argc, char*argv[]){
 	uv_orb UV(&Pot,4.,30.,50,50,"example.delta_uv");
 
 	// Polar Adiabatic
-	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.);
+	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.,100);
 
 	// Spheroidal Adiabatic
-	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,4.,30.,15.);
+	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,4.,30.,15.,100);
 
 	// Spheroidal Adiabatic
 	Actions_StackelFit SF(&Pot,1e-5);
@@ -157,7 +157,10 @@ int main(int argc, char*argv[]){
 	#endif
 	outfile<<"OmR Omp Omz Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
 	double VMax = sqrt((Pot.Phi({50.,0.,50.})-Pot.Phi(X))-.5*X[4]*X[4]);
-	VecDoub range = create_log_range(0.03*VMax,0.8*VMax,500);
+	int number = 500;
+	if(argc>3)
+		number=atoi(argv[3]);
+	VecDoub range = create_log_range(0.03*VMax,0.8*VMax,number);
 	int count=0;
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	for(auto j: range){
@@ -166,6 +169,7 @@ int main(int argc, char*argv[]){
 		// 	continue;
 		X[3]=j;
 		X[5]=j*.8;
+		printVector(X);
 		O.integrate(X,10.*Pot.torb(X),0.204*Pot.torb(X));
 		int guess_alpha=1;
 		MatDoub FResults,ITResults,GResults,GAvResults,UVResults,PAAResults,SAAResults,FITResults;

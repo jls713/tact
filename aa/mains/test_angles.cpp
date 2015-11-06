@@ -97,11 +97,11 @@ int main(int argc, char*argv[]){
 	uv_orb UV(&Pot,3.,30.,10,10,"example.delta_uv");
 
 	// Polar Adiabatic
-	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,Rmin,Rmax,zmax);
+	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.,60);
 
 	std::cout<<"Action methods loaded"<<std::endl;
 	// Spheroidal Adiabatic
-	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,Rmin,Rmax,zmax);
+	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,4.,30.,15.);
 
 	// Spheroidal Adiabatic
 	Actions_StackelFit SF(&Pot);

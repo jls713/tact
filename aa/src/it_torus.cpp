@@ -127,7 +127,6 @@ VecDoub IterativeTorusMachine::actions(const VecDoub &X, void*params){
 	double min=1.; Angles theta;
 	// Use Stackel to initial guess
 	VecDoub aa_init = find_aa(x);
-	printVector(aa_init);
 	VecDoub aaGuess=aa_init, aaNEW, aaFirst;
 	int iter=0;
 	while(min>eta and iter<MaxIterations){

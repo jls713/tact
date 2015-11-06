@@ -156,7 +156,8 @@ void Actions_SpheroidalAdiabaticApproximation::make_grids(std::string filename){
 			double nulast=-CS->gamma()+SMALL, nulim = 0.;
 
 			for(int i=1; i<NGRID; i++){
-				Ezgrid[nL][nR][i]=((double)i)*Ezmaxgrid[nL][nR]/(double)(NGRID-1);
+				Ezgrid[nL][nR][i]=((double)i)*sqrt(Ezmaxgrid[nL][nR])/(double)(NGRID-1);
+				Ezgrid[nL][nR][i]*=Ezgrid[nL][nR][i];
 				Jzgrid[nL][nR][i]=actions_Jz(Ezgrid[nL][nR][i],Lz2,{Rgrid[nR]*Rgrid[nR]-CS->alpha(),0.,nulast},&nulim);
 				nulast = nulim;
 				// std::cout<<CS->alpha()<<" "<<Rgrid[nR]<<" "<<nulim<<" "<<Lz2<<" "<<Ezgrid[nL][nR][i]<<" "<<Jzgrid[nL][nR][i]<<std::endl;
@@ -255,20 +256,65 @@ double Actions_SpheroidalAdiabaticApproximation::estimate_tiny(double ENu, doubl
 
 double Actions_SpheroidalAdiabaticApproximation::find_nulimit(double ENu, double Lz2, VecDoub tau){
 	SpheroidalAA_zactions_struct RS(this,ENu,Lz2,tau[0],0.,0.,0.);
-	double nutry = tau[2];
-	while(pnu_squared(nutry, &RS)>0.) nutry+=0.1*(-CS->alpha()-nutry);
+	double nu=tau[2],nutry = tau[2];double tiny_number=TINY;
 	root_find RF(TINY,100);
-	return RF.findroot(&pnu_squared,tau[2],nutry,&RS);
+	if(pnu_squared(nu, &RS)>0.0){
+		while(pnu_squared(nutry, &RS)>0.
+		      and -(nutry+CS->alpha())>tiny_number)
+			nutry+=0.1*(-CS->alpha()-nutry);
+		if(-(nutry+CS->alpha())>tiny_number)
+			return RF.findroot(&pnu_squared,nu,nutry,&RS);
+		else return -CS->alpha();
+	}
+	else return tau[2]+tiny_number;
+
+	// SpheroidalAA_zactions_struct RS(this,ENu,Lz2,tau[0],0.,0.,0.);
+	// double nutry = tau[2];
+	// double PP = pnu_squared(nutry, &RS);
+	// if(PP<0. or PP!=PP) return nutry+TINY;
+	// while(pnu_squared(nutry, &RS)>0.) nutry+=0.1*(-CS->alpha()-nutry);
+	// root_find RF(TINY,100);
+	// return RF.findroot(&pnu_squared,tau[2],nutry,&RS);
+
+	// double PP = pnu_squared(nutry, &RS);
+	// if(PP<0. or PP!=PP) return nutry+TINY;
+	// while(pnu_squared(nutry, &RS)>0.) nutry+=0.1*(-CS->alpha()-nutry);
+	// return RF.findroot(&pnu_squared,tau[2],nutry,&RS);
 }
 
 VecDoub Actions_SpheroidalAdiabaticApproximation::find_lamlimits(double Elam, double Lz2,double Jz,VecDoub tau){
+	// SpheroidalAA_Ractions_struct RS(this,Elam,Lz2,Jz,tau[2],0.,0.,0.);
+	// double lamin = tau[0], lamout = tau[0];
+	// while(plam_squared(lamout, &RS)>0.) lamout*=1.1;;
+	// while(plam_squared(lamin, &RS)>0.)  lamin-=.1*(lamin+CS->alpha());
+	// root_find RF(TINY,100);
+	// return {RF.findroot(&plam_squared,lamin,tau[0],&RS),
+	// 		RF.findroot(&plam_squared,tau[0],lamout,&RS)};
+
+
 	SpheroidalAA_Ractions_struct RS(this,Elam,Lz2,Jz,tau[2],0.,0.,0.);
-	double lamin = tau[0], lamout = tau[0];
-	while(plam_squared(lamout, &RS)>0.) lamout*=1.1;;
-	while(plam_squared(lamin, &RS)>0.)  lamin-=.1*(lamin+CS->alpha());
+	// find roots of p^2(lam)
+	VecDoub limits;
+	double lambda=tau[0], tiny_number=TINY;
 	root_find RF(TINY,100);
-	return {RF.findroot(&plam_squared,lamin,tau[0],&RS),
-			RF.findroot(&plam_squared,tau[0],lamout,&RS)};
+	double laminner=lambda, lamouter=lambda;
+	if(plam_squared(lambda, &RS)>0.0){
+		while(plam_squared(laminner, &RS)>0.0
+		      and (laminner+CS->alpha())>tiny_number)
+			laminner-=.1*(laminner+CS->alpha());
+		while(plam_squared(lamouter, &RS)>0.)	lamouter*=1.1;
+
+		if((laminner+CS->alpha())>tiny_number)
+			limits.push_back(
+			    RF.findroot(&plam_squared,laminner,lambda,&RS));
+		else limits.push_back(-CS->alpha());
+		limits.push_back(RF.findroot(&plam_squared,lambda,lamouter,&RS));
+	}
+	else{
+		limits.push_back(lambda-tiny_number);
+		limits.push_back(lambda+tiny_number);
+	}
+	return limits;
 }
 
 double Actions_SpheroidalAdiabaticApproximation::actions_Jz(double ENu, double Lz2, VecDoub tau, double *nulim){
@@ -284,7 +330,6 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 
 	VecDoub acts(3,0.);
     if(action_check(x,acts,Pot)) return acts;
-
 	if(fabs(x[2])>ZMAX) std::cerr<<"z outside grid range"<<std::endl;
 
 	if(params){
@@ -292,15 +337,14 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
+	else{CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());}
 
 	if(CS->alpha()>CS->gamma()){
 	    if(debug_NegativeDelta)
 	    	std::cerr<<"Negative Delta at R="<<sqrt(x[0]*x[0]+x[1]*x[1])<<", z="<<x[2]<<std::endl;
         CS->newalpha(CS->gamma()-0.1);
 	}
-
 	VecDoub tau = CS->xv2tau(x);
-	if(tau[2]==-CS->gamma())tau[2]+=TINY;
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
 	double ENu = (fabs(tau[5])>TINY?(tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
 	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:0.)
@@ -308,7 +352,6 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 
 	double nulim = tau[2];
 	double Jz = actions_Jz(ENu, Lz2, tau, &nulim);
-
 	double Elam = (tau[0]-tau[2])*tau[3]*tau[3]/(8.0*(tau[0]+CS->alpha())*(tau[0]+CS->gamma()))+Philam_eff(tau,Lz2,Jz);
 	VecDoub lamlims = find_lamlimits(Elam,Lz2,Jz,tau);
 	double Delta = .5*(lamlims[1]-lamlims[0]), taubar = .5*(lamlims[1]+lamlims[0]);
@@ -330,6 +373,7 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
+	else{CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());}
 
 	if(CS->alpha()>CS->gamma()){
 	    if(debug_NegativeDelta)
@@ -362,7 +406,9 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	dJdIn[2] = 1.;//2.*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,.5*PI,&PA)/PI;
 	dSdI[0] += 0.;//lsign*Delta*GaussLegendreQuad(&dJnudEint,-.5*PI,anglim,&PA)/PI;
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJnudLzint,-.5*PI,anglim,&PA);
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,anglim,&PA)/dJzdEz(Lz2,sqrt(tau[0]+CS->alpha()),Jz);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,anglim,&PA)/(2.*Delta*GaussLegendreQuad(&dJnudEnuint,-.5*PI,.5*PI,&PA)/PI);
+
+	// /dJzdEz(Lz2,sqrt(tau[0]+CS->alpha()),Jz);
 
 	double Elam = (tau[0]-tau[2])*tau[3]*tau[3]/(8.0*(tau[0]+CS->alpha())*(tau[0]+CS->gamma()))+Philam_eff(tau,Lz2,Jz);
 	VecDoub lamlims = find_lamlimits(Elam,Lz2,Jz,tau);
@@ -543,11 +589,14 @@ void Actions_PolarAdiabaticApproximation::make_grids(std::string filename){
 		Ezmaxgrid.push_back(Pot->Phi({Rgrid[n],0.,ZMAX})-Pot->Phi({Rgrid[n],0.,0.}));
 		Ezgrid.push_back(VecDoub(NGRID,0.));
 		Jzgrid.push_back(VecDoub(NGRID,0.));
+		dJzgrid.push_back(VecDoub(NGRID,0.));
 		double zlast=.005, zlim = 0.;
 
 		for(int i=1; i<NGRID; i++){
-			Ezgrid[n][i]=((double)i)*Ezmaxgrid[n]/(double)(NGRID-1);
+			Ezgrid[n][i]=((double)i)*sqrt(Ezmaxgrid[n])/(double)(NGRID-1);
+			Ezgrid[n][i]*=Ezgrid[n][i];
 			Jzgrid[n][i]=actions_Jz(Rgrid[n],Ezgrid[n][i],zlast,&zlim);
+			dJzgrid[n][i]=actions_dJzdEz(Rgrid[n],Ezgrid[n][i],zlast,&zlim);
 			zlast = zlim;
 		}
 	}
@@ -597,11 +646,25 @@ double Actions_PolarAdiabaticApproximation::Jz_from_grid(double R,double Ez){
 
 double Actions_PolarAdiabaticApproximation::dJzdEz(double R, double Jz){
 	// dJzdEz at fixed R_0
-	int bbotJ,btopJ,tbotJ,ttopJ,botR,topR;
-	topbottom<double>(Rgrid,R,&botR,&topR);
-	topbottom<double>(Jzgrid[botR],Jz,&bbotJ,&btopJ);
-	topbottom<double>(Jzgrid[topR],Jz,&tbotJ,&ttopJ);
-	return 0.5*((Jzgrid[topR][ttopJ]-Jzgrid[topR][tbotJ])/(Ezgrid[topR][ttopJ]-Ezgrid[topR][tbotJ])+(Jzgrid[botR][btopJ]-Jzgrid[botR][bbotJ])/(Ezgrid[botR][btopJ]-Ezgrid[botR][bbotJ]));
+	// int bbotJ,btopJ,tbotJ,ttopJ,botR,topR;
+	// if(R<Rgrid[0]) R=Rgrid[0];
+	// if(R>Rgrid[NGRID-1]) R = Rgrid[NGRID-1];
+	// topbottom<double>(Rgrid,R,&botR,&topR);
+	// double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
+	// if(Jz<Jzgrid[botR][0]){bbotJ=0;btopJ=1;}
+	// else if(Jz>Jzgrid[botR][NGRID-1]){bbotJ=NGRID-2;btopJ=NGRID-1;}
+	// else topbottom<double>(Jzgrid[botR],Jz,&bbotJ,&btopJ);
+	// if(Jz<Jzgrid[topR][0]){tbotJ=0;ttopJ=1;}
+	// else if(Jz>Jzgrid[topR][NGRID-1]){tbotJ=NGRID-2;ttopJ=NGRID-1;}
+	// else topbottom<double>(Jzgrid[topR],Jz,&tbotJ,&ttopJ);
+	// return (fac*(Jzgrid[topR][ttopJ]-Jzgrid[topR][tbotJ])/(Ezgrid[topR][ttopJ]-Ezgrid[topR][tbotJ])+(1-fac)*(Jzgrid[botR][btopJ]-Jzgrid[botR][bbotJ])/(Ezgrid[botR][btopJ]-Ezgrid[botR][bbotJ]));
+
+	// dJzdEz at fixed R0
+	double dJ = 0.1*Jz;
+	double Eu = Ez_from_grid(R,Jz+dJ);
+	double Ed = Ez_from_grid(R,Jz-dJ);
+	return 2.*dJ/(Eu-Ed);
+
 }
 
 double Actions_PolarAdiabaticApproximation::dJzdR(double R, double Ez){
@@ -616,6 +679,7 @@ double Actions_PolarAdiabaticApproximation::find_zlimit(double Ez, VecDoub Polar
 	PolarAA_zactions_struct RS(this,Ez,Polar[0],0.,0.);
 	double ztry = fabs(Polar[2]);
 	if(ztry==0.)ztry+=SMALL;
+	if(pz_squared(ztry, &RS)<0.)return ztry;
 	while(pz_squared(ztry, &RS)>0.) ztry*=1.1;
 	root_find RF(TINY,100);
 	return RF.findroot(&pz_squared,fabs(Polar[2]),ztry,&RS);
@@ -632,7 +696,7 @@ VecDoub Actions_PolarAdiabaticApproximation::find_Rlimits(double R, double Etot,
 }
 
 double Actions_PolarAdiabaticApproximation::estimate_tiny(double Ez, double R){
-	return 2.*(Ez-Phi_z({R,0.,0.}))/10000.;
+	return 2.*(Ez-Phi_z({R,0.,0.}))/1e8;
 }
 
 double Actions_PolarAdiabaticApproximation::actions_Jz(double R, double Ez,double z, double *zlim){
@@ -640,6 +704,12 @@ double Actions_PolarAdiabaticApproximation::actions_Jz(double R, double Ez,doubl
 	*zlim = find_zlimit(Ez, {R,0.,z});
 	PolarAA_zactions_struct PA(this,Ez,R,*zlim,0.);
 	return 2.*(*zlim)*GaussLegendreQuad(&Jzint,0.,.5*PI,&PA)/PI;
+
+}
+
+double Actions_PolarAdiabaticApproximation::actions_dJzdEz(double R, double Ez,double z, double *zlim){
+	PolarAA_zactions_struct PA(this,Ez,R,*zlim,0.);
+	return 2.*(*zlim)*GaussLegendreQuad(&dJzdEzint,0.,.5*PI,&PA)/PI;
 
 }
 
@@ -689,7 +759,7 @@ VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *para
 	dJdIn[2] = 1.;//2.*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,.5*PI,&PA)/PI;
 	dSdI[0] += 0.;
 	dSdI[1] += 0.;
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,anglim,&PA)/dJzdEz(R,Jz);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,anglim,&PA)/(2.*Delta*GaussLegendreQuad(&dJzdEzint,-.5*PI,.5*PI,&PA)/PI);
 
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
 	double vR = Polar[3];
