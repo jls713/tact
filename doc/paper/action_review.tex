@@ -636,8 +636,7 @@ Using this effective potential, we estimate the radial action as
 J_r = \frac{1}{\pi}\int_{\Rp}^{\Ra}\mathrm{d}R\,v_R,
 \end{equation}
 where $\Rp$ and $\Ra$ are the radii where the radial velocity, $v_R$,
-vanishes. For our standard setup we use $60$ grid points in both $R$ and
-$E_z$.
+vanishes. For our standard setup we use a linearly-spaced grid of $100$ points in $R_0$ and a linearly-spaced grid of $100$ points in $E_z^2$.
 
 \subsection{Spheroidal adiabatic approximation (SAA)}\label{Method::SAA}
 
@@ -743,8 +742,7 @@ constant $\lambda$ and $\nu$ tend to those of constant $R$ and $z$ in the
 limit of very large inter-focal distance. In this limit, the vertical action
 becomes independent of $J_\phi$ and the SAA tends to the CAA.
 
-For our standard setup we use a $60$-point grid in $\lambda$ and $E_\nu$ and
-a $10$-point grid in $J_\phi$.
+For our standard setup we use a linearly-spaced grid of $100$ points in $\lambda$, a linearly-spaced grid of $100$ points in $E_\nu^2$ and a $10$-point linearly-spaced grid in $J_\phi$.
 
 \subsection{St\"ackel Fudge}\label{Method::SF}
 
@@ -1492,7 +1490,7 @@ constructed around the true torus. We use this matrix to convert the action
 spreads in equation~\eqref{ActionSpread} into frequency spreads
 $\bsigma_{\Omega i}$.
 
-McMillan 2016 in preparation shows that the initial angle spreads of
+McMillan (2016,in prep.) shows that the initial angle spreads of
 particles released into a tidal stream from a progenitor are given by
 \begin{equation}
 \begin{split}
@@ -1505,13 +1503,6 @@ where $r_s$ is the scale radius of the stream progenitor. However, the angle
 spread in the stream increases linearly in time at a rate governed by the
 frequency separation from the progenitor so for most streams we do not need
 to resolve the angle spreads in such fine detail.
-
-\section{TODO list}
-
-\begin{enumerate}
-\item Finish the tests for the code
-\item Provide example python for code
-\end{enumerate}
 
 \label{lastpage}
 \end{document}
