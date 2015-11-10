@@ -20,29 +20,33 @@ This will install the basic package. To access all the features one should also 
 * Some code uses [LAPACK](http://www.netlib.org/lapack/). To use this install LAPACK, add path to LAPACK to Makefile.inc and run 'make LAPACK=1'
 * To do both run 'make TORUS=1 LAPACK=1'
 
+One can also compile the code into a python module. This requires the boost library and the paths in Makefile.inc to python and boost to be correctly set. With these set either run 'make python' or use the setup.py in /aa like 'TORUS=1 LAPACK=1 python setup.py install'.
+
+There is also test code that runs using googletest. However, there is a quick test to run detailed below.
+
 ## Methods
 
 1. Analytic potentials (Isochrone and Harmonic oscillator)
 2. General spherical potentials
-3. [Polar Adiabatic Approximation](http://arxiv.org/abs/1109.4417), Schoenrich & Binney (2012)
-4. Spheroidal Adiabatic Approximation (unpublished, in my thesis)
+3. [Cylindrical Adiabatic Approximation (CAA)](http://arxiv.org/abs/1109.4417), Schoenrich & Binney (2012)
+4. Spheroidal Adiabatic Approximation (SAA) (unpublished, in my thesis)
 5. [Stackel fitting](http://arxiv.org/abs/1208.2813), Sanders (2012)
 6. [Axisymmetric Stackel fudge](http://arxiv.org/abs/1207.4910), Binney (2012)
 7. [Interpolation using Axisymmetric Stackel fudge](http://arxiv.org/abs/1207.4910), Binney (2012)
-8. [Triaxial Stackel fudge](http://arxiv.org/abs/1412.2093), Sanders & Binney (2014)
-9. [Generating function from orbit (axisymmetric and triaxial)](http://arxiv.org/abs/1401.3600), Sanders & Binney (2014)
-10. [Average generating function from orbit](http://arxiv.org/abs/1401.2985), Bovy (2014), [Fox (2014)](http://arxiv.org/abs/1407.1688)
-11. [Iterative Torus Machine](http://arxiv.org/abs/1412.2093), Sanders & Binney (2014)
+8. [Triaxial Stackel fudge](http://arxiv.org/abs/1412.2093), Sanders & Binney (2015)
+9. [Generating function from orbit (axisymmetric and triaxial, O2GF)](http://arxiv.org/abs/1401.3600), Sanders & Binney (2014)
+10. [Average generating function from orbit (AvGF)](http://arxiv.org/abs/1401.2985), Bovy (2014), [Fox (2014)](http://arxiv.org/abs/1407.1688)
+11. [Iterative Torus Machine (ItTC)](http://arxiv.org/abs/1412.2093), Sanders & Binney (2015)
 
 
 ## Test case
 
 After successful compilation the command
 ```
-./mains/test_actions.exe 8. 1. 0.2 40. 200. 50. acts.dat
+cd aa; ./mains/test_actions.exe 8. 1. 0.2 40. 200. 50. acts.dat
 ```
 should integrate an orbit with initial conditions X=(8. 1. 0.2) kpc and V = (40. 200. 50.)km/s in the potential
 
 Phi(x)=Vc^2/2 log(R^2+(z/q)^2)
 
-with Vc=220km/s and q=0.9 and compute the actions for each point using a variety of methods. The results are output in tmp with two columns per method (JR and Jz).
+with Vc=220km/s and q=0.9 (or in the Piffl 2014 potential if Torus is installed) and compute the actions for each point using a variety of methods. The results are output in acts.dat with two columns per method (JR and Jz).

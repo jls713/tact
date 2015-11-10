@@ -96,8 +96,13 @@ VecDoub ProlateSpheroidCoordSys::tau2polar(const VecDoub& tau){
 VecDoub ProlateSpheroidCoordSys::tau2x(const VecDoub& tau){
 	/* Calculates x given tau */
 	VecDoub pol(3,0.);
-	pol[0] = sqrt((tau[0]+Alpha)*(tau[2]+Alpha)/(Alpha-Gamma));
- 	pol[2] = sqrt((tau[0]+Gamma)*(tau[2]+Gamma)/(Gamma-Alpha));
+	if(tau[2]+Gamma<TINY){
+		pol[0]=sqrt(tau[0]+Alpha);pol[2]=0.;
+	}
+	else{
+		pol[0] = sqrt((tau[0]+Alpha)*(tau[2]+Alpha)/(Alpha-Gamma));
+	 	pol[2] = sqrt((tau[0]+Gamma)*(tau[2]+Gamma)/(Gamma-Alpha));
+ 	}
  	pol[1]=pol[0]*sin(tau[1]);pol[0]*=cos(tau[1]);
  	return pol;
 }

@@ -28,8 +28,8 @@ GTESTPATH=/data/jls/gtest-1.7.0/
 ###		with ebf library (http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/)
 ### 1.2. Set Torus and ebf paths
 
-TORUSPATH = ../Torus/
-EBFPATH = ../libebf_c_cpp-0.0.3/
+TORUSPATH=../Torus
+EBFPATH=../libebf_c_cpp-0.0.3
 
 ### 1.3. Compile with "make TORUS=1"
 
@@ -61,7 +61,7 @@ PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 ####################################################################
 ## Compiler flags
 DEBUG = -ggdb3 #-ffast-math -Ofast
-OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC -ggdb3
+OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC
 
 ####################################################################
 

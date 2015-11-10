@@ -13,19 +13,19 @@ BoostPath=""
 
 s = open("../Makefile.inc","r")
 for l in s:
-  if "CCOMPILER" in l:
-    os.environ["CXX"]=l[10:]
-    os.environ["CC"]=l[10:-3]+"gcc"
-  if "GSLPATH" in l:
-    GSLPath=l[8:]
+  # if "CCOMPILER" in l:
+  #   os.environ["CXX"]=l[10:]
+  #   os.environ["CC"]=os.environ["CXX"]
+  if "GSLPATH" in l and GSLPath=="":
+    GSLPath=l[9:].replace('\n', '')
   if "LAPACKPATH" in l:
-    LapackPath=l[11:]
+    LapackPath=l[11:].replace('\n', '')
   if "TORUSPATH" in l:
-    TorusPath=l[10:]
+    TorusPath=l[10:].replace('\n', '')
   if "EBFPATH" in l:
-    EBFPath=l[8:]
+    EBFPath=l[8:].replace('\n', '')
   if "BOOSTINCPATH" in l:
-    BoostPath=l[13:-7]
+    BoostPath=l[14:-8].replace('\n', '')
 
 if GSLPath=="":
     print "GSLPath not found"
@@ -38,6 +38,13 @@ if EBFPath=="":
 if BoostPath=="":
     print "BoostPath not found"
 
+TorusFlag=0
+if 'TORUS' in os.environ:
+  TorusFlag=1
+LapackFlag=0
+if 'LAPACK' in os.environ:
+  LapackFlag=1
+
 setup(name="aa_py",
       ext_modules=[
           Extension("aa_py", ["src/aa_py.cpp"],
@@ -45,28 +52,30 @@ setup(name="aa_py",
                                   '../pot/inc',
                                   '../general/GSLInterface',
 				                          '../general/',
+                                  '../general/cuba/',
                                   '../general/coordtransforms/inc',
                                   '../general/jamestools/jamestools',
                                   '../general/jamestools/numrec',
                                   '../general/jamestools/octint',
 				                          GSLPath+'/include',
-				                          TorusPath + 'src',
-                                  TorusPath + 'src/pot',
-                                  TorusPath + 'src/utils',
+				                          TorusPath+'/src',
+                                  TorusPath+'/src/pot',
+                                  TorusPath+'/src/utils',
                                   BoostPath+'include',
                                   np.get_include()],
                     library_dirs=['lib',
-                                  TorusPath+'obj/',
-                                  TorusPath+'WDlib/obj',
+                                  TorusPath+'/obj/',
+                                  TorusPath+'/WDlib/obj',
 				                          GSLPath+'/lib',
                                   BoostPath+'lib',
                                   "../general/gnuplot/",
+                                  "../general/cuba/",
                                   "../general/coordtransforms/",
                                   "../general/jamestools/jamestools",
                                   "../general/jamestools/numrec",
                                   "../general/jamestools/octint",
                                   "../pot/",
-                                  EBFPath+"lib"],
+                                  EBFPath+"/lib"],
                     libraries=[
                         'aa','pot_js', 'plot','coords',
                         'jamestools','lapack','cuba',
@@ -75,5 +84,7 @@ setup(name="aa_py",
                         'boost_python', 'gsl','gslcblas','m'],
                     extra_compile_args=['-fPIC', '-shared', '-std=c++0x',
                                         '-Wall', '-O3',
-                                        '-ffast-math', '-fPIC', '-fopenmp'])
+                                        '-ffast-math', '-fPIC', '-fopenmp',
+                                        'TORUS='+str(TorusFlag),
+                                        'LAPACK='+str(LapackFlag)])
       ])

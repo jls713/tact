@@ -680,8 +680,8 @@ double dJdI3_integrand_AxiSym_Fudge(double theta, void *params){
 
 VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *params){
 
-    VecDoub acts(3,0.);
-    if(action_check(x,acts,Pot)) return acts;
+    VecDoub actions(3,0.);
+    if(action_check(x,actions,Pot)) return actions;
 
 	if(params){
 		double *deltaguess = (double *) params;
@@ -692,6 +692,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
 
 	VecDoub tau = CS->xv2tau(x);
+
 	E = Pot->H(x);
 	if(E>0){
 		std::cout<<"You have passed an unbound orbit:"<<std::endl;
@@ -701,21 +702,21 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 	integrals(tau);
 	VecDoub limits = find_limits(tau);
 
-	VecDoub actions;
 	// JR
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
 	VecDoub ints = {E,I2,Kt[0]};
+
 	action_struct_axi_fudge AS(this,ints,tau,taubar,Delta,0, 0.);
-	actions.push_back(Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI);
+	actions[0]=Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
 	// Lz
-	actions.push_back(sqrt(2.0*I2));
+	actions[1]=sqrt(2.0*I2);
 	// Jz
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);
 	ints[2]=Kt[1];
 	AS = action_struct_axi_fudge(this,ints,tau,taubar,Delta,1, 0.);
-	actions.push_back(2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI);
+	actions[2]=2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
 	if(x[2]==0. and x[5]==0.) actions[2]=0.;
 	return actions;
 }

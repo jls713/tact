@@ -26,8 +26,8 @@ CUBALIBPATH = -L$(GENERALPATH)cuba
 CUBA = $(CUBALIBPATH) -lcuba
 
 ifeq ($(TORUS), 1)
-	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
-	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/ -L$(EBFPATH)lib/
+	TORUSINCPATH = -I$(TORUSPATH)/src/ -I$(TORUSPATH)/src/utils/ -I$(TORUSPATH)/src/pot
+	TORUSLIBPATH = -L$(TORUSPATH)/obj/ -L$(TORUSPATH)/WDlib/obj/ -L$(EBFPATH)/lib/
 	TORUSLIBS = -lTorus -lOther -lPot -lWD -lebf_cpp
 else
 	TORUSINCPATH =
@@ -55,7 +55,7 @@ LIBPATHS =
 		   # -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
 		   # -Wl,-R$(GSLPATH)lib/ -Wl,-R$(CTPATH)
 
-LIB = -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/  -Wl,-rpath,$(EBFPATH)lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
+LIB = -Wl,-rpath,$(TORUSPATH)/obj/ -Wl,-rpath,$(TORUSPATH)/WDlib/obj/  -Wl,-rpath,$(EBFPATH)/lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) $(TORUSLIBS) -lpot_js -lcoords \
@@ -83,7 +83,7 @@ HEADERS = $(wildcard inc/*.h)
 
 #------------------------------------------------------
 
-default: all
+default: clean all
 
 all: lib/libaa.so mains/test_actions.exe mains/test_angles.exe mains/many_tori.exe mains/genfunc_converg.exe
 
@@ -129,6 +129,9 @@ mains/test_angles.exe: $(OBJECTS) $(OBJ)test_angles.o
 mains/many_tori.exe: $(OBJECTS) $(OBJ)many_tori.o
 	$(CCOMPILER) $(OPTS) -o mains/many_tori.exe $(OBJECTS) $(OBJ)many_tori.o $(LIB) $(CUBA)
 
+mains/many_tori_james.exe: $(OBJECTS) $(OBJ)many_tori_james.o
+	$(CCOMPILER) $(OPTS) -o mains/many_tori_james.exe $(OBJECTS) $(OBJ)many_tori_james.o $(LIB) $(CUBA)
+
 mains/genfunc_converg.exe: $(OBJECTS) $(OBJ)genfunc_converg.o
 	$(CCOMPILER) $(OPTS) -o mains/genfunc_converg.exe $(OBJECTS) $(OBJ)genfunc_converg.o $(LIB) $(CUBA)
 
@@ -158,4 +161,4 @@ falcON_aa.exe: $(OBJECTS) $(FALCONOBJ)falcON_aa.o
 
 .PHONY: clean
 clean:
-	rm -rf obj/*.o; rm -rf *.so; rm -rf *.exe
+	rm -rf obj/*.o; rm -rf *.so; rm -rf mains/*.exe

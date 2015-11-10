@@ -184,7 +184,7 @@ TEST(ActionTest_Small,StackelFudge){
   Actions_AxisymmetricStackel_Fudge AA(&Pot,1.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
-  // small z, zero vR, zero vz
+  std::cout<<"small z, zero vR, zero vz"<<std::endl;
   VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
   VecDoub Acs = AA.actions(X);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
@@ -197,7 +197,7 @@ TEST(ActionTest_Small,StackelFudge){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  // zero z, small vR, small vz
+  std::cout<<"zero z, small vR, small vz"<<std::endl;
   X = {1.,0.,0.,2e-5,Vc,2e-5};
   Acs = AA.actions(X);
   Acs = AA.actions(X);
@@ -211,7 +211,7 @@ TEST(ActionTest_Small,StackelFudge){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  // small z, small vR, small vz
+  std::cout<<"small z, small vR, small vz"<<std::endl;
   X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
   Acs = AA.actions(X);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
