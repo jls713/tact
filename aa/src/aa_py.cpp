@@ -149,44 +149,44 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
 // ============================================================================
   class_<Potential_JS, boost::noncopyable,
          boost::shared_ptr<Potential_JS_PythonCallback>>("Potential_JS",
-            "Base potential class"
-            ""
+            "Base potential class\n"
+            "\n"
             "All potential classes must have a Phi(x) and Forces(x) routine in C++. These are called by __call__ and Forces respectively in python",init<>())
       .def("__call__", &Potential_JS::Phi,
-           "Compute potential Phi(x)"
-            ""
-            "Args:"
-            "    param1: np.array of Cartesian position x."
-            ""
-            "Returns:"
-            "    Potential at x"
+           "Compute potential Phi(x)\n"
+            "\n"
+            "Args:\n"
+            "    param1: np.array of Cartesian position x.\n"
+            "\n"
+            "Returns:\n"
+            "    Potential at x\n"
         "")
       .def("energy", &Potential_JS::H,
-           "Compute energy = \frac{1}{2}(v_x^2+v_y^2+v_z^2)+Phi(x)"
-           ""
-            "Args:"
-            " param1: np.array of Cartesian position X."
-            ""
-            "Returns:"
-            " Potential at x"
+           "Compute energy = \frac{1}{2}(v_x^2+v_y^2+v_z^2)+Phi(x)\n"
+           "\n"
+            "Args:\n"
+            " param1: np.array of Cartesian position X.\n"
+            "\n"
+            "Returns:\n"
+            " Potential at x\n"
         "")
       .def("Forces", &Potential_JS::Forces,
-           "Compute Forces at x"
-           ""
-            "Args:"
-            " param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz)."
-            ""
-            "Returns:"
-            " np.array of Forces at x"
+           "Compute Forces at x\n"
+           "\n"
+            "Args:\n"
+            " param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz).\n"
+            "\n"
+            "Returns:\n"
+            " np.array of Forces at x\n"
         "")
       .def("torb", &Potential_JS::torb,
-           "Compute orbital time-scale of circular orbit with energy H(x)"
-           ""
-            "Args:"
-            " param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz)."
-            ""
-            "Returns:"
-            "    Orbital time-scale for x"
+           "Compute orbital time-scale of circular orbit with energy H(x)\n"
+           "\n"
+            "Args:\n"
+            " param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz).\n"
+            "\n"
+            "Returns:\n"
+            "    Orbital time-scale for x\n"
         "");
 
   // class_<Density, boost::noncopyable>("Density",init<double>());
@@ -270,28 +270,28 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
 // Action Finders
 // ============================================================================
   class_<Action_Finder>("Action_Finder",
-        "Base action finding class"
-        ""
-        "    All action finding classes must have actions(x) and angles(x) routine that returns the actions and (angles,frequencies) respectively."
-        ""
+        "Base action finding class\n"
+        "\n"
+        "    All action finding classes must have actions(x) and angles(x) routine that returns the actions and (angles,frequencies) respectively.\n"
+        "\n"
         "",no_init)
 	.def("actions",&Action_Finder::actions_nopars,
-       "Compute actions(X)"
-       ""
-       "  Args:"
-       "    param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz)."
-       ""
-       "  Returns:"
-       "    np.array of actions = (J_R,J_phi,J_z)"
+       "Compute actions(X)\n"
+       "\n"
+       "  Args:\n"
+       "    param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz).\n"
+       "\n"
+       "  Returns:\n"
+       "    np.array of actions = (J_R,J_phi,J_z)\n"
        "")
   .def("angles",&Action_Finder::angles_nopars,
-       "Compute angles(X)"
-       ""
-       "  Args:"
-       "    param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz)."
-       ""
-       "  Returns:"
-       "    np.array of angles and frequencies = (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)"
+       "Compute angles(X)\n"
+       "\n"
+       "  Args:\n"
+       "    param1: np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz).\n"
+       "\n"
+       "  Returns:\n"
+       "    np.array of angles and frequencies = (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)\n"
        "");
 
   class_<Actions_Spherical, bases<Action_Finder> >(
@@ -299,135 +299,135 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
 
   class_<Actions_Isochrone, bases<Action_Finder, Isochrone> >(
   "Actions_Isochrone",
-  "Action finder for isochrone potential"
-    "Args:"
-      "param1: potential param GM"
-      "param2: potential param b"
+  "Action finder for isochrone potential\n"
+    "Args:\n"
+      "param1: potential param GM\n"
+      "param2: potential param b\n"
     "Finds actions in spherical potential Phi(r)=-GM/(b+sqrt(b^2+r^2))"
     , init<double,double>());
 
   class_<Actions_PolarAdiabaticApproximation, bases<Action_Finder> >(
 	"Actions_PolarAdiabaticApproximation",
-  "Polar Adiabatic Approximation"
-    "Args:"
-     " param1: Potential_JS potential"
-      "param2: output file"
-      "param3: write to file bool (if 1 write)"
-      "param4: no_energy_corr (if true don't couple radial and vertical energies)"
-      "param5 Rm: minimum radius for grid"
-      "param6 Rn: maximum radius for grid"
-      "param7 zmax: maximum z height for grid"
-      "param8 NGRID: number of grid points for Ez"
+  "Polar Adiabatic Approximation\n"
+    "Args:\n"
+     " param1: Potential_JS potential\n"
+      "param2: output file\n"
+      "param3: write to file bool (if 1 write)\n"
+      "param4: no_energy_corr (if true don't couple radial and vertical energies)\n"
+      "param5 Rm: minimum radius for grid\n"
+      "param6 Rn: maximum radius for grid\n"
+      "param7 zmax: maximum z height for grid\n"
+      "param8 NGRID: number of grid points for Ez\n"
       "", init<Potential_JS*, std::string,bool,bool,double,double,double,int>());
 
   class_<Actions_SpheroidalAdiabaticApproximation, bases<Action_Finder> >(
 	"Actions_SpheroidalAdiabaticApproximation",
   "Spheroidal Adiabatic Approximation:"
-    "can pass alpha guess to actions and angles, or if alpha>1 uses local guess"
-    "Args:"
-      "param1: Potential_JS potential"
-      "param2: output file"
-     " param3: write to file bool (if 1 write)"
-      "param4: no_energy_corr (if true don't couple radial and vertical energies)"
-      "param5: alpha estimate"
-      "param6 Rm -- minimum radius for grid"
-      "param7 Rn -- maximum radius for grid"
-      "param8 zmax -- maximum z height for grid"
-      "param9 NGRID -- number of grid points for Enu"
-      "param10 NL -- number of grid points for Lz"
+    "can pass alpha guess to actions and angles, or if alpha>1 uses local guess\n"
+    "Args:\n"
+      "param1: Potential_JS potential\n"
+      "param2: output file\n"
+     " param3: write to file bool (if 1 write)\n"
+      "param4: no_energy_corr (if true don't couple radial and vertical energies)\n"
+      "param5: alpha estimate\n"
+      "param6 Rm -- minimum radius for grid\n"
+      "param7 Rn -- maximum radius for grid\n"
+      "param8 zmax -- maximum z height for grid\n"
+      "param9 NGRID -- number of grid points for Enu\n"
+      "param10 NL -- number of grid points for Lz\n"
       "", init<Potential_JS*, std::string,bool,bool,double,double,double,double,int,int>());
 
   class_<Actions_AxisymmetricStackel, bases<Action_Finder> >(
-	"Actions_AxisymmetricStackel","Action finding in axisymmetric Staeckel potential:"
-      "params: StackelOblate_PerfectEllipsoid potential"
+	"Actions_AxisymmetricStackel","Action finding in axisymmetric Staeckel potential:\n"
+      "params: StackelOblate_PerfectEllipsoid potential\n"
       "", init<StackelOblate_PerfectEllipsoid*>());
 
   class_<Actions_AxisymmetricStackel_Fudge, bases<Action_Finder> >(
-      "Actions_AxisymmetricStackel_Fudge"," Action estimation in general axisymmetric potential using Staeckel fudge (can pass alpha guess to actions and angles, or if alpha>1 uses local guess:"
-        "Args:"
-          "param1 Potential"
+      "Actions_AxisymmetricStackel_Fudge"," Action estimation in general axisymmetric potential using Staeckel fudge (can pass alpha guess to actions and angles, or if alpha>1 uses local guess:\n"
+        "Args:\n"
+          "param1 Potential\n"
           "param2 alpha guess"
       , init<Potential_JS*, double>());
 
   class_<Actions_TriaxialStackel, bases<Action_Finder> >(
 	"Actions_TriaxialStackel",
-  "Action finding in triaxial Staeckel potential:"
-     " Args:"
-      "  param1: StackelTriaxial potential"
+  "Action finding in triaxial Staeckel potential:\n"
+     " Args:\n"
+      "  param1: StackelTriaxial potential\n"
       "", init<StackelTriaxial*>());
 
   class_<Actions_TriaxialStackel_Fudge, bases<Action_Finder> >(
 	"Actions_TriaxialStackel_Fudge",
-  "Action estimation in general triaxial potentials using Staeckel fudge"
-   " Args:"
-      "param1: Potential_JS potential"
-      "param2: alpha"
-     " param3: beta"
+  "Action estimation in general triaxial potentials using Staeckel fudge\n"
+   " Args:\n"
+      "param1: Potential_JS potential\n"
+      "param2: alpha\n"
+     " param3: beta\n"
   "", init<Potential_JS*, double, double>());
 
   class_<Actions_Genfunc, bases<Action_Finder> >(
 	"Actions_Genfunc",
   ""
-    "Action finder using Generating function"
-    "Args:"
-      "param1: Potential_JS potential"
-      "param2: symmetry string (axisymmetric or triaxial)"
-    "Finds actions by calculating the generating function components from a orbit integration via toy actions in either the isochrone or harmonic oscillator potential"
-    "The actions routine accepts a set of parameters = (Total time, N_T, N_max). If no parameters are passed the routine will estimate the orbital time scale from T = Potential_JS::torb and use Total_T = 8*T, N_T=200 and N_max = 6"
-    "Currently geared up to return J_lambda, J_mu, J_nu -- this means that for the inner long axis loops (identified via the Stackel fudge) have J_r <==> L such that J_mu is the radial action"
+    "Action finder using Generating function\n"
+    "Args:\n"
+      "param1: Potential_JS potential\n"
+      "param2: symmetry string (axisymmetric or triaxial)\n"
+    "Finds actions by calculating the generating function components from a orbit integration via toy actions in either the isochrone or harmonic oscillator potential\n"
+    "The actions routine accepts a set of parameters = (Total time, N_T, N_max). If no parameters are passed the routine will estimate the orbital time scale from T = Potential_JS::torb and use Total_T = 8*T, N_T=200 and N_max = 6\n"
+    "Currently geared up to return J_lambda, J_mu, J_nu -- this means that for the inner long axis loops (identified via the Stackel fudge) have J_r <==> L such that J_mu is the radial action\n"
   "", init<Potential_JS*,std::string>())
   .def("full_actions",&Actions_Genfunc::full_actions,
        ""
-       "Finds actions"
-        "Args:"
-          "param1 np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz)."
-          "param2 NT number of orbital times to integrate for"
-          "param3 Nsamp number of time samples"
-         " param4 Nmax number of Fourier coefficients Sn"
-         ""
-        "Returns: actions -- 3D vector J=(J_R,J_phi,J_z)"
-        "")
+       "Finds actions\n"
+        "Args:\n"
+          "param1 np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz).\n"
+          "param2 NT number of orbital times to integrate for\n"
+          "param3 Nsamp number of time samples\n"
+         " param4 Nmax number of Fourier coefficients Sn\n"
+         "\n"
+        "Returns: actions -- 3D vector J=(J_R,J_phi,J_z)\n"
+        "\n")
   .def("full_angles",&Actions_Genfunc::full_angles,
        ""
-       "Finds angles"
-        "Args:"
-          "param1 np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz)."
-          "param2 NT number of orbital times to integrate for"
-          "param3 Nsamp number of time samples"
-         " param4 Nmax number of Fourier coefficients Sn"
-         ""
-        "Returns: angles and frequencies -- 6D vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)"
-        "");
+       "Finds angles\n"
+        "Args:\n"
+          "param1 np.array of Cartesian position and velocity X = (x,y,z,vx,vy,vz).\n"
+          "param2 NT number of orbital times to integrate for\n"
+          "param3 Nsamp number of time samples\n"
+         " param4 Nmax number of Fourier coefficients Sn\n"
+         "\n"
+        "Returns: angles and frequencies -- 6D vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)\n"
+        "\n");
 
   class_<Actions_Genfunc_Average, bases<Action_Finder> >(
-  "Actions_Genfunc_Average",
+  "Actions_Genfunc_Average\n",
   ""
-    "Action finder averaging the toy actions over toy angles"
-    "Args:"
-      "param1: Potential_JS potential"
-      "param2: symmetry string (axisymmetric or triaxial)"
-    "Finds actions by averaging using an orbit integration via toy actions in either the isochrone or harmonic oscillator potential"
-    "", init<Potential_JS*,std::string>());
+    "Action finder averaging the toy actions over toy angles\n"
+    "Args:\n"
+      "param1: Potential_JS potential\n"
+      "param2: symmetry string (axisymmetric or triaxial)\n"
+    "Finds actions by averaging using an orbit integration via toy actions in either the isochrone or harmonic oscillator potential\n"
+    "\n", init<Potential_JS*,std::string>());
 
   class_<Actions_StackelFit, bases<Action_Finder> >(
-  "Actions_StackelFit",
+  "Actions_StackelFit\n",
   ""
-    "Action finding by first fitting a Staeckel potential to the region an orbit probes"
-    "Args:"
-      "param1: Potential_JS potential"
-      "param2: tolerance of orbit integration"
+    "Action finding by first fitting a Staeckel potential to the region an orbit probes\n"
+    "Args:\n"
+      "param1: Potential_JS potential\n"
+      "param2: tolerance of orbit integration\n"
   "", init<Potential_JS*,double>());
 
 #ifdef TORUS
   class_<IterativeTorusMachine, bases<Action_Finder> >(
-      "IterativeTorusMachine",
-      "Action finding by iteratively constructing tori"
-      "Args:"
-       " param1 Actions_AxisymmetricStackel_Fudge object"
-        "param2 GalPot potential"
-        "param3 tolerance in angle fit"
-       " param4 max number of torus fits"
-        "param5 relative error of torus fits",
+      "IterativeTorusMachine\n",
+      "Action finding by iteratively constructing tori\n"
+      "Args:\n"
+       " param1 Actions_AxisymmetricStackel_Fudge object\n"
+        "param2 GalPot potential\n"
+        "param3 tolerance in angle fit\n"
+       " param4 max number of torus fits\n"
+        "param5 relative error of torus fits\n",
       init<Actions_AxisymmetricStackel_Fudge*, GalPot*, double, int, double>()
       ).def("set_maxit",&IterativeTorusMachine::set_maxit,
       "set max no. of torus constructions");
@@ -435,98 +435,98 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
 
   class_<uv_orb, bases<Action_Finder> >(
       "Actions_AxisymmetricStackel_Fudge_DeltaGuess",
-      "uv_orb is an interface for using axisymmetric St\"ackel fudge apparatus. It handles the choice of coordinate system using the Delta estimation from Binney (2014). It is thread-safe as each action call creates a new instance of Actions_AxisymmetricStackel_Fudge"
-"  Args:"
-    "param pot Potential_JS (axisymmetric)"
-    "param Rm  minimum radial grid point"
-    "param Rn  maximum radial grid point"
-   " param NE  number of energy grid points"
-    "param NL  number of ang. mom. grid points"
-    "param name name of class"
-    "",
+      "uv_orb is an interface for using axisymmetric St\"ackel fudge apparatus. It handles the choice of coordinate system using the Delta estimation from Binney (2014). It is thread-safe as each action call creates a new instance of Actions_AxisymmetricStackel_Fudge\n"
+"  Args:\n"
+    "param pot Potential_JS (axisymmetric)\n"
+    "param Rm  minimum radial grid point\n"
+    "param Rn  maximum radial grid point\n"
+   " param NE  number of energy grid points\n"
+    "param NL  number of ang. mom. grid points\n"
+    "param name name of class\n"
+    "\n",
       init<Potential_JS*, double, double, int, int, std::string>());
 
   class_<lmn_orb, bases<Action_Finder> >(
       "Actions_TriaxialStackel_Fudge_DeltaGuess",
       ""
-      "Interface for using triaxial St\"ackel fudge apparatus"
-      "Handles the choice of coordinate system"
-     " Args:"
-          "param pot Potential (axisymmetric) in which to compute the actions"
-          "param ym -- minimum intermediate (y) intercept value"
-         " param yn -- maximum intermediate (y) intercept value"
-          "param NEE -- number of energy grid points"
-          "param use_log_grid -- if true, use log-spaced grid, else linear"
-          "param use_acts-if true, estimate alpha & beta by action minimization"
-          "param s -- output file"
-      "",
+      "Interface for using triaxial St\"ackel fudge apparatus\n"
+      "Handles the choice of coordinate system\n"
+     " Args:\n"
+          "param pot Potential (axisymmetric) in which to compute the actions\n"
+          "param ym -- minimum intermediate (y) intercept value\n"
+         " param yn -- maximum intermediate (y) intercept value\n"
+          "param NEE -- number of energy grid points\n"
+          "param use_log_grid -- if true, use log-spaced grid, else linear\n"
+          "param use_acts-if true, estimate alpha & beta by action minimization\n"
+          "param s -- output file\n"
+      "\n",
       init<Potential_JS*, double, double, int, bool,bool, std::string>());
 
 
   class_<Orbit, boost::noncopyable>("Orbit","Orbit integrator using GSL ode routines", init<Potential_JS*, double>())
       .def("integrate", &Orbit::integrate,
-           "Integrate phase-space point."
-              "Args:"
-             " param1 np.array x -- starting phase-space point x=(x,y,z,vx,vy,vz)"
-              "param2 t_interval -- total integration time"
-              "param3 step_size -- integration output step size"
-             " param4 adaptive -- adaptive step-sizes"
+           "Integrate phase-space point.\n"
+              "Args:\n"
+             " param1 np.array x -- starting phase-space point x=(x,y,z,vx,vy,vz)\n"
+              "param2 t_interval -- total integration time\n"
+              "param3 step_size -- integration output step size\n"
+             " param4 adaptive -- adaptive step-sizes\n"
              ""
-              "Returns: final phase-space point"
+              "Returns: final phase-space point\n"
               ""
-              "intermediate results stored in results"
+              "intermediate results stored in results\n"
             "");
 
 
   def("GalacticToPolar",conv::GalacticToPolar,
-      ""
-        "in: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)"
-       " out: Polar = (R,phi,z,vR,vphi,vz)"
-""
-        "Units: velocities in km/s, positions kpc and proper motions in mas/yr"
-      "");
+      "\n"
+        "in: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
+       " out: Polar = (R,phi,z,vR,vphi,vz)\n"
+"\n"
+        "Units: velocities in km/s, positions kpc and proper motions in mas/yr\n"
+      "\n");
   def("GalacticToCartesian",conv::GalacticToCartesian,
-      ""
-        "in: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)"
-        "out: Cartesian = (x,y,z,vx,vy,vz):"
-           "  x away from centre of Galaxy towards Sun"
-            " y opposite to Galactic rotation"
-             "z up towards North Galactic Pole"
-""
-        "Units: velocities in km/s, positions kpc and proper motions in mas/yr"
-      "");
+      "\n"
+        "in: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
+        "out: Cartesian = (x,y,z,vx,vy,vz):\n"
+           "  x away from centre of Galaxy towards Sun\n"
+            " y opposite to Galactic rotation\n"
+             "z up towards North Galactic Pole\n"
+"\n"
+        "Units: velocities in km/s, positions kpc and proper motions in mas/yr\n"
+      "\n");
   def("GalacticToEquatorial",conv::GalacticToEquatorial,
-      ""
-       " in: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)"
-       " out: Equatorial =(alpha,delta,s,vlos,mu_alphacos(delta),mu_delta)"
-      "");
+      "\n"
+       " in: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
+       " out: Equatorial =(alpha,delta,s,vlos,mu_alphacos(delta),mu_delta)\n"
+      "\n");
   def("CartesianToPolar",conv::CartesianToPolar,
-      ""
-       " in:  Cartesian = (x,y,z,vx,vy,vz)"
-       " out: Polar = (R,phi,z,vR,vphi,vz)"
-      "");
+      "\n"
+       " in:  Cartesian = (x,y,z,vx,vy,vz)\n"
+       " out: Polar = (R,phi,z,vR,vphi,vz)\n"
+      "\n");
   def("CartesianToGalactic",conv::CartesianToGalactic,
-      ""
-       " in:  Cartesian = (x,y,z,vx,vy,vz):"
-       "      x away from centre of Galaxy towards Sun"
-        "     y opposite to Galactic rotation"
-       "      z up towards North Galactic Pole"
-      "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)"
-""
-      "  Units: velocities in km/s, positions kpc and proper motions in mas/yr"
-      "");
+      "\n"
+       " in:  Cartesian = (x,y,z,vx,vy,vz):\n"
+       "      x away from centre of Galaxy towards Sun\n"
+        "     y opposite to Galactic rotation\n"
+       "      z up towards North Galactic Pole\n"
+      "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
+"\n"
+      "  Units: velocities in km/s, positions kpc and proper motions in mas/yr\n"
+      "\n");
   def("PolarToGalactic",conv::PolarToGalactic,
-      ""
-      "  in:  Polar = (R,phi,z,vR,vphi,vz)"
-      "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)"
-      ""
-      "  Units: velocities in km/s, positions kpc and proper motions in mas/yr"
-      "");
+      "\n"
+      "  in:  Polar = (R,phi,z,vR,vphi,vz)\n"
+      "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
+      "\n"
+      "  Units: velocities in km/s, positions kpc and proper motions in mas/yr\n"
+      "\n");
   def("EquatorialToGalactic",conv::EquatorialToGalactic,
-      ""
-      "  in: Equatorial =(alpha,delta,s,vlos,mu_alphacos(delta),mu_delta)"
-      "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)"
-      "");
+      "\n"
+      "  in: Equatorial =(alpha,delta,s,vlos,mu_alphacos(delta),mu_delta)\n"
+      "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
+      "\n");
 
 
 
