@@ -149,6 +149,7 @@ VecDoub IterativeTorusMachine::actions(const VecDoub &X, void*params){
 
 	// Return actions in right units
 	for(int i=0;i<6;i++) aaGuess[i]*=conv::kpcMyr2kms;
+	aaGuess[5]*=SIGN(Phi->Lz(X));
 
 	return {aaGuess[0],aaGuess[1],aaGuess[2], // Action results
 			aaGuess[3],aaGuess[5],aaGuess[4], // Freq. results

@@ -356,19 +356,19 @@ VecDoub Actions_AxisymmetricStackel::actions(const VecDoub& x, void *params){
 	VecDoub integrals = Pot->x2ints(x,&tau);
 	VecDoub limits = find_limits(tau,integrals);
 
-	VecDoub actions;
+	VecDoub actions(3,0.);
 	// JR
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
 	action_struct_axi AS(Pot,integrals,taubar,Delta,0.);
-	actions.push_back(Delta*GaussLegendreQuad(&J_integrand_AxiSym,-.5*PI,.5*PI,&AS)/PI);
+	actions[0]=Delta*GaussLegendreQuad(&J_integrand_AxiSym,-.5*PI,.5*PI,&AS)/PI;
 	// Lz
-	actions.push_back(sqrt(2.0*integrals[1]));
+	actions[1]=Pot->Lz(x);
 	// Jz
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);
 	AS = action_struct_axi (Pot,{integrals[0],integrals[1],integrals[3]},taubar,Delta,0.);
-	actions.push_back(2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym,-.5*PI,.5*PI,&AS)/PI);
+	actions[2]=2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym,-.5*PI,.5*PI,&AS)/PI;
 	return actions;
 }
 
@@ -459,6 +459,7 @@ VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, void*params){
 
 	angles[3]=det2(dJdI[1][1],dJdI[1][2],dJdI[2][1],dJdI[2][2])/Determinant;
 	angles[4]=det2(dJdI[2][1],dJdI[2][2],dJdI[0][1],dJdI[0][2])/Determinant;
+	angles[4]*=SIGN(Pot->Lz(x));
 	angles[5]=det2(dJdI[0][1],dJdI[0][2],dJdI[1][1],dJdI[1][2])/Determinant;
 	// FLAG data which doesn't make sense
 
@@ -723,8 +724,8 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 
 VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params){
 
-    VecDoub angs(6,0.);
-    if(angle_check(x,angs,Pot)) return angs;
+    VecDoub angles(6,0.);
+    if(angle_check(x,angles,Pot)) return angles;
 
 	if(params){
 		double *deltaguess = (double *) params;
@@ -741,7 +742,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 	E = Pot->H(x); I2 = 0.5*(x[0]*x[4]-x[1]*x[3])*(x[0]*x[4]-x[1]*x[3]);
 	integrals(tau);
 	VecDoub limits = find_limits(tau);
-	VecDoub angles;
+
 	// thetaR
 	double taubar = 0.5*(limits[0]+limits[1]);
 	double Delta = 0.5*(limits[1]-limits[0]);
@@ -787,12 +788,14 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
 	dIdJ[2][1] = -det2(dJdIl[0],dJdIl[1],dJdIn[0],dJdIn[1])/Determinant;
 	dIdJ[2][2] = det2(dJdIl[0],dJdIl[1],dJdIp[0],dJdIp[1])/Determinant;
 
-	angles.push_back(dSdI[0]*dIdJ[0][0]+dSdI[1]*dIdJ[1][0]+dSdI[2]*dIdJ[2][0]);
-	angles.push_back(dSdI[0]*dIdJ[0][1]+dSdI[1]*dIdJ[1][1]+dSdI[2]*dIdJ[2][1]);
-	angles.push_back(dSdI[0]*dIdJ[0][2]+dSdI[1]*dIdJ[1][2]+dSdI[2]*dIdJ[2][2]);
-	angles.push_back(det2(dJdIp[1],dJdIp[2],dJdIn[1],dJdIn[2])/Determinant);
-	angles.push_back(det2(dJdIn[1],dJdIn[2],dJdIl[1],dJdIl[2])/Determinant);
-	angles.push_back(det2(dJdIl[1],dJdIl[2],dJdIp[1],dJdIp[2])/Determinant);
+	angles[0]=dSdI[0]*dIdJ[0][0]+dSdI[1]*dIdJ[1][0]+dSdI[2]*dIdJ[2][0];
+	angles[1]=dSdI[0]*dIdJ[0][1]+dSdI[1]*dIdJ[1][1]+dSdI[2]*dIdJ[2][1];
+	angles[2]=dSdI[0]*dIdJ[0][2]+dSdI[1]*dIdJ[1][2]+dSdI[2]*dIdJ[2][2];
+	angles[3]=det2(dJdIp[1],dJdIp[2],dJdIn[1],dJdIn[2])/Determinant;
+	angles[4]=det2(dJdIn[1],dJdIn[2],dJdIl[1],dJdIl[2])/Determinant;
+	angles[5]=det2(dJdIl[1],dJdIl[2],dJdIp[1],dJdIp[2])/Determinant;
+
+	angles[4]*=SIGN(Pot->Lz(x));
 
 	if(tau[5]<0.0){angles[2]+=PI;}
 	if(x[2]<0.0){angles[2]+=PI;}

@@ -427,6 +427,8 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	angles[4]=det2(dJdIn[1],dJdIn[2],dJdIl[1],dJdIl[2])/Determinant;
 	angles[5]=det2(dJdIl[1],dJdIl[2],dJdIp[1],dJdIp[2])/Determinant;
 
+	angles[4]*=SIGN(Lz);
+
 	if(tau[5]<0.0){angles[2]+=PI;}
 	if(x[2]<0.0){angles[2]+=PI;}
 	if(angles[2]>2.*PI)	angles[2]-=2.0*PI;
@@ -778,6 +780,8 @@ VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *para
 	angles[3]=det2(dJdIp[1],dJdIp[2],dJdIn[1],dJdIn[2])/Determinant;
 	angles[4]=det2(dJdIn[1],dJdIn[2],dJdIl[1],dJdIl[2])/Determinant;
 	angles[5]=det2(dJdIl[1],dJdIl[2],dJdIp[1],dJdIp[2])/Determinant;
+
+	angles[4]*=SIGN(Lz);
 
 	if(x[5]<0.0){angles[2]+=PI;}
 	if(x[2]<0.0){angles[2]+=2.*PI;}

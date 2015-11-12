@@ -57,7 +57,6 @@ int main(int argc, char*argv[]){
 	#ifdef TORUS
 	GalPot Pot("pot/Piffl14.Tpot");
 	WrapperTorusPotential TPot(&Pot);
-	std::cout<<TPot.KapNuOm(8.29)*conv::kpcMyr2kms<<std::endl;
 	std::cerr<<"Using Piffl14 GalPot"<<std::endl;
 	#else
 	Logarithmic Pot(220.,1.,0.9);
@@ -109,7 +108,7 @@ int main(int argc, char*argv[]){
 
 	double tt = 10.;
 	double tstep = 0.01*Pot.torb(X);
-	if(argc>7) tt=atof(argv[8]);
+	if(argc>8) tt=atof(argv[8]);
 	O.integrate(X,tt*Pot.torb(X),tstep);
 	O.plot(0,1);
 
