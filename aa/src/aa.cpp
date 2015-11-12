@@ -24,7 +24,7 @@ int action_check(const VecDoub &x, VecDoub &acts, Potential_JS *Pot){
         return 1;
     }
     // Check if unbound
-    if(Pot->H(x)>Pot->Phi({1.e7*x[0],1.e7*x[1],1.e7*x[2]})){
+    if(Pot->H(x)>Pot->Phi({1.e7*(x[0]==0.?1.:x[0]),1.e7*(x[1]==0.?1.:x[1]),1.e7*(x[2]==0.?1.:x[2])})){
         std::cerr<<"Orbit passed to action routine is unbound\n";
         for(unsigned i=0;i<3;++i)
             acts[i]=std::numeric_limits<double>::infinity();
@@ -62,7 +62,7 @@ int angle_check(const VecDoub &x, VecDoub &angs, Potential_JS *Pot){
         return 1;
     }
     // Check if unbound
-    if(Pot->H(x)>Pot->Phi({1.e7*x[0],1.e7*x[1],1.e7*x[2]})){
+    if(Pot->H(x)>Pot->Phi({1.e7*(x[0]==0.?1.:x[0]),1.e7*(x[1]==0.?1.:x[1]),1.e7*(x[2]==0.?1.:x[2])})){
         std::cerr<<"Orbit passed to angle routine is unbound\n";
         for(unsigned i=0;i<6;++i)
             angs[i]=std::numeric_limits<double>::infinity();

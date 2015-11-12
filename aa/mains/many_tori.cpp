@@ -187,7 +187,7 @@ int main(int argc, char*argv[]){
 		}
 		VecDoub acts = {columnMean(GResults)[0],Pot.Lz(X),columnMean(GResults)[1],columnMean(GResults)[5],columnMean(GResults)[6],columnMean(GResults)[7]};
 
-		VecDoub GF_SD = columnSD(GResults);
+		VecDoub GF_SD = columncarefulSD(GResults);
 		outfile<<acts[0]<<" "<<acts[1]<<" "<<acts[2]<<" "<<(acts[0]+acts[2])/fabs(acts[1])<<" ";
 		#ifdef TORUS
 		Actions J;J[0]=acts[0]/conv::kpcMyr2kms;
@@ -196,7 +196,7 @@ int main(int argc, char*argv[]){
 		outfile<<T.minR()<<" "<<T.maxR()<<" "<<" "<<T.maxz()<<" ";
 		MatDoub Hess = dOmdJ(J,.1*J,&TPot);
 		#endif
-		outfile<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" "<<SD(Energy)/Mean(Energy)<<" ";
+		outfile<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" "<<carefulSD(Energy)/Mean(Energy)<<" ";
 
 		int N=0;
 		for(auto i:O.results()){
@@ -266,7 +266,7 @@ int main(int argc, char*argv[]){
 		#ifdef TORUS
 		for(auto k:columnRMS(ITResults)) outfile<<k<<" ";
 		#endif
-		for(auto k:columnSD(GResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(GResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(GAvResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(UVResults)) outfile<<k<<" ";
 		for(auto k:columnRMS(PAAResults)) outfile<<k<<" ";

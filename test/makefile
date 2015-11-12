@@ -27,8 +27,8 @@ CUBALIBPATH = -L$(GENERALPATH)cuba
 CUBA = $(CUBALIBPATH) -lcuba
 
 ifeq ($(TORUS), 1)
-	TORUSINCPATH = -I$(TORUSPATH)src/ -I$(TORUSPATH)src/utils/ -I$(TORUSPATH)src/pot
-	TORUSLIBPATH = -L$(TORUSPATH)obj/ -L$(TORUSPATH)WDlib/obj/ -L$(EBFPATH)lib/
+	TORUSINCPATH = -I$(TORUSPATH)/src/ -I$(TORUSPATH)/src/utils/ -I$(TORUSPATH)/src/pot
+	TORUSLIBPATH = -L$(TORUSPATH)/obj/ -L$(TORUSPATH)/WDlib/obj/ -L$(EBFPATH)/lib/
 	TORUSLIBS = -lTorus -lOther -lPot -lWD -lebf_cpp
 else
 	TORUSINCPATH =
@@ -53,7 +53,7 @@ LIBPATHS = -Wl,-R$(GENERALPATH) -Wl,-R$(NUMRECLIBPATH) -Wl,-R$(JAMESLIBPATH)\
 		   -Wl,-R$(CUBALIBPATH) -Wl,-R$(GNUPLOTLIBPATH) -Wl,-R$(TORUSLIBPATH)\
 		   -Wl,-R$(GSLPATH)lib/ -Wl,-R$(POTLIBPATH) -Wl,-R$(CTPATH) -Wl,-R../aa/lib -Wl,-R$(GTESTLIB)
 
-LIB = $(LIBPATHS) -L../aa/lib/ -Wl,-rpath,$(TORUSPATH)obj/ -Wl,-rpath,$(TORUSPATH)WDlib/obj/ -Wl,-rpath,$(EBFPATH)lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
+LIB = $(LIBPATHS) -L../aa/lib/ -Wl,-rpath,$(TORUSPATH)/obj/ -Wl,-rpath,$(TORUSPATH)/WDlib/obj/ -Wl,-rpath,$(EBFPATH)lib/ -L$(GENERALPATH) -L$(NUMRECLIBPATH) -L$(JAMESLIBPATH) \
 	$(CUBALIBPATH)\
 	  -L$(GNUPLOTLIBPATH) $(TORUSLIBPATH) -L$(GSLPATH)lib/ -L$(POTLIBPATH)\
 	  -L$(CTPATH) -laa -lpot_js -lcoords \

@@ -379,7 +379,7 @@ VecDoub Actions_AxisymmetricStackel::angles(const VecDoub& x, void*params){
 	if(params)with_hess=true;
 	VecDoub tau = Pot->xv2tau(x);
 	if(tau[2]==-Pot->gamma())tau[2]+=TINY;
-	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e8;
+	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e11;
 	VecDoub integrals = Pot->x2ints(x,&tau);
 	VecDoub limits = find_limits(tau,integrals);
 
@@ -737,7 +737,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
         CS->newalpha(CS->gamma()-0.1);
 	}
 	VecDoub tau = CS->xv2tau(x);
-	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e8;
+	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e11;
 	E = Pot->H(x); I2 = 0.5*(x[0]*x[4]-x[1]*x[3])*(x[0]*x[4]-x[1]*x[3]);
 	integrals(tau);
 	VecDoub limits = find_limits(tau);

@@ -175,6 +175,17 @@ double SD(const std::vector<c> &a){
 	int N=a.size();R1/=(double)N;
 	return sqrt(R2/N-R1*R1);
 }
+template<class c>
+double carefulSD(const std::vector<c> &a){
+    double R1=0., R2=0., delta; unsigned n;
+    for(n=1;n<a.size()+1;++n){
+        delta=a[n-1]-R1;
+        R1+=delta/n;
+        R2+=delta*(a[n-1]-R1);
+    }
+
+    return sqrt(R2/(n-1));
+}
 
 template<class c>
 double RMS(const std::vector<c> &a){
@@ -204,6 +215,13 @@ std::vector<c> rowSD(const std::vector<std::vector<c>> &a){
 	std::vector<c> rM(a.size());
 	for(unsigned int i=0;i<a.size();i++) rM[i] = SD<c>(a[i]);
 	return rM;
+}
+
+template<class c>
+std::vector<c> rowcarefulSD(const std::vector<std::vector<c>> &a){
+    std::vector<c> rM(a.size());
+    for(unsigned int i=0;i<a.size();i++) rM[i] = carefulSD<c>(a[i]);
+    return rM;
 }
 
 template<class c>
@@ -237,6 +255,11 @@ std::vector<c> columnMean(const std::vector<std::vector<c>> &a){
 template<class c>
 std::vector<c> columnSD(const std::vector<std::vector<c>> &a){
 	return rowSD<c>(transpose(a));
+}
+
+template<class c>
+std::vector<c> columncarefulSD(const std::vector<std::vector<c>> &a){
+    return rowcarefulSD<c>(transpose(a));
 }
 
 template<class c>

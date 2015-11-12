@@ -267,30 +267,9 @@ double Actions_SpheroidalAdiabaticApproximation::find_nulimit(double ENu, double
 		else return -CS->alpha();
 	}
 	else return tau[2]+tiny_number;
-
-	// SpheroidalAA_zactions_struct RS(this,ENu,Lz2,tau[0],0.,0.,0.);
-	// double nutry = tau[2];
-	// double PP = pnu_squared(nutry, &RS);
-	// if(PP<0. or PP!=PP) return nutry+TINY;
-	// while(pnu_squared(nutry, &RS)>0.) nutry+=0.1*(-CS->alpha()-nutry);
-	// root_find RF(TINY,100);
-	// return RF.findroot(&pnu_squared,tau[2],nutry,&RS);
-
-	// double PP = pnu_squared(nutry, &RS);
-	// if(PP<0. or PP!=PP) return nutry+TINY;
-	// while(pnu_squared(nutry, &RS)>0.) nutry+=0.1*(-CS->alpha()-nutry);
-	// return RF.findroot(&pnu_squared,tau[2],nutry,&RS);
 }
 
 VecDoub Actions_SpheroidalAdiabaticApproximation::find_lamlimits(double Elam, double Lz2,double Jz,VecDoub tau){
-	// SpheroidalAA_Ractions_struct RS(this,Elam,Lz2,Jz,tau[2],0.,0.,0.);
-	// double lamin = tau[0], lamout = tau[0];
-	// while(plam_squared(lamout, &RS)>0.) lamout*=1.1;;
-	// while(plam_squared(lamin, &RS)>0.)  lamin-=.1*(lamin+CS->alpha());
-	// root_find RF(TINY,100);
-	// return {RF.findroot(&plam_squared,lamin,tau[0],&RS),
-	// 		RF.findroot(&plam_squared,tau[0],lamout,&RS)};
-
 
 	SpheroidalAA_Ractions_struct RS(this,Elam,Lz2,Jz,tau[2],0.,0.,0.);
 	// find roots of p^2(lam)
@@ -546,25 +525,25 @@ static double dJzdEzint(double theta, void *params){
 static double dJRdEint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return sqrt(MAX(0.,ct/(2.*pR_squared(R,RS))));
+	return sqrt(MAX(0.,ct/(2.*MAX(1e-20,pR_squared(R,RS)))));
 }
 
 static double dJRdLzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return -sqrt(MAX(0.,RS->Lz2*ct/(2.*pR_squared(R,RS))))/R/R;
+	return -sqrt(MAX(0.,RS->Lz2*ct/(2.*MAX(1e-20,pR_squared(R,RS)))))/R/R;
 }
 
 static double dJRdJzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return -(1./RS->AA->dJzdEz(R,RS->Jz))*sqrt(MAX(0.,ct/(2.*pR_squared(R,RS))));
+	return -(1./RS->AA->dJzdEz(R,RS->Jz))*sqrt(MAX(0.,ct/(2.*MAX(1e-20,pR_squared(R,RS)))));
 }
 
 static double dJRdEzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return -sqrt(ct/(2.*pR_squared(R,RS)));
+	return -sqrt(ct/(2.*MAX(1e-20,pR_squared(R,RS))));
 }
 void Actions_PolarAdiabaticApproximation::load_grids(std::string filename){
 

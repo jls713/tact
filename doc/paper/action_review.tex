@@ -94,8 +94,8 @@ improved through further computation.  We critically compare the accuracy of
 the methods and the required computation time for a range of orbits in an
 axisymmetric multi-component Galactic potential.  We introduce a new method
 for estimating actions that builds on the adiabatic approximation of
-Sch\"onrich \& Binney (2012) and specify suitable distribution functions for
-thin and thick discs and a star stream. All the software used in this study
+Sch\"onrich \& Binney (2012) and discuss the accuracy required for the actions, angles and frequencies using suitable distribution functions for the
+thin and thick discs, the stellar halo and a star stream. All the software used in this study
 can be downloaded from
 \href{https://github.com/jls713/tact}{https://github.com/jls713/tact}.
 \end{abstract}
@@ -158,7 +158,7 @@ achieved by the methods that deliver best value. We also
 briefly discuss how changes of parameters affect the accuracy of one of the
 most powerful methods, and we outline the structure of the code we have made
 available. Section \ref{Sect::Conclusions} sums up. An appendix gives
-functional forms of DFs that provide good models of the thin and thick discs
+functional forms of DFs that provide good models of the thin and thick discs, the stellar halo
 and a stellar stream.
 
 
@@ -205,7 +205,7 @@ we will work with in the  axisymmetric but non-spherical case.
 
 \subsubsection{Analytic cases}\label{Sect::analytic}
 
-The integral (\ref{JrSphere}) can rarely be evaluated analytical.
+The integral (\ref{JrSphere}) can rarely be evaluated analytically.
 An exception of great importance  is the isochrone
 potential \citep{Henon}
 \begin{equation}
@@ -320,14 +320,14 @@ J_\tau = \frac{2}{\upi}\int_{\tau_-}^{\tau_+} \mathrm{d}\tau\,|p_\tau(\tau)|.
 \label{Eq::action}
 \end{equation}
 where ($\tau_-,\tau_+$) are the roots of $p_\tau(\tau)=0$, which we locate
-with Brent's method. We compute the integral using a $50$-point Gauss-Legendre
+with Brent's method. We compute the integral (and all similar integrals) using a $50$-point Gauss-Legendre
 quadrature. \cite{deZeeuw1985a} chose to define the actions in a triaxial St\"ackel potential in this way such that the actions are continuous across the transitions from one orbit family to the next. However, for the loop orbits the oscillation in one of the coordinates is covered twice. In the axisymmetric case this means that the radial action is half the value given by equation~\eqref{Eq::action}.
 
 \subsubsection{Axisymmetric limits}
 
 In the limit $a^2\rightarrow b^2$ the confocal ellipsoidal coordinate system
-reduces to a prolate spheroidal coordinate system. In this case the $\mu$
-coordinate is replaced by the familiar polar angle $\phi$. The most general
+reduces to a prolate spheroidal coordinate system. In this case $\Delta_1\rightarrow0$ and the $\mu$
+coordinate is replaced by the familiar polar angle $\phi$. The coordinate system is now described by a single pair of foci $\Delta=\Delta_2=\sqrt{a^2-c^2}$. The most general
 potentials that are separable  in these coordinates, are the oblate St\"ackel potentials
 \begin{equation}
 \Phi_{\rm S,obl} = -\frac{F(\lambda)-F(\nu)}{\lambda-\nu}.
@@ -398,8 +398,8 @@ actions for a general axisymmetric potential. They used
 the isochrone potential as the toy potential, and showed that the required
 generating function can be written
 \begin{equation}\label{eq:genGF}
-S(\btheta,\bs{J}') = \btheta\cdot\bs{J}'
-+2 \sum_{\bs{n}>\bs{0}}S_{\bs{n}}(\bs{J}')\sin\bs{n}\cdot\btheta,
+S(\btheta',\bs{J}) = \btheta'\cdot\bs{J}
++2 \sum_{\bs{n}>\bs{0}}S_{\bs{n}}(\bs{J})\sin\bs{n}\cdot\btheta',
 \end{equation}
 where the vector $\bs{n}$ has integer components: on account of the
 periodicity of the angle coordinates, the generating function is a Fourier
@@ -412,13 +412,13 @@ restricted to only half of $\bs{n}$ space.
 The relation between the toy and true
 actions is
 \begin{equation}
-\bs{J}=\frac{\partial S}{\partial \btheta} = \bs{J}'+2\sum_{\bs{n}>\bs{0}}\bs{n}S_{\bs{n}}(\bs{J}')\cos\bs{n}\cdot\btheta,
+\bs{J}'=\frac{\partial S}{\partial \btheta'} = \bs{J}+2\sum_{\bs{n}>\bs{0}}\bs{n}S_{\bs{n}}(\bs{J})\cos\bs{n}\cdot\btheta',
 \label{toyact}
 \end{equation}
 while the angles are related by
 \begin{equation}
-\btheta'=\frac{\partial S}{\partial \bs{J}'}
-= \btheta+2\sum_{\bs{n}>\bs{0}}\frac{\partial S_{\bs{n}}}{\partial \bs{J}'}(\bs{J}')\sin\bs{n}\cdot\btheta.
+\btheta=\frac{\partial S}{\partial \bs{J}}
+= \btheta'+2\sum_{\bs{n}>\bs{0}}\frac{\partial S_{\bs{n}}}{\partial \bs{J}}(\bs{J})\sin\bs{n}\cdot\btheta'.
 \label{targetang}
 \end{equation}
  Given a true action $\bs{J}'$ and a trial set of coefficients
@@ -429,38 +429,38 @@ potential's analytic formulae, and the true Hamiltonian is evaluated at
 this phase-space point.  The Marquardt-Levenberg algorithm is used to adjust
 the $S_{\bs{n}}$ iteratively until the spread in energy at the sampled points
 is minimised. \cite{BinneyKumar} showed how the procedure could be extended
-to recover $\partial S_{\bs{n}}/\partial\bs{J}'$ so the true angles can be
+to recover $\partial S_{\bs{n}}/\partial\bs{J}$ so the true angles can be
 recovered from equation \eqref{targetang}.  \cite{KaasalainenB} showed that
 torus mapping can be also used for potentials that admit more than one orbit
 family and introduced a new algorithm for the recovery of $\partial
-S_{\bs{n}}/\partial\bs{J}'$.
+S_{\bs{n}}/\partial\bs{J}$.
 
 This algorithm involves integrating short sections of the orbit starting from
 several points on the torus. For each point along each orbit section, the toy
-angles $\btheta$ are known and the true angles $\btheta'$ must satisfy
-$\btheta'=\btheta'(0)+\boldsymbol{\Omega}'t$. Equating these values to those
+angles $\btheta'$ are known and the true angles $\btheta$ must satisfy
+$\btheta=\btheta(0)+\boldsymbol{\Omega}t$. Equating these values to those
 given by equation \eqref{targetang}, we obtain a series of
-linear equations for $\btheta'(0)$, $\boldsymbol{\Omega}'$ and $\partial
-S_{\bs{n}}/\partial\bs{J}'$:
+linear equations for $\btheta(0)$, $\boldsymbol{\Omega}$ and $\partial
+S_{\bs{n}}/\partial\bs{J}$:
 \begin{equation}
-\btheta'(0)+\boldsymbol{\Omega}'t
-= \btheta+2\sum_{\bs{n}>\bs{0}}\frac{\partial S_{\bs{n}}}{\partial \bs{J}'}(\bs{J}')\sin\bs{n}\cdot\btheta.
+\btheta(0)+\boldsymbol{\Omega}t
+= \btheta'+2\sum_{\bs{n}>\bs{0}}\frac{\partial S_{\bs{n}}}{\partial \bs{J}}(\bs{J})\sin\bs{n}\cdot\btheta'.
 \label{toyang}
 \end{equation}
  More equations are obtained than one has unknowns and they are solved in a
 least-squares sense by standard methods.
 
-With the $S_{\bs{n}}$ and $\partial S_{\bs{n}}/\partial \bs{J}'$ found, the
-corresponding $(\bs{x},\bs{v})$ for any point $\btheta'$ on the torus
-$\boldsymbol{J}'$ can be found. This is ideal for many applications but for
+With the $S_{\bs{n}}$ and $\partial S_{\bs{n}}/\partial \bs{J}$ found, the
+corresponding $(\bs{x},\bs{v})$ for any point $\btheta$ on the torus
+$\boldsymbol{J}$ can be found. This is ideal for many applications but for
 others one needs machinery to convert $(\bs{x},\bs{v})$ to
 $(\btheta,\boldsymbol{J})$ \citep{McMillanBinney2013}.
-\cite{McMillanBinney2008} obtained $(\btheta',\boldsymbol{J}')$ for given
+\cite{McMillanBinney2008} obtained $(\btheta,\boldsymbol{J})$ for given
 points $(\bs{x},\bs{v})$ by repeatedly constructing tori until one was
 obtained that passed through the given phase-space point. Their procedure was
 slow but \cite{SandersBinney2015} proposed a much faster iterative
 procedure that combines torus mapping with one of the non-convergent methods
-described below.
+described below. We call this method \emph{Iterative Torus Construction} (ItTC).
 
 One first estimates the angle-actions $(\btheta_{\rm S},\boldsymbol{J}_{\rm S})$ from
 $(\bs{x},\bs{v})$ using the axisymmetric St\"ackel Fudge of
@@ -542,9 +542,9 @@ As noted by \cite{Bovy2014} and \cite{Fox2014}, averaging
 equation~\eqref{toyact} over the toy angles yields an expression for the
 true actions:
 \begin{equation}
-\bs{J}'=\int{\mathrm{d}^3\btheta\over(2\pi)^3}
-\Big(\boldsymbol{J}-2\sum_{\bs{n}>\bs{0}}\bs{n}S_{\bs{n}}(\bs{J}')\cos\bs{n}\cdot\btheta\Big)
-=\int{\mathrm{d}^3\btheta\over(2\pi)^3}\,\boldsymbol{J}.
+\bs{J}=\int{\mathrm{d}^3\btheta'\over(2\pi)^3}
+\Big(\boldsymbol{J}'-2\sum_{\bs{n}>\bs{0}}\bs{n}S_{\bs{n}}(\bs{J})\cos\bs{n}\cdot\btheta'\Big)
+=\int{\mathrm{d}^3\btheta'\over(2\pi)^3}\,\boldsymbol{J}'.
 \end{equation}
  The task now is to estimate the value of the integral on the right given values
 of $\bs{J}$ at irregularly distributed points $\btheta$. This can be done to
@@ -582,17 +582,17 @@ St\"ackel potential to a general axisymmetric potential either globally or
 locally, and \cite{BatsleerDejonghe} and \cite{Famaey2003} fitted a St\"ackel
 potential to the available constraints for our Galaxy.  However, it seems the
 inner regions of the Galaxy cannot be accurately represented with a St\"ackel
-potential.  \cite{deBruyne2000} produced a series of localy-fitted St\"ackel
+potential.  \cite{deBruyne2000} produced a series of locally-fitted St\"ackel
 potentials and found that $I_3$ varied by $\sim10\percent$ around an orbit.
-The other route is to construct an approximate St\"ackel potential by considering the target potential along lines of constant prolate spheroidal coordinate. For
-example, \cite{KentdeZeeuw1991} presented several methods for estimating
-$I_3$. For general disc orbits they found that the most accurate technique
+
+\cite{KentdeZeeuw1991} pioneered using the real potential in formulae
+derived for St\"ackel potentials by considering the target potential along lines of constant prolate spheroidal coordinate. These authors proposed several methods for estimating $I_3$ based on this idea. For general disc orbits they found that the most accurate technique
 was the `least-squares method' that minimised the variation in the expression
 for $I_3$ in a St\"ackel potential using an approximation for
 $F(\lambda)\approx-(\lambda-c^2)\Phi(R(\lambda,c^2),0)$.  More recently,
 \cite{Bienayme2015} used what appears to be an identical approximation for
 $F(\lambda)$ to that used by \cite{KentdeZeeuw1991} to demonstrate that a
-third integral for disc orbits in the Besan\c on Galaxy model is conserved to
+third integral for disc orbits in the Besan\c con Galaxy model is conserved to
 $\sim 1\percent$.
 
 \subsection{Cylindrical adiabatic approximation (CAA)}\label{Method::PAA}
@@ -603,7 +603,7 @@ argued that since the vertical frequency $\Omega_z$ of a disc star is
 significantly larger than its radial frequency $\Omega_r$, the potential that
 governs vertical oscillations may be considered to vary slowly as the star
 oscillates radially, with the consequence that $J_z$ is adiabatically
-invariant.  \citet{BinneyMcMillan2011} showed that better approximations to
+invariant.  \citet{BinneyMcMillan2011} showed that a better approximations to
 orbits can be obtained by replacing $J_\phi$ by $|J_\phi|+J_z$ in the formula
 for the effective radial potential.  \citet{Schonrich2012} observed that
 conservation of energy requires that variation along the orbit in the energy
@@ -718,7 +718,7 @@ The grid on which $J_z$ is evaluated is defined in terms of $R$ rather than
 $\lambda$ so that we can use different choices of $\Delta$ for each orbit.
 
 An illustration of how this method differs from the CAA is shown in
-Figure~\ref{SinglePoint}.  The blue line shows the line along which we
+Figure~\ref{SinglePoint}. We show an example thick disc orbit integrated in a realistic Galactic potential in the meridional plane. The blue line shows the line along which we
 integrate to determine $J_z$ with the CAA, while the red line shows the line
 of constant $\lambda$ along which we integrate with the SAA. The points at
 which they intersect give the $(R,\pm|z|)$ coordinates of the input
@@ -888,7 +888,7 @@ approximation schemes. In the adiabatic approximations the three integrals
 are taken to be $(E,J_\phi,J_z)$. When computing the derivatives of the
 generating function and $J_r$ with respect to $J_z$ we require the
 derivatives $\partial J_z/\partial E_z|_R$ and $\partial J_z/\partial
-E_\nu|_{\lambda,J_\phi}$ which must be computed from the grids. In the
+E_\nu|_{\lambda,J_\phi}$ which we choose to compute from the grids (note these quantities can be computed by integration but as they are required for each integrand call this would be computationally expensive). In the
 St\"ackel Fudge the classical integrals are $(E,J_\phi,B_\tau)$ and finally
 in the St\"ackel fitting procedure the classical integrals are $(E,J_\phi,I_3)$.
 
@@ -973,8 +973,8 @@ left the radial action, $J_r$, (top panel) and the vertical action, $J_z$,
 from \emph{non-convergent} methods are shown with solid lines whilst values
 from \emph{convergent} methods are shown with dashed lines. Blue solid line
 is for the CAA, green solid is for the SAA, red solid line is for the
-St\"ackel Fudge with variable $\Delta$ estimation, the purple solid is for
-the St\"ackel Fudge with $\Delta$ estimated from shell orbits, the solid
+St\"ackel Fudge with variable $\Delta$ estimation (v1), the purple solid is for
+the St\"ackel Fudge with $\Delta$ estimated from shell orbits (v2), the solid
 mustard yellow line is for the St\"ackel fitting method, the blue dashed line
 is for the ItTC method, the green dashed line is for the O2GF method,
 and the red dashed line is for the AvGF method. To the right of each
@@ -988,8 +988,8 @@ the multi-component potential from \protect\cite{Piffl2014}.}
 \begin{table*}
 \caption{Errors in the action for four example orbits: on the first line we give the
 radial and vertical actions for the four orbits in units of $\!\kpc\kms$. Below
-the double horizontal separators we give the standard deviations of the
-radial and vertical action estimates for the seven methods. The methods above
+the double horizontal separators we give the RMS deviations of the
+radial and vertical action estimates relative to the mean of the O2GF estimates for the eight methods. The methods above
 the horizontal separator are the non-convergent methods whilst those below
 are the convergent methods.} \input{acttable} \label{Table}
 \end{table*}
@@ -1052,7 +1052,7 @@ is not a good one. For this reason the CAA is inferior to
 the other methods by a factor of a few. All four of the methods based on
 St\"ackel potentials give comparable accuracy for $J_z$ but explicit St\"ackel
 fitting gives a result that is twice as  accurate as the other methods for
-$J_r$. As for the thin-disc orbit, the AvGF method gives a slightly
+$J_r$. As for the thin-disc orbit, the AvGF method gives slightly
 biased estimates of both $J_r$ and $J_z$, with the error in $J_z\sim
 1\kpc\kms$.
 
@@ -1147,7 +1147,7 @@ and maximum Galactic height $\sim15\kpc$.
 In Figure~\ref{MultiOrbits} we show as a function of $(J_r+J_z)/|J_\phi|$,
 which is a measure of eccentricity, the RMS of the differences between the
 actions from a particular method and the mean of the values obtained from the
-O2GF method. Since the green dashed curve of the O2GF method runs along the
+O2GF method. The use of the RMS does not give the full story as inspection of Figure~\ref{SingleOrbs} shows that the action fluctuations can be quite peaky, particularly around the turning points of the orbit. However, it serves as a useful summary statistic. Since the green dashed curve of the O2GF method runs along the
 bottom of both the upper panel for RMS in $J_r$ and the lower panel for RMS
 in $J_z$, the O2GF method emerges as the most accurate method regardless of
 orbital eccentricity. It must, however, be acknowledged that our playing
@@ -1155,9 +1155,7 @@ field is not entirely level in that RMS fluctuations are computed relative to
 the mean of the O2GF results, so for O2GF to show no RMS it merely needs to
 extract the same actions from two, strongly overlapping segments of orbit.
 In particular, its RMS would be zero even if it consistently returned
-erroneous actions. {\sl Jason: suppose one simply plotted the RMS fluctuation
-about a method's own mean? I'd be particularly interested in this for the
-ItTC.}
+erroneous actions.
 
 The next most accurate method is the ItTC method. As regards $J_z$ it
 is followed by the St\"ackel Fudge v1, but consideration of $J_r$ yields a
@@ -1176,15 +1174,11 @@ the two convergent methods.
 In Fig.~\ref{MultiOrbits_Freq} we show the RMS deviations of the frequencies
 from the mean of the frequencies returned by the O2GF method, and in
 Figure~\ref{MultiOrbits_Ang} we show the RMS deviation of the angles from
-those computed with the O2GF method. {\sl Jason: I can't see the broken green
-line of the O2GF. Also it may be unfair to other methods to compare with O2GF
-method (which must fail near resonances. I'd prefer the statistic to be the
-rms variation between $\theta(t)$ and $\Omega t+\theta_0$.} Again the O2GF
+those computed with the O2GF method. Again the O2GF
 method shows clear superiority at all eccentricities, followed by the
 ItTC method. Again we see a striking deterioration in the performance
 of the O2GF method at resonances. The deleterious impact of resonances is
-particularly marked in the case of the angle variables. A surprise here is
-that the SAA returns the most accurate values of $\theta_\phi$.
+particularly marked in the case of the angle variables.
 
 We have also computed RMS deviations for two series of orbits generated in
 the same way as those used for Figs.~\ref{MultiOrbits} to
@@ -1293,6 +1287,8 @@ bands, that method provides sufficient accuracy for the job in hand. We see
 that the St\"ackel Fudge v1 comes too high for safety only in a small range
 of values of $(J_r+J_z)/|J_\phi|$, so even this cheap and cheerful method is
 adequate for all but a few thick-disc orbits.
+
+The spread in frequencies and angles we have computed is averaged over many orbital periods. In reality, when modelling a stream the stream particles are confined to a much narrower range of angles. The frequency estimation for the collection of particles may be systematically offset from the truth due to the phase of the stream but we anticipate the inter-particle frequency separations will be well resolved.
 
 \subsection{Convergence of the O2GF method}
 
