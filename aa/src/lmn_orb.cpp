@@ -92,7 +92,7 @@ int lmn_orb::check_ang_mom(double y, double E, int swit){
 	else if(swit==1) X[5]=p;
 	double step = 1e-2*Pot->torb(X);
 	VecDoub QQ=orbit.integrate(X, 10000*step, step);
-	orbit.plot(0,1);
+	//orbit.plot(0,1);
 	int l=1, l0=angular_momentum(orbit.results()[0])[index];
     int result = 1;
 	for(auto it = std::begin(orbit.results())+1;
@@ -391,7 +391,7 @@ VecDoub lmn_orb::find_best_alphabeta(const VecDoub& X){
 	double step = 5e-1*torb;
 	Orbit orbit(Pot);
 	VecDoub QQ=orbit.integrate(X, 100*step, step);
-	orbit.plot(1,2);
+	//orbit.plot(1,2);
 	root_struct_actions RS(Pot,&orbit);
 	VecDoub a1 = {-1.5,-1.1};
 	VecDoub sizes ={.5,.1};

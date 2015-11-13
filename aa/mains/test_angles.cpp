@@ -110,7 +110,7 @@ int main(int argc, char*argv[]){
 	double tstep = 0.01*Pot.torb(X);
 	if(argc>8) tt=atof(argv[8]);
 	O.integrate(X,tt*Pot.torb(X),tstep);
-	O.plot(0,1);
+	//O.plot(0,1);
 
 	std::ofstream outfile;
 	outfile.open(argv[7]);
