@@ -1,5 +1,5 @@
 // ============================================================================
-/// \file src/many_tori.cpp
+/// \file src/many_tori_james.cpp
 // ============================================================================
 /// \author Jason Sanders
 /// \date 2014-2015
@@ -22,9 +22,12 @@
 
 // ============================================================================
 /// \brief Computes the variance of the actions, angles and frequencies using various methods for axisymmetric potential and computes total time taken.
+/// Differs from many_torus.cpp as computes standard deviations in actions and frequencies and variance
+/// of angles wrt those calculated from theta0+Omega t for the given method. In many_torus.cpp the variance
+/// is computed wrt to O2GF method
 ///
 /// Must pass output file
-/// e.g. mains/./many_tori.exe output
+/// e.g. mains/./many_tori_james.exe many_torus_output_james.dat
 // ============================================================================
 #include <iostream>
 #include <vector>

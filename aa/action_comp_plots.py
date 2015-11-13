@@ -1,3 +1,10 @@
+### action_comp_plots.py
+##  Produces the plots in Sanders & Binney (2016)
+##  Fig 2. is produced by method_comparison which requires the result of running orbits.sh
+##  Figs 3., 4., 5. and 6. are produced by time_plot which requires the result of running
+##  mains/./many_tori.exe many_tori_output.dat
+##  Fig 7. uses the output from orbits_converg.sh
+
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -552,8 +559,8 @@ def make_table(files,names,dontplot,Jranges):
 	outfile.write(tablecon)
 	outfile.close
 
-# time_plot('many_tori_output.dat', with_res=True, with_boxes=True)
-time_plot('many_tori_output_moreacc.dat', with_res=True, with_boxes=True)
-# time_plot('many_tori_output_james.dat',with_res=True,with_boxes=True)
-make_table(['thin','thick','halo','stream'],['Thin','Thick','Halo','Stream'],[[],[],[5],[5]],[None,None,None,[[290.,340.],[540.,580.]]])
-genfunc_converg(['thin_gc','thick_gc','halo_gc','stream_gc'],['Thin','Thick','Halo','Stream'])
+if __name__=="__main__":
+    time_plot('many_tori_output.dat', with_res=True, with_boxes=True)
+    time_plot('many_tori_output_james.dat',with_res=True,with_boxes=True)
+    make_table(['thin','thick','halo','stream'],['Thin','Thick','Halo','Stream'],[[],[],[5],[5]],[None,None,None,[[290.,340.],[540.,580.]]])
+    genfunc_converg(['thin_gc','thick_gc','halo_gc','stream_gc'],['Thin','Thick','Halo','Stream'])

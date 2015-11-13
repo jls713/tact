@@ -1,3 +1,9 @@
+### example.py
+## Gives an example of how to use the python interface to the tact code
+## 
+## Estimates actions using the variety of methods in Sanders & Binney (2016)
+## in multi-component potential from Piffl et al. (2014) 
+
 import numpy as np
 import sys
 sys.path.append('lib/')

@@ -21,11 +21,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ============================================================================
-/// \brief Computes the actions using most of the available methods for axisymmetric potentials
+/// \brief Computes the errors in the actions as a function of the parameters in the O2GF method
 ///
 /// Must pass phase-space point x y z vx vy vz, output file and no of orbital
 /// times to integrate for.
-/// e.g. mains/./test_actions.exe 8.29 0.1 0.1 30.22 211.1 19.22 thin 10.
+/// e.g. mains/./genfunc_converg.exe 8.29 0.1 0.1 30.22 211.1 19.22 thin 10.
 // ============================================================================
 #include <iostream>
 #include <vector>

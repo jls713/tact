@@ -4,6 +4,12 @@
 
 Code for calculating actions, angles and frequencies in various ways
 
+## Author
+
+Jason Sanders -- jls at ast dot cam dot ac dot uk
+
+Please cite the accompanying paper Sanders & Binney (2016) if you find the code useful.
+
 ## Requirements
 
 1. [gsl](http://www.gnu.org/software/gsl/)
@@ -50,3 +56,21 @@ should integrate an orbit with initial conditions X=(8. 1. 0.2) kpc and V = (40.
 Phi(x)=Vc^2/2 log(R^2+(z/q)^2)
 
 with Vc=220km/s and q=0.9 (or in the Piffl 2014 potential if Torus is installed) and compute the actions for each point using a variety of methods. The results are output in acts.dat with two columns per method (JR and Jz).
+
+## Paper 
+
+The accompanying paper is Sanders & Binney (2016). [action_comp_plots.py](aa/action_comp_plots.py) reproduces all but one of the plots in the paper. To produce the data for these plots the following scripts are available. 
+
+1. Fig. 2 data is produced by the command 
+```
+./orbits.sh
+```
+2. Fig. 3, 4, 5, 6 data are produced by the command
+```
+./mains/./many_tori.exe many_tori_output.dat
+```
+3. Fig. 7 data are produced by
+```
+./orbits_converg.sh
+```
+

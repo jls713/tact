@@ -23,8 +23,9 @@
 // ============================================================================
 /// \brief Computes the variance of the actions, angles and frequencies using various methods for axisymmetric potential and computes total time taken.
 ///
+/// Produces data for Figs. 3, 4, 5 and 6 in Sanders & Binney (2016)
 /// Must pass output file
-/// e.g. mains/./many_tori.exe output
+/// e.g. mains/./many_tori.exe many_torus_output.dat
 // ============================================================================
 #include <iostream>
 #include <vector>
@@ -56,22 +57,7 @@
 #ifdef TORUS
 #include "it_torus.h"
 #include "falPot.h"
-#endif
 
-MatDoub dvdJ(VecDoub X, double dv, Actions_Genfunc *AG){
-	VecDoub Y = X, uJ,dJ;MatDoub mat(3,VecDoub(3,0.));
-	for(int j=0;j<3;++j){
-		Y[j+3]+=   dv; uJ = AG->actions(Y);
-		Y[j+3]-=2.*dv; dJ = AG->actions(Y);
-		for(unsigned i=0;i<3;++i) mat[i][j]=(uJ[i]-dJ[i])/(2.*dv);
-		Y[j+3]+=dv;
-	}
-	MatDoub inv = inverse3D(mat);
-	return inv;
-}
-
-
-#ifdef TORUS
 MatDoub dOmdJ(Actions J, Actions dJ, WrapperTorusPotential *Pot){
 	Torus T; Actions Jp = J; Frequencies Omu, Omd;
 	MatDoub mat(3,VecDoub(3,0.));

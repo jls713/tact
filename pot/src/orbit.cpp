@@ -34,7 +34,6 @@
 /* 				  Orbits	 			*/
 /*======================================*/
 
-// #include <Python.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>

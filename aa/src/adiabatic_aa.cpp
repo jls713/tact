@@ -670,8 +670,8 @@ VecDoub Actions_CylindricalAdiabaticApproximation::find_Rlimits(double R, double
 
 	PolarAA_Ractions_struct RS(this,Etot,Lz2,Jz,0.,0.,0.);
 	double Rin = R, Rout = R;
-	while(pR_squared(Rout, &RS)>=0.) Rout*=1.01;
-	while(pR_squared(Rin, &RS)>=0.)  Rin*=.99;
+	while(pR_squared(Rout, &RS)>0.) Rout*=1.01;
+	while(pR_squared(Rin, &RS)>0.)  Rin*=.99;
 	root_find RF(TINY,100);
 	return {RF.findroot(&pR_squared,Rin,Rin/.99,&RS),
 				RF.findroot(&pR_squared,Rout/1.01,Rout,&RS)};
@@ -751,15 +751,15 @@ VecDoub Actions_CylindricalAdiabaticApproximation::angles(const VecDoub& x, void
 	taubar = .5*(Rlims[1]+Rlims[0]);
 	PolarAA_Ractions_struct RA(this,Etot,Lz2,Jz,Delta,taubar,tn);
 
-	anglim = MAX(-.5*PI,asin((R-taubar)/Delta));
+	anglim = asin((R-taubar)/Delta);
 	lsign = SIGN(vR);
-	dJdIl[0] = Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,.5*PI,&RA)/PI;
-	dJdIl[1] = Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,.5*PI,&RA)/PI;
-	dJdIl[2] = Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,.5*PI,&RA)/PI;
+	dJdIl[0] = Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,.5*PI,&RA,8)/PI;
+	dJdIl[1] = Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,.5*PI,&RA,8)/PI;
+	dJdIl[2] = Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,.5*PI,&RA,8)/PI;
 	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,anglim,&RA,8);
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,anglim,&RA,8);
 	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,anglim,&RA,8);
-
+	
 	VecDoub dJdIp = {0.,1.,0.};
 
 	double Determinant = dJdIp[1]*(dJdIl[0]*dJdIn[2]-dJdIl[2]*dJdIn[0]);

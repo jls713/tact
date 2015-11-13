@@ -26,6 +26,8 @@
 /// Must pass phase-space point x y z vx vy vz, output file and no of orbital
 /// times to integrate for.
 /// e.g. mains/./test_actions.exe 8.29 0.1 0.1 30.22 211.1 19.22 thin 10.
+///
+/// Used to produce data for Fig. 2 in Sanders & Binney (2016) using the script orbits.sh
 // ============================================================================
 #include <iostream>
 #include <vector>
