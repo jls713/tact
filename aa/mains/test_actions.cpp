@@ -95,8 +95,8 @@ int main(int argc, char*argv[]){
 	// uvorb
 	uv_orb UV(&Pot,3.,30.,10,10,"example.delta_uv");
 
-	// Polar Adiabatic
-	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,Rmin,Rmax,zmax);
+	// Cylindrical Adiabatic
+	Actions_CylindricalAdiabaticApproximation PAA(&Pot,"example.paa",true,false,Rmin,Rmax,zmax);
 
 	std::cout<<"Action methods loaded"<<std::endl;
 	// Spheroidal Adiabatic
@@ -114,7 +114,11 @@ int main(int argc, char*argv[]){
 
 	std::ofstream outfile;
 	outfile.open(argv[7]);
-	outfile<<"# Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
+	outfile<<"# Fudgev1 ";
+	#ifdef TORUS
+	outfile<<"ItTC ";
+	#endif
+	outfile<<"O2GF AvGF Fudgev2 CAA SAA Fit\n";
 
 	int guess_alpha=1; int N=0;
 	VecDoub Fudge, ITorus, Genfunc, GenfuncAv, uvAct, paaAct, saaAct, fitAct;

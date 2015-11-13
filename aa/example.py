@@ -39,9 +39,9 @@ UV = aa_py.Actions_AxisymmetricStackel_Fudge_DeltaGuess(Pot,1.,20.,10,10,"exampl
 print '\t Actions:',UV.actions(X)
 print '\t Angles and Freqs:',UV.angles(X)
 
-## Polar Adiabatic
-print 'Using polar adiabatic approximation'
-PAA = aa_py.Actions_PolarAdiabaticApproximation(Pot,"example.paa",True,False,1.,20.,10.,60)
+## Cylindrical Adiabatic
+print 'Using cylindrical adiabatic approximation'
+PAA = aa_py.Actions_CylindricalAdiabaticApproximation(Pot,"example.paa",True,False,1.,20.,10.,60)
 print '\t Actions:',PAA.actions(X)
 print '\t Angles and Freqs:',PAA.angles(X)
 

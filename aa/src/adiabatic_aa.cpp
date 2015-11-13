@@ -23,12 +23,12 @@
 // ============================================================================
 /// \brief Action finders for adiabatic approximations
 ///
-/// There are two adiabatic approximations -- polar and spheroidal
+/// There are two adiabatic approximations -- cylindrical and spheroidal
 /// The two classes are very similar in that the actions are estimated by
-/// assuming the potential is separable in either a polar or spheroidal
+/// assuming the potential is separable in either a cylindrical or spheroidal
 /// coordinate system.
 ///
-/// The polar method is taken from Schoenrich \& Binney (2012).
+/// The cylindrical method is taken from Schoenrich \& Binney (2012).
 /// The spheroidal method is from Sanders \& Binney (2015).
 ///
 /// Both classes first construct grids of the vertical energy as a function
@@ -494,7 +494,7 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 
 // ============================================================================
 /*======================================================*/
-/* 			  Polar Adiabatic Approximation 			*/
+/* 		 Cylindrical Adiabatic Approximation 			*/
 /*======================================================*/
 static double pz_squared(double z, void *params){
 	PolarAA_zactions_struct *RS = (PolarAA_zactions_struct *) params;
@@ -527,27 +527,27 @@ static double dJzdEzint(double theta, void *params){
 static double dJRdEint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return sqrt(MAX(0.,ct/(2.*MAX(1e-20,pR_squared(R,RS)))));
+	return sqrt(MAX(0.,ct/(2.*pR_squared(R,RS))));
 }
 
 static double dJRdLzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return -sqrt(MAX(0.,RS->Lz2*ct/(2.*MAX(1e-20,pR_squared(R,RS)))))/R/R;
+	return -sqrt(MAX(0.,RS->Lz2*ct/(2.*pR_squared(R,RS))))/R/R;
 }
 
 static double dJRdJzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return -(1./RS->AA->dJzdEz(R,RS->Jz))*sqrt(MAX(0.,ct/(2.*MAX(1e-20,pR_squared(R,RS)))));
+	return -(1./RS->AA->dJzdEz(R,RS->Jz))*sqrt(MAX(0.,ct/(2.*pR_squared(R,RS))));
 }
 
 static double dJRdEzint(double theta, void *params){
 	PolarAA_Ractions_struct *RS = (PolarAA_Ractions_struct *) params;
 	double R=RS->taubar+RS->Delta*sin(theta), ct = cos(theta); ct*=ct;
-	return -sqrt(ct/(2.*MAX(1e-20,pR_squared(R,RS))));
+	return -sqrt(ct/(2.*pR_squared(R,RS)));
 }
-void Actions_PolarAdiabaticApproximation::load_grids(std::string filename){
+void Actions_CylindricalAdiabaticApproximation::load_grids(std::string filename){
 
 	std::ifstream in; in.open(filename);
 	int NG;	in>>NG; assert(NG==NGRID);
@@ -563,7 +563,7 @@ void Actions_PolarAdiabaticApproximation::load_grids(std::string filename){
 	in.close();
 }
 
-void Actions_PolarAdiabaticApproximation::make_grids(std::string filename){
+void Actions_CylindricalAdiabaticApproximation::make_grids(std::string filename){
 
 	for(int n=0; n<NGRID; n++){
 		Rgrid.push_back(.75*Rmin+n*(1.5*Rmax-.75*Rmin)/((double)(NGRID-1)));
@@ -592,7 +592,7 @@ void Actions_PolarAdiabaticApproximation::make_grids(std::string filename){
 	}
 }
 
-double Actions_PolarAdiabaticApproximation::Ez_from_grid(double R,double Jz){
+double Actions_CylindricalAdiabaticApproximation::Ez_from_grid(double R,double Jz){
 	//Ez(R,Jz) by interpolation
 	if(no_energy_correction)
 		return 0;
@@ -609,7 +609,7 @@ double Actions_PolarAdiabaticApproximation::Ez_from_grid(double R,double Jz){
 }
 
 
-double Actions_PolarAdiabaticApproximation::Jz_from_grid(double R,double Ez){
+double Actions_CylindricalAdiabaticApproximation::Jz_from_grid(double R,double Ez){
 	//Jz(R,Ez) by interpolation
 	if(no_energy_correction)
 		return 0;
@@ -625,7 +625,7 @@ double Actions_PolarAdiabaticApproximation::Jz_from_grid(double R,double Ez){
 	}
 }
 
-double Actions_PolarAdiabaticApproximation::dJzdEz(double R, double Jz){
+double Actions_CylindricalAdiabaticApproximation::dJzdEz(double R, double Jz){
 	// dJzdEz at fixed R_0
 	// int bbotJ,btopJ,tbotJ,ttopJ,botR,topR;
 	// if(R<Rgrid[0]) R=Rgrid[0];
@@ -648,7 +648,7 @@ double Actions_PolarAdiabaticApproximation::dJzdEz(double R, double Jz){
 
 }
 
-double Actions_PolarAdiabaticApproximation::dJzdR(double R, double Ez){
+double Actions_CylindricalAdiabaticApproximation::dJzdR(double R, double Ez){
 	// dJzdR at fixed Ez
 	double dR = 0.1*R;
 	double Ju = Jz_from_grid(R+dR,Ez);
@@ -656,7 +656,7 @@ double Actions_PolarAdiabaticApproximation::dJzdR(double R, double Ez){
 	return (Ju-Jd)/2./dR;
 }
 
-double Actions_PolarAdiabaticApproximation::find_zlimit(double Ez, VecDoub Polar){
+double Actions_CylindricalAdiabaticApproximation::find_zlimit(double Ez, VecDoub Polar){
 	PolarAA_zactions_struct RS(this,Ez,Polar[0],0.,0.);
 	double ztry = fabs(Polar[2]);
 	if(ztry==0.)ztry+=SMALL;
@@ -666,21 +666,22 @@ double Actions_PolarAdiabaticApproximation::find_zlimit(double Ez, VecDoub Polar
 	return RF.findroot(&pz_squared,fabs(Polar[2]),ztry,&RS);
 }
 
-VecDoub Actions_PolarAdiabaticApproximation::find_Rlimits(double R, double Etot, double Lz2,double Jz){
+VecDoub Actions_CylindricalAdiabaticApproximation::find_Rlimits(double R, double Etot, double Lz2,double Jz){
+
 	PolarAA_Ractions_struct RS(this,Etot,Lz2,Jz,0.,0.,0.);
 	double Rin = R, Rout = R;
-	while(pR_squared(Rout, &RS)>0.) Rout*=1.01;
-	while(pR_squared(Rin, &RS)>0.)  Rin*=.99;
+	while(pR_squared(Rout, &RS)>=0.) Rout*=1.01;
+	while(pR_squared(Rin, &RS)>=0.)  Rin*=.99;
 	root_find RF(TINY,100);
-	return {RF.findroot(&pR_squared,Rin,R,&RS),
-			RF.findroot(&pR_squared,R,Rout,&RS)};
+	return {RF.findroot(&pR_squared,Rin,Rin/.99,&RS),
+				RF.findroot(&pR_squared,Rout/1.01,Rout,&RS)};
 }
 
-double Actions_PolarAdiabaticApproximation::estimate_tiny(double Ez, double R){
+double Actions_CylindricalAdiabaticApproximation::estimate_tiny(double Ez, double R){
 	return 2.*(Ez-Phi_z({R,0.,0.}))/1.e5;
 }
 
-double Actions_PolarAdiabaticApproximation::actions_Jz(double R, double Ez,double z, double *zlim){
+double Actions_CylindricalAdiabaticApproximation::actions_Jz(double R, double Ez,double z, double *zlim){
 	// Calculates vertical action -- only require R and Ez but for speed reasons it is efficient to pass the input z value and output the found z limit
 	*zlim = find_zlimit(Ez, {R,0.,z});
 	PolarAA_zactions_struct PA(this,Ez,R,*zlim,0.);
@@ -688,13 +689,13 @@ double Actions_PolarAdiabaticApproximation::actions_Jz(double R, double Ez,doubl
 
 }
 
-double Actions_PolarAdiabaticApproximation::actions_dJzdEz(double R, double Ez,double z, double *zlim){
+double Actions_CylindricalAdiabaticApproximation::actions_dJzdEz(double R, double Ez,double z, double *zlim){
 	PolarAA_zactions_struct PA(this,Ez,R,*zlim,0.);
 	return 2.*(*zlim)*GaussLegendreQuad(&dJzdEzint,0.,.5*PI,&PA)/PI;
 
 }
 
-VecDoub Actions_PolarAdiabaticApproximation::actions(const VecDoub& x, void*params){
+VecDoub Actions_CylindricalAdiabaticApproximation::actions(const VecDoub& x, void*params){
 	VecDoub acts(3,0.);
     if(action_check(x,acts,Pot)) return acts;
 	VecDoub Polar = conv::CartesianToPolar(x);
@@ -715,7 +716,7 @@ VecDoub Actions_PolarAdiabaticApproximation::actions(const VecDoub& x, void*para
 }
 
 
-VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *params){
+VecDoub Actions_CylindricalAdiabaticApproximation::angles(const VecDoub& x, void *params){
 
     VecDoub angs(6,0.);
     if(angle_check(x,angs,Pot)) return angs;
@@ -750,14 +751,14 @@ VecDoub Actions_PolarAdiabaticApproximation::angles(const VecDoub& x, void *para
 	taubar = .5*(Rlims[1]+Rlims[0]);
 	PolarAA_Ractions_struct RA(this,Etot,Lz2,Jz,Delta,taubar,tn);
 
-	anglim = asin((R-taubar)/Delta);
+	anglim = MAX(-.5*PI,asin((R-taubar)/Delta));
 	lsign = SIGN(vR);
 	dJdIl[0] = Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,.5*PI,&RA)/PI;
 	dJdIl[1] = Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,.5*PI,&RA)/PI;
 	dJdIl[2] = Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,.5*PI,&RA)/PI;
-	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,anglim,&RA);
-	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,anglim,&RA);
-	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,anglim,&RA);
+	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,anglim,&RA,8);
+	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,anglim,&RA,8);
+	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,anglim,&RA,8);
 
 	VecDoub dJdIp = {0.,1.,0.};
 

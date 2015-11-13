@@ -125,8 +125,8 @@ int main(int argc, char*argv[]){
 	// uvorb
 	uv_orb UV(&Pot,4.,30.,50,50,"example.delta_uv");
 
-	// Polar Adiabatic
-	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.,100);
+	// Cylindrical Adiabatic
+	Actions_CylindricalAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.,100);
 
 	// Spheroidal Adiabatic
 	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,4.,30.,15.,100);
@@ -140,7 +140,7 @@ int main(int argc, char*argv[]){
 	#ifdef TORUS
 	outfile<<"Rperi Rapo Zmax ";
 	#endif
-	outfile<<"OmR Omp Omz Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
+	outfile<<"OmR Omp Omz Fudgev1 ItTC O2GF AvGF Fudgev2 CAA SAA Fit\n";
 	double VMax = sqrt((Pot.Phi({50.,0.,50.})-Pot.Phi(X))-.5*X[4]*X[4]);
 	int number = 500;
 	if(argc>3)
@@ -173,7 +173,7 @@ int main(int argc, char*argv[]){
 		}
 		VecDoub acts = {columnMean(GResults)[0],Pot.Lz(X),columnMean(GResults)[1],columnMean(GResults)[5],columnMean(GResults)[6],columnMean(GResults)[7]};
 
-		VecDoub GF_SD = columnSD(GResults);
+		VecDoub GF_SD = columncarefulSD(GResults);
 		outfile<<acts[0]<<" "<<acts[1]<<" "<<acts[2]<<" "<<(acts[0]+acts[2])/fabs(acts[1])<<" ";
 		#ifdef TORUS
 		Actions J;J[0]=acts[0]/conv::kpcMyr2kms;
@@ -182,7 +182,7 @@ int main(int argc, char*argv[]){
 		outfile<<T.minR()<<" "<<T.maxR()<<" "<<" "<<T.maxz()<<" ";
 		MatDoub Hess = dOmdJ(J,.1*J,&TPot);
 		#endif
-		outfile<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" "<<SD(Energy)/Mean(Energy)<<" ";
+		outfile<<acts[3]<<" "<<acts[4]<<" "<<acts[5]<<" "<<carefulSD(Energy)/Mean(Energy)<<" ";
 
 		int N=0;
 		for(auto i:O.results()){
@@ -274,16 +274,16 @@ int main(int argc, char*argv[]){
 		for(unsigned k=2;k<5;++k) PAAResults[0][k]=0.;
 		for(unsigned k=2;k<5;++k) SAAResults[0][k]=0.;
 
-		for(auto k:columnSD(FResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(FResults)) outfile<<k<<" ";
 		#ifdef TORUS
-		for(auto k:columnSD(ITResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(ITResults)) outfile<<k<<" ";
 		#endif
-		for(auto k:columnSD(GResults)) outfile<<k<<" ";
-		for(auto k:columnSD(GAvResults)) outfile<<k<<" ";
-		for(auto k:columnSD(UVResults)) outfile<<k<<" ";
-		for(auto k:columnSD(PAAResults)) outfile<<k<<" ";
-		for(auto k:columnSD(SAAResults)) outfile<<k<<" ";
-		for(auto k:columnSD(FITResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(GResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(GAvResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(UVResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(PAAResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(SAAResults)) outfile<<k<<" ";
+		for(auto k:columncarefulSD(FITResults)) outfile<<k<<" ";
 		for(unsigned N=0;N<8;++N) outfile<<times[N].count()/range.size()<<" ";
 		#ifdef TORUS
 		for(unsigned kk=0;kk<3;++kk)

@@ -253,9 +253,9 @@ TEST(ActionTest_Small,StackelFudge){
 }
 //=============================================================================
 
-TEST(ActionTest_Iso,StackelPAA){
+TEST(ActionTest_Iso,StackelCAA){
   Isochrone Pot(1.,1.,0.99999);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
@@ -274,9 +274,9 @@ TEST(ActionTest_Iso,StackelPAA){
 
 // NANs in Stackel forces on axis
 
-// TEST(ActionTest_Stack,StackelPAA){
+// TEST(ActionTest_Stack,StackelCAA){
 //   StackelOblate_PerfectEllipsoid Pot(1.,-30.);
-//   Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
+//   Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
 //   Actions_AxisymmetricStackel AAS(&Pot);
 //   double radius = 1.;
 //   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
@@ -293,9 +293,9 @@ TEST(ActionTest_Iso,StackelPAA){
 //   EXPECT_NEAR(FreqsTrue[5],Angs[5],0.004);
 // }
 
-TEST(ActionTest_Zeros,StackelPAA){
+TEST(ActionTest_Zeros,StackelCAA){
   Logarithmic Pot(1.,1.,0.9);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {1.,0.,0.,0.,Vc,0.};
@@ -313,9 +313,9 @@ TEST(ActionTest_Zeros,StackelPAA){
 }
 
 
-TEST(ActionTest_Planar,StackelPAA){
+TEST(ActionTest_Planar,StackelCAA){
   IsochronePotential Pot(1.,1.);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {1.,0.,0.,0.1*Vc,Vc,0.};
@@ -333,9 +333,9 @@ TEST(ActionTest_Planar,StackelPAA){
   EXPECT_NEAR(AngsTrue[1],Angs[4],1e-4);
 }
 
-TEST(ActionTest_Zero,StackelPAA){
+TEST(ActionTest_Zero,StackelCAA){
   IsochronePotential Pot(1.,1.);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {0.,0.,0.,0.1*Vc,Vc,0.};
@@ -352,9 +352,9 @@ TEST(ActionTest_Zero,StackelPAA){
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
 }
 
-TEST(ActionTest_Small,StackelPAA){
+TEST(ActionTest_Small,StackelCAA){
   IsochronePotential Pot(1.,1.);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   std::cout<<"small z, zero vR, zero vz"<<std::endl;
@@ -666,9 +666,9 @@ TEST(ActionTest,StackelSAA){
   EXPECT_NEAR(AngsTrue[4],Angs[4],0.04);
   EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
 }
-TEST(ActionTest,StackelPAA){
+TEST(ActionTest,StackelCAA){
   Logarithmic Pot(1.,1.,0.8);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
   VecDoub X = {1.,0.1,0.1,0.4*Vc,.6*Vc,0.3*Vc};
@@ -956,7 +956,7 @@ TEST(ActionTest_Small,StackelFit){
 
 TEST(ActionTest_Iso,StackelSAA){
   Isochrone Pot(1.,1.,0.99999);
-  Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
@@ -977,7 +977,7 @@ TEST(ActionTest_Iso,StackelSAA){
 
 // TEST(ActionTest_Stack,StackelSAA){
 //   StackelOblate_PerfectEllipsoid Pot(1.,-30.);
-//   Actions_PolarAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
+//   Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
 //   Actions_AxisymmetricStackel AAS(&Pot);
 //   double radius = 1.;
 //   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);

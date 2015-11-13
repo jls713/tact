@@ -46,7 +46,7 @@
 // ============================================================================
 /*! Polar Adiabatic Approximation */
 // ============================================================================
-class Actions_PolarAdiabaticApproximation : public Action_Finder{
+class Actions_CylindricalAdiabaticApproximation : public Action_Finder{
     private:
         Potential_JS *Pot;          /*! Potential (axisymmetric)             */
         bool no_energy_correction;  /*! if true, no radial-vertical coupling */
@@ -69,7 +69,7 @@ class Actions_PolarAdiabaticApproximation : public Action_Finder{
         double dJzdR(double R, double Jz);
         double actions_dJzdEz(double R, double Ez,double z, double *zlim);
     public:
-        //! Actions_PolarAdiabaticApproximation constructor.
+        //! Actions_CylindricalAdiabaticApproximation constructor.
         /*!
           \param pot Potential (axisymmetric) in which to compute the actions
           \param filename -- output file for Ez grid
@@ -80,7 +80,7 @@ class Actions_PolarAdiabaticApproximation : public Action_Finder{
           \param zmax -- maximum z height for grid
           \param NGRID -- number of grid points for Ez
         */
-        Actions_PolarAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false, double Rm=1., double Rn=40.,double zmax=40.,int NGRID=60)
+        Actions_CylindricalAdiabaticApproximation(Potential_JS *pot,std::string filename="",bool write=false,bool no_energy_corr=false, double Rm=1., double Rn=40.,double zmax=40.,int NGRID=60)
             : Pot(pot), no_energy_correction(no_energy_corr), Rmin(Rm), Rmax(Rn), ZMAX(zmax), NGRID(NGRID){
             if(filename!="" and !write)
                 load_grids(filename);
@@ -116,17 +116,17 @@ class Actions_PolarAdiabaticApproximation : public Action_Finder{
 };
 /*! Helper structure for Jz polar adiabatic approx integration */
 struct PolarAA_zactions_struct{
-    Actions_PolarAdiabaticApproximation *AA;
+    Actions_CylindricalAdiabaticApproximation *AA;
     double Ez, R, zlim, tiny_number;
-    PolarAA_zactions_struct(Actions_PolarAdiabaticApproximation *AA,double Ez, double R,double zlim, double tn)
+    PolarAA_zactions_struct(Actions_CylindricalAdiabaticApproximation *AA,double Ez, double R,double zlim, double tn)
         :AA(AA),Ez(Ez), R(R), zlim(zlim), tiny_number(tn){}
 };
 
 /*! Helper structure for JR polar adiabatic approx integration */
 struct PolarAA_Ractions_struct{
-    Actions_PolarAdiabaticApproximation *AA;
+    Actions_CylindricalAdiabaticApproximation *AA;
     double Etot, Lz2, Jz, Delta,taubar, tiny_number;
-    PolarAA_Ractions_struct(Actions_PolarAdiabaticApproximation *AA,double Etot, double Lz2, double Jz, double Delta,double taubar, double tn)
+    PolarAA_Ractions_struct(Actions_CylindricalAdiabaticApproximation *AA,double Etot, double Lz2, double Jz, double Delta,double taubar, double tn)
         :AA(AA),Etot(Etot), Lz2(Lz2), Jz(Jz), Delta(Delta), taubar(taubar), tiny_number(tn){}
 };
 

@@ -140,8 +140,8 @@ int main(int argc, char*argv[]){
 	// uvorb
 	uv_orb UV(&Pot,4.,30.,50,50,"example.delta_uv");
 
-	// Polar Adiabatic
-	Actions_PolarAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.,100);
+	// Cylindrical Adiabatic
+	Actions_CylindricalAdiabaticApproximation PAA(&Pot,"example.paa",true,false,4.,30.,15.,100);
 
 	// Spheroidal Adiabatic
 	Actions_SpheroidalAdiabaticApproximation SAA(&Pot,"example.saa",true,false,100.,4.,30.,15.,100);
@@ -155,7 +155,7 @@ int main(int argc, char*argv[]){
 	#ifdef TORUS
 	outfile<<"Rperi Rapo Zmax ";
 	#endif
-	outfile<<"OmR Omp Omz Fudge ItTorus Genfunc GenfuncAv uvOrb PAA SAA FIT\n";
+	outfile<<"OmR Omp Omz Fudgev1 ItTC O2GF AvGF Fudgev2 CAA SAA Fit\n";
 	double VMax = sqrt((Pot.Phi({50.,0.,50.})-Pot.Phi(X))-.5*X[4]*X[4]);
 	int number = 500;
 	if(argc>3)
@@ -165,8 +165,6 @@ int main(int argc, char*argv[]){
 	high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	for(auto j: range){
 		count+=1;
-		// if(count<480)
-		// 	continue;
 		X[3]=j;
 		X[5]=j*.8;
 		printVector(X);

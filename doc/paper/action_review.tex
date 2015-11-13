@@ -95,7 +95,7 @@ the methods and the required computation time for a range of orbits in an
 axisymmetric multi-component Galactic potential.  We introduce a new method
 for estimating actions that builds on the adiabatic approximation of
 Sch\"onrich \& Binney (2012) and discuss the accuracy required for the actions, angles and frequencies using suitable distribution functions for the
-thin and thick discs, the stellar halo and a star stream. All the software used in this study
+thin and thick discs, the stellar halo and a star stream. We conclude that for studies of the disc and smooth halo component of the Milky Way the most suitable compromise between speed and accuracy is the St\"ackel Fudge, whilst when studying streams the non-convergent methods do not offer sufficient accuracy and the most suitable method is computing the actions from an orbit integration via a generating function. All the software used in this study
 can be downloaded from
 \href{https://github.com/jls713/tact}{https://github.com/jls713/tact}.
 \end{abstract}
@@ -971,13 +971,13 @@ the progenitor of a tidal \emph{stream}.  Each set of panels shows on the
 left the radial action, $J_r$, (top panel) and the vertical action, $J_z$,
 (lower panel) as a function of time in units of the radial period. Values
 from \emph{non-convergent} methods are shown with solid lines whilst values
-from \emph{convergent} methods are shown with dashed lines. Blue solid line
-is for the CAA, green solid is for the SAA, red solid line is for the
+from \emph{convergent} methods are shown with dashed lines. Mustard-yellow solid line
+is for the CAA, cyan solid is for the SAA, red solid line is for the
 St\"ackel Fudge with variable $\Delta$ estimation (v1), the purple solid is for
 the St\"ackel Fudge with $\Delta$ estimated from shell orbits (v2), the solid
-mustard yellow line is for the St\"ackel fitting method, the blue dashed line
+orange line is for the St\"ackel fitting method, the blue dashed line
 is for the ItTC method, the green dashed line is for the O2GF method,
-and the red dashed line is for the AvGF method. To the right of each
+and the pink dashed line is for the AvGF method. To the right of each
 sub-panel the vertical lines show the $\pm$ standard deviation spread in the
 action estimates from each method. All orbits are computed in
 the multi-component potential from \protect\cite{Piffl2014}.}
@@ -1091,13 +1091,13 @@ multiple orbits: each panel shows the root-mean-squared deviations of the
 estimates from the mean computed using the O2GF method. The upper panel shows
 the radial action $J_r$ and the lower panel shows the vertical action $J_z$.
 The \emph{non-convergent} methods are shown with solid lines whilst the
-\emph{convergent} methods are shown with dashed lines. The blue solid line is
-for the CAA, the green solid line is for the SAA, the red solid line is for
+\emph{convergent} methods are shown with dashed lines. The mustard-yellow solid line is
+for the CAA, the cyan solid line is for the SAA, the red solid line is for
 the St\"ackel Fudge with variable $\Delta$ estimation, the purple solid line
 is for the St\"ackel Fudge with $\Delta$ estimation from shell orbits, the
-solid mustard yellow line is for the St\"ackel fitting method, the blue
+solid orange line is for the St\"ackel fitting method, the blue
 dashed line is for the ItTC method, the green dashed line is for the
-O2GF method and the red dashed line is for the AvGF method.  The coloured
+O2GF method and the pink dashed line is for the AvGF method.  The coloured
 bands show the region in which the relative error in the action-based
 distribution functions for the thin (red), thick (green) and halo (red)
 components are between $1$ and $10\percent$. The upper and lower boundaries
@@ -1115,7 +1115,7 @@ $$\includegraphics[width=\columnwidth]{{{plots/many_tori_output.dat.freq}}}$$
 \caption{Comparison of the accuracy of frequencies estimated using different
 methods: the top panel shows the radial frequency, middle panel the azimuthal
 and bottom panel the vertical frequency. The colour-coding and range of
-orbits explored are as in Fig.~\protect\ref{MultiOrbits}. The upper and lower
+orbits explored are as in Fig.~\protect\ref{MultiOrbits}. The solid black lines show the frequencies of the orbits computed using the O2GF method. The upper and lower
 boundaries of the yellow band correspond to the frequency widths of streams
 with velocity dispersions of $5$ and $0.5\kms$. The vertical grey dashed
 lines correspond to resonances $x:y$ when $\Omega_R/\Omega_z=x/y$.}
@@ -1158,9 +1158,9 @@ In particular, its RMS would be zero even if it consistently returned
 erroneous actions.
 
 The next most accurate method is the ItTC method. As regards $J_z$ it
-is followed by the St\"ackel Fudge v1, but consideration of $J_r$ yields a
+is followed by the St\"ackel Fudge v1 and SAA methods at small eccentricities and by the AvGF method at larger eccentricities. However, consideration of $J_r$ yields a
 different ordering with both the St\"ackel fitting and AvGF methods
-proving more accurate than the St\"ackel Fudge v1.
+proving more accurate than the St\"ackel Fudge v1 at all eccentricities. The SAA and St\"ackel Fudge methods calculate the vertical action in very similar ways so at all eccentricities St\"ackel Fudge v1 method has near identical errors to the SAA method. However, inspection of Figure~\ref{SingleOrbs} shows that the individual action estimates around an orbit are not identical for the two methods. At high eccentricities the St\"ackel fitting method produces the best results of the non-convergent methods followed by Fudge v2 and then the SAA and Fudge v1. At the largest eccentricities the CAA produces errors that are an order of magnitude larger than the St\"ackel-based non-convergent methods.
 
 In Fig.~\ref{MultiOrbits} vertical lines mark eccentricities at which
 orbits may become trapped by resonances. At these eccentricities there are
@@ -1176,7 +1176,7 @@ from the mean of the frequencies returned by the O2GF method, and in
 Figure~\ref{MultiOrbits_Ang} we show the RMS deviation of the angles from
 those computed with the O2GF method. Again the O2GF
 method shows clear superiority at all eccentricities, followed by the
-ItTC method. Again we see a striking deterioration in the performance
+ItTC method. Of the St\"ackel-based non-convergent methods the broad picutre is that St\"ackel fitting performs best followed by the St\"ackel Fudge, the SAA and finally the CAA. An exception to this in the azimuthal frequency, $\Omega_\phi$ where the SAA performs worst and the CAA is competitive with St\"ackel fitting. Additionally, the SAA angle estimation is very competetive at low eccentricities. The vertical frequency estimates for both the CAA and SAA are peaky due to the interpolation grid that is used. Again we see a striking deterioration in the performance
 of the O2GF method at resonances. The deleterious impact of resonances is
 particularly marked in the case of the angle variables.
 
@@ -1189,8 +1189,8 @@ replacing the realistic Galactic potential by a flattened
 logarithmic potential ($q=0.9$). The errors with the actions are much
 smoother in this case and resonances are not evident. The magnitude of
 the errors in the actions are very similar to those in the more realistic
-potential with allhe non-convergent St\"ackel methods producing very similar magnitude errors that are a factor of ten smaller errors than the CAA and the AvGF and ItTC methods producing errors another factor of ten smaller for the most eccentric orbits. The O2GF method produces significantly smaller errors ($\sim$ a factor
-of ten) as the smoothness of the potential means fewer terms  are
+potential with all the non-convergent St\"ackel methods producing very similar magnitude errors that are a factor of ten smaller errors than the CAA and the AvGF and ItTC methods producing errors another factor of ten smaller for the most eccentric orbits. The O2GF method produces significantly smaller errors ($\sim$ a factor
+of ten) as the smoothness of the potential means fewer terms are
 required in the generating function.
 
 \subsection{Computational time}
@@ -1362,7 +1362,9 @@ used with custom potentials.
 \section{Conclusions}\label{Sect::Conclusions}
 
 We have reviewed of the currently available algorithms for
-estimating actions, angles and frequencies in general potentials. We focused
+estimating actions, angles and frequencies in general potentials. We began by presenting a discussion of the separable potentials in which these quantities can be expressed as simple quadratures. The most general such class of potentials is the triaxial St\"ackel potentials of which axisymmetric St\"ackel potentials and spherical potentials are limiting cases. The only case in which the actions can be computed analytically is the isochrone potential. The existence of actions in more general systems has been demonstrated from numerical experiments but there is no way to simply compute the actions in a general potential. The results from the special separable cases have inspired and aided work in creating numerical algorithms for action estimation in general potentials and we have collected together and summarised these algorithms.
+
+We focused
 on axisymmetric potentials and for tests used a realistic model of the
 potential of our Galaxy. The presented methods fall into two groups: non-convergent
 methods and convergent methods.
@@ -1384,7 +1386,7 @@ the accuracy of the actions, frequencies and angles for a large number of
 orbits in the same potential, and we finally discussed the computational
 speed of each method. The time required to compute an action varies by three
 orders of magnitude between the cheapest method, the St\"ackel Fudge, and the
-most expensive method, ItTC. The accuracy of
+most expensive method, ItTC.  We gave distribution functions for components of the Milky Way and compared the accuracy of the action estimates yielded from the various methods with the relative error in the corresponding evaluation of the distribution function. The accuracy of
 St\"ackel Fudge v1 is sufficient for most applications with the possible
 exception of some thick-disc orbits. The convergent methods O2GF and
 ItTC provide significantly more accuracy that one normally requires,
@@ -1403,8 +1405,10 @@ occur). Currently there is no general-purpose tool that will evaluate the
 true actions of a trapped orbit, although \cite{KaasalainenB} showed that the
 actions and angles of trapped orbits can be evaluated by torus mapping.
 
+Action, angle and frequency variables have proved important tools for modelling dynamical systems, and with the Gaia data on the horizon the need for robust, accurate and rapid routines for estimating the actions is great. We have demonstrated that there are powerful algorithms that are appropriate for a wide range of modelling requirements and that promise to be indispensable for understanding and dissecting the Gaia data.
+
 \section*{Acknowledgments}
-We thank Angus Williams for constructing the backronym `The Action Computation Tool' for the \texttt{tact} code.
+We thank Angus Williams for reading a draft of this paper and constructing the backronym `The Action Computation Tool' for the \texttt{tact} code.
 
 \bibliography{bibliography}
 \bibliographystyle{mn2e}

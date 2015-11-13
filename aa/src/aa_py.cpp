@@ -306,9 +306,9 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
     "Finds actions in spherical potential Phi(r)=-GM/(b+sqrt(b^2+r^2))"
     , init<double,double>());
 
-  class_<Actions_PolarAdiabaticApproximation, bases<Action_Finder> >(
-	"Actions_PolarAdiabaticApproximation",
-  "Polar Adiabatic Approximation\n"
+  class_<Actions_CylindricalAdiabaticApproximation, bases<Action_Finder> >(
+	"Actions_CylindricalAdiabaticApproximation",
+  "Cylindrical Adiabatic Approximation\n"
     "Args:\n"
      " param1: Potential_JS potential\n"
       "param2: output file\n"

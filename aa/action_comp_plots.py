@@ -10,14 +10,14 @@ import seaborn as sns
 
 kms2kpcGyr = 1000./977.775
 
-def method_comparison(results_file,name,dontplot=[],rangess=None):
+def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None):
 	results = np.genfromtxt(results_file)
 	labels = [r'Fudge v1','ItTC','O2GF','AvGF',r'Fudge v2','CAA','SAA',r'Fit']
 	f = plt.figure(figsize=(6.64,3))
 
 	a=[plt.subplot2grid((2,2),(i,0),colspan=1,rowspan=1) for i in range(2)]
 
-	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[2],sns.color_palette()[3],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[4]]
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[4],sns.color_palette()[5],sns.color_palette("Set1",5,desat=.6)[4]]
 
 	dashed=['-','--','--','--','-','-','-','-']
 
@@ -73,6 +73,9 @@ def method_comparison(results_file,name,dontplot=[],rangess=None):
 			line.set_dashes((0.5,0.25))
 		line.set_clip_on(False)
 		a[1].add_line(line)
+	if(Jranges):
+		a[0].set_ylim(Jranges[0][0],Jranges[0][1])
+		a[1].set_ylim(Jranges[1][0],Jranges[1][1])
 
 	plt.setp(a[0].get_xticklabels(),visible=False)
 	plt.setp(a[1].get_yticklabels()[-1],visible=False)
@@ -82,8 +85,10 @@ def method_comparison(results_file,name,dontplot=[],rangess=None):
 	a[0].set_ylabel(r'$J_R/\mathrm{kpc\,km\,s}^{-1}$')
 	a[1].set_ylabel(r'$J_z/\mathrm{kpc\,km\,s}^{-1}$')
 
-	a[0].legend(handlelength=1, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower left', bbox_to_anchor=(0.05, 1.0),fontsize=10)
-
+	leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower left', bbox_to_anchor=(0.05, 1.0),fontsize=10)
+	# set the linewidth of each legend object
+	for legobj in leg.legendHandles:
+	    legobj.set_linewidth(2.0)
 	a[0].set_xlim(0.,Mx)
 	a[1].set_xlim(0.,Mx)
 
@@ -128,7 +133,7 @@ def halo_dff(J,alpha0,alpha_inf,f,delta,v0,r0,rad=False):
 	curl = J.T[1]+J.T[2]+f*D0*J.T[0]
 	lambd = zeta*(alpha0/delta-1.5)
 	mu = zeta*(alphainf/delta-1.5)
-	fac = 1
+	fac = 1.
 	if(rad):
 		fac = np.fabs(f*D0)
 	return fac*np.fabs(-lambd/curl-(mu-lambd)*curl/(curl**2+J_b**2))
@@ -172,7 +177,7 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	fig,a = plt.subplots(2,1,figsize=(4.,8.))
 
 	plt.subplots_adjust(hspace=0.)
-	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[2],sns.color_palette()[3],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[4]]
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[4],sns.color_palette()[5],sns.color_palette("Set1",5,desat=.6)[4]]
 
 	dashed=['-','--','--','--','-','-','-','-']
 
@@ -263,13 +268,16 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 		draw_res_lines(a,res_line,1.2e-4)
 
 	a[1].set_xlabel(r'$(J_R+J_z)/|J_\phi|$')
-	a[0].set_ylabel(r'$\langle(\Delta J_R)^2\rangle/\mathrm{kpc\,km\,s}^{-1}$')
-	a[1].set_ylabel(r'$\langle(\Delta J_z)^2\rangle/\mathrm{kpc\,km\,s}^{-1}$')
+	a[0].set_ylabel(r'$\sqrt{\langle(\Delta J_R)^2\rangle}/\mathrm{kpc\,km\,s}^{-1}$')
+	a[1].set_ylabel(r'$\sqrt{\langle(\Delta J_z)^2\rangle}/\mathrm{kpc\,km\,s}^{-1}$')
 	a[0].semilogx()
 	a[1].semilogx()
 	a[0].semilogy()
 	a[1].semilogy()
-	a[0].legend(handlelength=1, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	# set the linewidth of each legend object
+	for legobj in leg.legendHandles:
+	    legobj.set_linewidth(2.0)
 	a[0].set_ylim(0.0001,1000.)
 	a[1].set_ylim(0.0001,1000.)
 	plt.savefig(results_file+'.acc.pdf',bbox_inches='tight')
@@ -296,8 +304,10 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	a.set_ylabel(r'$t/\mathrm{s}$')
 	a.semilogx()
 	a.semilogy()
-	a.legend(handlelength=1, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
-
+	leg=a.legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	# set the linewidth of each legend object
+	for legobj in leg.legendHandles:
+	    legobj.set_linewidth(2.0)
 	plt.savefig(results_file+'.times.pdf',bbox_inches='tight')
 
 	fig,a = plt.subplots(3,1,figsize=(4.,8.))
@@ -347,9 +357,9 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	plt.setp(a[1].get_yticklabels()[1],visible=False)
 
 	a[2].set_xlabel(r'$(J_R+J_z)/|J_\phi|$')
-	a[0].set_ylabel(r'$\langle(\Delta \Omega_R)^2\rangle/\mathrm{Gyr}^{-1}$')
-	a[1].set_ylabel(r'$\langle(\Delta \Omega_\phi)^2\rangle/\mathrm{Gyr}^{-1}$')
-	a[2].set_ylabel(r'$\langle(\Delta \Omega_z)^2\rangle/\mathrm{Gyr}^{-1}$')
+	a[0].set_ylabel(r'$\sqrt{\langle(\Delta \Omega_R)^2\rangle}/\mathrm{Gyr}^{-1}$')
+	a[1].set_ylabel(r'$\sqrt{\langle(\Delta \Omega_\phi)^2\rangle}/\mathrm{Gyr}^{-1}$')
+	a[2].set_ylabel(r'$\sqrt{\langle(\Delta \Omega_z)^2\rangle}/\mathrm{Gyr}^{-1}$')
 
 	if(with_res):
 		draw_res_lines(a,res_line,1.2e-6)
@@ -381,7 +391,10 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	a[0].semilogy()
 	a[1].semilogy()
 	a[2].semilogy()
-	a[0].legend(handlelength=1, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	# set the linewidth of each legend object
+	for legobj in leg.legendHandles:
+	    legobj.set_linewidth(2.0)
 	# a[0].set_ylim(0.0001,1000.)
 	# a[1].set_ylim(0.0001,1000.)
 	# a[2].set_ylim(0.0001,1000.)
@@ -445,12 +458,12 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	plt.setp(a[1].get_yticklabels()[1],visible=False)
 
 	a[2].set_xlabel(r'$(J_R+J_z)/|J_\phi|$')
-	a[0].set_ylabel(r'$\langle(\Delta \theta_R)^2\rangle/\pi$')
-	a[1].set_ylabel(r'$\langle(\Delta \theta_\phi)^2\rangle/\pi$')
-	a[2].set_ylabel(r'$\langle(\Delta \theta_z)^2\rangle/\pi$')
+	a[0].set_ylabel(r'$\sqrt{\langle(\Delta \theta_R)^2\rangle}/\pi$')
+	a[1].set_ylabel(r'$\sqrt{\langle(\Delta \theta_\phi)^2\rangle}/\pi$')
+	a[2].set_ylabel(r'$\sqrt{\langle(\Delta \theta_z)^2\rangle}/\pi$')
 
 	if(with_res):
-		draw_res_lines(a,res_line,1.2e-4)
+		draw_res_lines(a,res_line,0.3)
 
 	a[0].semilogx()
 	a[1].semilogx()
@@ -458,9 +471,12 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	a[0].semilogy()
 	a[1].semilogy()
 	a[2].semilogy()
-	a[0].legend(handlelength=1, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(0.5, 1.0))
+	# set the linewidth of each legend object
+	for legobj in leg.legendHandles:
+	    legobj.set_linewidth(2.0)
 	# a[0].set_ylim(0.0001,1000.)
-	# a[1].set_ylim(0.0001,1000.)
+	a[1].set_ylim(1e-6,.1)
 	# a[2].set_ylim(0.0001,1000.)
 
 
@@ -504,7 +520,7 @@ def genfunc_converg(data,labels):
 
 import tabulate
 
-def make_table(files,names,dontplot):
+def make_table(files,names,dontplot,Jranges):
 	actmethods=['PAA','SAA','Fudge v1','Fudge v2','Fit','ItTorus','AvGenfunc','Genfunc']
 	acts=[[0 for y in range(9)]]
 	acts[0][0]='Actions'
@@ -516,7 +532,7 @@ def make_table(files,names,dontplot):
 		else:
 			spreadsnon[i][0]=actmethods[i]
 	for N,(f,n,d) in enumerate(zip(files,names,dontplot)):
-		r = method_comparison(f,n,dontplot=d,rangess=5.)
+		r = method_comparison(f,n,dontplot=d,rangess=5.,Jranges=Jranges[N])
 		acts[0][1+2*N]=r[0][0]
 		acts[0][2+2*N]=r[0][1]
 		for i in range(len(r)-1):
@@ -536,11 +552,8 @@ def make_table(files,names,dontplot):
 	outfile.write(tablecon)
 	outfile.close
 
-time_plot('many_tori_output.dat')
-time_plot('many_tori_output_hess_sqE_betterres_2.dat',with_res=True,with_boxes=True)
-time_plot('many_tori_output_james.dat',with_res=True,with_boxes=True)
-time_plot('many_tori_output_hess5.dat')
-time_plot('many_tori_output_hess13.dat')
-time_plot('many_tori_output_hess_log.dat')
-make_table(['thin','thick','halo','stream'],['Thin','Thick','Halo','Stream'],[[],[],[5],[5]])
+# time_plot('many_tori_output.dat', with_res=True, with_boxes=True)
+time_plot('many_tori_output_moreacc.dat', with_res=True, with_boxes=True)
+# time_plot('many_tori_output_james.dat',with_res=True,with_boxes=True)
+make_table(['thin','thick','halo','stream'],['Thin','Thick','Halo','Stream'],[[],[],[5],[5]],[None,None,None,[[290.,340.],[540.,580.]]])
 genfunc_converg(['thin_gc','thick_gc','halo_gc','stream_gc'],['Thin','Thick','Halo','Stream'])
