@@ -44,6 +44,13 @@ There is also test code that runs using googletest. However, there is a quick te
 10. [Average generating function from orbit (AvGF)](http://arxiv.org/abs/1401.2985), Bovy (2014), [Fox (2014)](http://arxiv.org/abs/1407.1688)
 11. [Iterative Torus Machine (ItTC)](http://arxiv.org/abs/1412.2093), Sanders & Binney (2015)
 
+## Docs
+
+There is some documentation that can be produced by doxygen by running
+```
+make docs
+```
+The python library also contains doc strings.
 
 ## Test case
 
