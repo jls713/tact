@@ -171,7 +171,7 @@ int main(int argc, char*argv[]){
 			Genfunc = AG.actions(i);
 			times[2]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);GenfuncAv.resize(3);
 			VecDoub aa = AG.angles(i);
-			GResults.push_back({Genfunc[0],Genfunc[2],0.,0.,0.,aa[3],aa[4],aa[5]});
+			GResults.push_back({Genfunc[0],Genfunc[2],aa[0],aa[1],aa[2],aa[3],aa[4],aa[5]});
 			Energy.push_back(Pot.H(i));
 		}
 		VecDoub acts = {columnMean(GResults)[0],Pot.Lz(X),columnMean(GResults)[1],columnMean(GResults)[5],columnMean(GResults)[6],columnMean(GResults)[7]};

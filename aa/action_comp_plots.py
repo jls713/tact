@@ -24,7 +24,7 @@ def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None):
 
 	a=[plt.subplot2grid((2,2),(i,0),colspan=1,rowspan=1) for i in range(2)]
 
-	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[4],sns.color_palette()[5],sns.color_palette("Set1",5,desat=.6)[4]]
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[5],sns.color_palette()[4],sns.color_palette("Set1",5,desat=.6)[4]]
 
 	dashed=['-','--','--','--','-','-','-','-']
 
@@ -184,7 +184,7 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	fig,a = plt.subplots(2,1,figsize=(4.,8.))
 
 	plt.subplots_adjust(hspace=0.)
-	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[4],sns.color_palette()[5],sns.color_palette("Set1",5,desat=.6)[4]]
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[5],sns.color_palette()[4],sns.color_palette("Set1",5,desat=.6)[4]]
 
 	dashed=['-','--','--','--','-','-','-','-']
 
@@ -294,6 +294,7 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	offsets=np.ones(8)
 	offsets[2]=1.2
 	offsets[3]=0.8
+	offsets[1]=1.3
 	offsets[-1]=1.1
 
 	for N,i in enumerate([5,6,0,4,7,1,3,2]):
@@ -320,7 +321,8 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	fig,a = plt.subplots(3,1,figsize=(4.,8.))
 
 	plt.subplots_adjust(hspace=0.)
-	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[2],sns.color_palette()[3],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[4]]
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[5],sns.color_palette()[4],sns.color_palette("Set1",5,desat=.6)[4]]
+
 
 	dashed=['-','--','--','--','-','-','-','-']
 
@@ -334,8 +336,8 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	a[1].set_xlim(0.001,0.6) #JRJz[-1])
 	a[2].set_xlim(0.001,0.6) #JRJz[-1])
 
-	offsetsR=[1.,1.,1.35,0.9,0.8,1.,1.,1.]
-	offsetsp=[0.85,1.,1.5,0.9,0.9,1.,1.,1.]
+	offsetsR=[1.,1.,1.5,0.9,0.8,1.,1.,1.]
+	offsetsp=[0.85,1.,1.7,0.9,0.9,1.,1.,1.]
 	offsetsz=[1.4,1.,1.,1.,1.,1.,1.,1.]
 
 	a[0].plot(JRJz,kms2kpcGyr*results.T[7],c='k')
@@ -347,6 +349,8 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	a[2].annotate(r'$\Omega_z$',xy=(0.2,kms2kpcGyr*results.T[9][370]*0.7),horizontalalignment='right', verticalalignment='top',fontsize=12)
 
 	for N,i in enumerate([5,6,0,4,7,1,3,2]):
+		if(i==3):
+			continue
 		l1, = a[0].plot(JRJz,kms2kpcGyr*results.T[i*8+16],label=labels[i],lw=.5,ls=dashed[i],color=colors[i])
 		a[0].annotate(labels[i],xy=(MaxX*1.012,kms2kpcGyr*results.T[i*8+16][-1]*offsetsR[N]),horizontalalignment='left', verticalalignment=align[i],color=colors[i],fontsize=5)
 		l2, = a[1].plot(JRJz,kms2kpcGyr*results.T[i*8+17],lw=0.5,ls=dashed[i],color=colors[i])
@@ -412,7 +416,8 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	fig,a = plt.subplots(3,1,figsize=(4.,8.))
 
 	plt.subplots_adjust(hspace=0.)
-	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[2],sns.color_palette()[3],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette()[4]]
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[5],sns.color_palette()[4],sns.color_palette("Set1",5,desat=.6)[4]]
+
 
 	dashed=['-','--','--','--','-','-','-','-']
 
@@ -422,20 +427,23 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	Jp = results.T[1]
 	J = np.vstack((JR,Jp,Jz)).T
 
-	a[0].set_xlim(0.001,JRJz[-1])
-	a[1].set_xlim(0.001,JRJz[-1])
-	a[2].set_xlim(0.001,JRJz[-1])
+	a[0].set_xlim(0.001,0.6)
+	a[1].set_xlim(0.001,0.6)
+	a[2].set_xlim(0.001,0.6)
 
-	offsets=[1.,0.85,1.3,0.85,1.,1.,1.,1.]
+	offsets=[1.,0.85,1.3,0.85,1.3,1.,1.,1.]
 	offsets2=[1.,1.,1.1,0.85,0.9,1.,1.,1.]
+	offsets3=[1.,1.,1.2,0.85,0.9,1.,1.,1.]
 
 	for N,i in enumerate([5,6,0,4,7,1,3,2]):
+		if(i==3):
+			continue
 		l1, = a[0].plot(JRJz,results.T[i*8+13]/np.pi,label=labels[i],lw=.5,ls=dashed[i],color=colors[i])
 		a[0].annotate(labels[i],xy=(MaxX*1.012,results.T[i*8+13][-1]*offsets2[N]/np.pi),horizontalalignment='left', verticalalignment=align[i],color=colors[i],fontsize=5)
 		l2, = a[1].plot(JRJz,results.T[i*8+14]/np.pi,lw=0.5,ls=dashed[i],color=colors[i])
 		a[1].annotate(labels[i],xy=(MaxX*1.012,results.T[i*8+14][-1]*offsets[N]/np.pi), horizontalalignment='left', verticalalignment=align[i],color=colors[i],fontsize=5)
 		l3, = a[2].plot(JRJz,results.T[i*8+15]/np.pi,label=labels[i],lw=.5,ls=dashed[i],color=colors[i])
-		a[2].annotate(labels[i],xy=(MaxX*1.012,results.T[i*8+15][-1]*offsets2[N]/np.pi),horizontalalignment='left', verticalalignment=align[i],color=colors[i],fontsize=5)
+		a[2].annotate(labels[i],xy=(MaxX*1.012,results.T[i*8+15][-1]*offsets3[N]/np.pi),horizontalalignment='left', verticalalignment=align[i],color=colors[i],fontsize=5)
 		if(i==1 or i==2 or i==3):
 			l1.set_dashes((2,1))
 			l2.set_dashes((2,1))
@@ -483,7 +491,7 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 	for legobj in leg.legendHandles:
 	    legobj.set_linewidth(2.0)
 	# a[0].set_ylim(0.0001,1000.)
-	a[1].set_ylim(1e-6,.1)
+	# a[1].set_ylim(1e-6,.1)
 	# a[2].set_ylim(0.0001,1000.)
 
 

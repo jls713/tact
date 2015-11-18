@@ -154,7 +154,8 @@ int main(int argc, char*argv[]){
 		X[3]=j;
 		X[5]=j*.8;
 		printVector(X);
-		O.integrate(X,10.*Pot.torb(X),0.204*Pot.torb(X));
+		double Torb = Pot.torb(X), tstep=0.204*Torb, tmax=10.*Torb;
+		O.integrate(X,tmax,tstep);
 		int guess_alpha=1;
 		MatDoub FResults,ITResults,GResults,GAvResults,UVResults,PAAResults,SAAResults,FITResults;
 		VecDoub Fudge, ITorus, Genfunc, GenfuncAv, uvAct, paaAct, saaAct, fitAct,Energy;
@@ -166,7 +167,7 @@ int main(int argc, char*argv[]){
 			Genfunc = AG.actions(i);
 			times[2]+=duration_cast<nanoseconds>(high_resolution_clock::now()-t1);GenfuncAv.resize(3);
 			VecDoub aa = AG.angles(i);
-			GResults.push_back({Genfunc[0],Genfunc[2],0.,0.,0.,aa[3],aa[4],aa[5]});
+			GResults.push_back({Genfunc[0],Genfunc[2],aa[0],aa[1],aa[2],aa[3],aa[4],aa[5]});
 			Energy.push_back(Pot.H(i));
 		}
 		VecDoub acts = {columnMean(GResults)[0],Pot.Lz(X),columnMean(GResults)[1],columnMean(GResults)[5],columnMean(GResults)[6],columnMean(GResults)[7]};
@@ -246,6 +247,17 @@ int main(int argc, char*argv[]){
 			}
 			++N;
 		}
+		double timeT=tstep;VecDoub freqs;
+		for(int i=1;i<N;++i){
+			freqs=columnMean(GResults)*timeT;
+			GResults[i][2]-=GResults[0][2]+freqs[5];
+			GResults[i][3]-=GResults[0][3]+freqs[6];
+			GResults[i][4]-=GResults[0][4]+freqs[7];
+			timeT+=tstep;
+			for(unsigned k=2;k<5;++k)
+				while(GResults[i][k]<-PI)GResults[i][k]+=2.*PI;
+		}
+		for(int k=2;k<5;++k) GResults[0][k]=0.;
 		for(auto k:columnRMS(FResults)) outfile<<k<<" ";
 		#ifdef TORUS
 		for(auto k:columnRMS(ITResults)) outfile<<k<<" ";

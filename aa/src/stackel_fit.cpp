@@ -110,13 +110,13 @@ double Stackel_Fitted_Potential::BigLambda(double lambda){
 
 double Stackel_Fitted_Potential::flam(double lambda){
     chi_integrals SFP(this,lambda);
-    return ((GaussLegendreQuad(&chiNu,limits[2],limits[3],&SFP)/N)-0.5*chibar);
+    return ((GaussLegendreQuad(&chiNu,limits[2],limits[3],&SFP,50)/N)-0.5*chibar);
 }
 
 double Stackel_Fitted_Potential::fnu(double nu){
     if(nu+gamma()<TINY) nu+=TINY;
     chi_integrals SFP(this,nu);
-    return (-(GaussLegendreQuad(&chiLam,limits[0],limits[1],&SFP)/L)+0.5*chibar);
+    return (-(GaussLegendreQuad(&chiLam,limits[0],limits[1],&SFP,50)/L)+0.5*chibar);
 }
 
 double Stackel_Fitted_Potential::flamINT(double lam){

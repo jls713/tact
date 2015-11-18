@@ -320,7 +320,7 @@ J_\tau = \frac{2}{\upi}\int_{\tau_-}^{\tau_+} \mathrm{d}\tau\,|p_\tau(\tau)|.
 \label{Eq::action}
 \end{equation}
 where ($\tau_-,\tau_+$) are the roots of $p_\tau(\tau)=0$, which we locate
-with Brent's method. We compute the integral (and all similar integrals) using a $50$-point Gauss-Legendre
+with Brent's method. We compute the integral (and all similar integrals) using a $10$-point Gauss-Legendre
 quadrature. \cite{deZeeuw1985a} chose to define the actions in a triaxial St\"ackel potential in this way such that the actions are continuous across the transitions from one orbit family to the next. However, for the loop orbits the oscillation in one of the coordinates is covered twice. In the axisymmetric case this means that the radial action is half the value given by equation~\eqref{Eq::action}.
 
 \subsubsection{Axisymmetric limits}
@@ -967,8 +967,8 @@ the progenitor of a tidal \emph{stream}.  Each set of panels shows on the
 left the radial action, $J_r$, (top panel) and the vertical action, $J_z$,
 (lower panel) as a function of time in units of the radial period. Values
 from \emph{non-convergent} methods are shown with solid lines whilst values
-from \emph{convergent} methods are shown with dashed lines. Mustard-yellow solid line
-is for the CAA, cyan solid is for the SAA, red solid line is for the
+from \emph{convergent} methods are shown with dashed lines. Cyan solid line
+is for the CAA, mustard-yellow solid is for the SAA, red solid line is for the
 St\"ackel Fudge with variable $\Delta$ estimation (v1), the purple solid is for
 the St\"ackel Fudge with $\Delta$ estimated from shell orbits (v2), the solid
 orange line is for the St\"ackel fitting method, the blue dashed line
@@ -1087,8 +1087,8 @@ multiple orbits: each panel shows the root-mean-squared deviations of the
 estimates from the mean computed using the O2GF method. The upper panel shows
 the radial action $J_r$ and the lower panel shows the vertical action $J_z$.
 The \emph{non-convergent} methods are shown with solid lines whilst the
-\emph{convergent} methods are shown with dashed lines. The mustard-yellow solid line is
-for the CAA, the cyan solid line is for the SAA, the red solid line is for
+\emph{convergent} methods are shown with dashed lines. The cyan solid line is
+for the CAA, the mustard-yellow solid line is for the SAA, the red solid line is for
 the St\"ackel Fudge with variable $\Delta$ estimation, the purple solid line
 is for the St\"ackel Fudge with $\Delta$ estimation from shell orbits, the
 solid orange line is for the St\"ackel fitting method, the blue
@@ -1110,7 +1110,7 @@ lines correspond to resonances $x:y$ when $\Omega_R/\Omega_z=x/y$.}
 $$\includegraphics[width=\columnwidth]{{{plots/many_tori_output.dat.freq}}}$$
 \caption{Comparison of the accuracy of frequencies estimated using different
 methods: the top panel shows the radial frequency, middle panel the azimuthal
-and bottom panel the vertical frequency. The colour-coding and range of
+and bottom panel the vertical frequency. Each panel shows the root-mean-squared deviations of the estimates from the mean computed using the O2GF method. The colour-coding and range of
 orbits explored are as in Fig.~\protect\ref{MultiOrbits}. The solid black lines show the frequencies of the orbits computed using the O2GF method. The upper and lower
 boundaries of the yellow band correspond to the frequency widths of streams
 with velocity dispersions of $5$ and $0.5\kms$. The vertical grey dashed
@@ -1123,7 +1123,7 @@ $$\includegraphics[width=\columnwidth]{{{plots/many_tori_output.dat.ang}}}$$
 \caption{Comparison of the accuracy of angle estimation using different
 methods for multiple orbits: the top panel shows the radial angle, middle
 panel the azimuthal and bottom the vertical. The colour-coding and the range
-of orbits explored are as in \protect\ref{MultiOrbits}. The upper and lower
+of orbits explored are as in \protect\ref{MultiOrbits}. Each panel shows the root-mean-squared deviations of the estimates from the angles computed using the O2GF method. The O2GF line shows the root-mean-squared deviations from the angles computed using $\theta_i(0)+\langle\Omega_i\rangle t$. The upper and lower
 boundaries of the yellow band correspond to the angle widths of streams with
 scale radii of $100$ and $10\pc$. The vertical grey dashed lines correspond
 to resonances $x:y$ when $\Omega_R/\Omega_z=x/y$.} \label{MultiOrbits_Ang}
@@ -1200,9 +1200,9 @@ the time per estimated action averaged from $50$ estimates per orbit.}
 \end{figure}
 
 In Figure~\ref{MultiOrbits_Time} we show for each method the average time for
-computing a single action as a function of $(J_r+J_z)/|J_\phi|$. For an orbit
+computing a single action as a function of $(J_r+J_z)/|J_\phi|$. The actions were computed on a single $4\mathrm{GHz}$ Intel i7 processor. For an orbit
 of given eccentricity, these times vary by more than three orders of
-magnitude, with the St\"ackel Fudges being cheapest ($\sim10^{-5}\mathrm{s}$)
+magnitude, with the St\"ackel Fudges being cheapest ($\sim5\times10^{-6}\mathrm{s}$)
 and the ItTC method most expensive. In the bargain basement we have
 the St\"ackel Fudges and the adiabatic approximations CAA and SAA.  Given
 that the CAA and SAA are two to three times more expensive (because they
@@ -1401,7 +1401,7 @@ occur). Currently there is no general-purpose tool that will evaluate the
 true actions of a trapped orbit, although \cite{KaasalainenB} showed that the
 actions and angles of trapped orbits can be evaluated by torus mapping.
 
-Action, angle and frequency variables have proved important tools for modelling dynamical systems, and with the Gaia data on the horizon the need for robust, accurate and rapid routines for estimating the actions is great. We have demonstrated that there are powerful algorithms that are appropriate for a wide range of modelling requirements and that promise to be indispensable for understanding and dissecting the Gaia data.
+Action, angle and frequency variables have proved important tools for modelling dynamical systems, and with arrival of the Gaia data on the horizon the need for robust, accurate and rapid routines for estimating the actions is great. We have demonstrated that there are powerful algorithms that are appropriate for a wide range of modelling requirements and that promise to be indispensable for understanding and dissecting the Gaia data.
 
 \section*{Acknowledgments}
 We thank Angus Williams for reading a draft of this paper and constructing the backronym `The Action Computation Tool' for the \texttt{tact} code.

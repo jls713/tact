@@ -521,12 +521,14 @@ extern const double weights32[32];
 extern const double abscissa50[50];
 extern const double weights50[50];
 
-inline double GaussLegendreQuad(double (*func)(double, void*),double a,double b, void *p = NULL, int order = 50){
+inline double GaussLegendreQuad(double (*func)(double, void*),double a,double b, void *p = NULL, int order = 10){
     // Adapted from numerical recipes routine qgaus
     auto abscissa = abscissa50, weights = weights50;
     if(order==8){abscissa=abscissa8;weights=weights8;}
     if(order==4){abscissa=abscissa4;weights=weights4;}
-    if(order!=50  and order!=8 and order!=4)
+    if(order==16){abscissa=abscissa16;weights=weights16;}
+    if(order==10){abscissa=abscissa10;weights=weights10;}
+    if(order!=50  and order!=8 and order!=4 and order!=10 and order!=16)
         std::cerr<<"GaussLegendre Order not available"<<std::endl;
     double xm=0.5*(b+a);
     double xr=0.5*(b-a);
