@@ -242,7 +242,7 @@ cubic in $\tau$
 \begin{equation}
 \frac{x^2}{(\tau-a^2)}+\frac{y^2}{(\tau-b^2)}+\frac{z^2}{(\tau-c^2)} = 1.
 \end{equation}
- Here $a$, $b$ and $c$ are constants that define the coordinate system. we
+ Here $a$, $b$ and $c$ are constants that define the coordinate system. We
 adopt the convention that the $x$ axis is the potential's major axis,
 $y$ is the intermediate axis and $z$ is the minor axis. For this to be the
 case we require
@@ -321,13 +321,13 @@ J_\tau = \frac{2}{\upi}\int_{\tau_-}^{\tau_+} \mathrm{d}\tau\,|p_\tau(\tau)|.
 \end{equation}
 where ($\tau_-,\tau_+$) are the roots of $p_\tau(\tau)=0$, which we locate
 with Brent's method. We compute the integral (and all similar integrals) using a $10$-point Gauss-Legendre
-quadrature. \cite{deZeeuw1985a} chose to define the actions in a triaxial St\"ackel potential in this way such that the actions are continuous across the transitions from one orbit family to the next. However, for the loop orbits the oscillation in one of the coordinates is covered twice. In the axisymmetric case this means that the radial action is half the value given by equation~\eqref{Eq::action}.
+quadrature. \cite{deZeeuw1985a} chose to define the actions in a triaxial St\"ackel potential in this way such that the actions are continuous across the transitions from one orbit family to the next. However, for the loop orbits the oscillation in one of the coordinates is covered twice. In the axisymmetric case this means that the radial action $J_\lambda$ is half the value given by the right-hand side of equation~\eqref{Eq::action}.
 
 \subsubsection{Axisymmetric limits}
 
 In the limit $a^2\rightarrow b^2$ the confocal ellipsoidal coordinate system
 reduces to a prolate spheroidal coordinate system. In this case $\Delta_1\rightarrow0$ and the $\mu$
-coordinate is replaced by the familiar polar angle $\phi$. The coordinate system is now described by a single pair of foci $\Delta=\Delta_2=\sqrt{a^2-c^2}$. The most general
+coordinate is replaced by the familiar polar angle $\phi$. The coordinate system is now described by a single pair of foci separated by $\Delta=\Delta_2=\sqrt{a^2-c^2}$. The most general
 potentials that are separable  in these coordinates, are the oblate St\"ackel potentials
 \begin{equation}
 \Phi_{\rm S,obl} = -\frac{F(\lambda)-F(\nu)}{\lambda-\nu}.
@@ -387,9 +387,9 @@ refined, so the error in the computed actions cannot be arbitrarily
 diminished. In this section we discuss convergent methods.
 
 These methods all involve numerical construction of the generating function that maps
-the analytic angle-action variables $(\btheta,\boldsymbol{J})$ of a ``toy''
+the analytic angle-action variables $(\btheta',\boldsymbol{J}')$ of a ``toy''
 potential such as the isochrone or harmonic oscillator, into the angle-action
-variables $(\btheta',\boldsymbol{J}')$ of the true potential.
+variables $(\btheta,\boldsymbol{J})$ of the true potential.
 
 \subsection{Iterative torus construction (ItTC)}\label{Method::ItTorus}
 
@@ -421,9 +421,9 @@ while the angles are related by
 = \btheta'+2\sum_{\bs{n}>\bs{0}}\frac{\partial S_{\bs{n}}}{\partial \bs{J}}(\bs{J})\sin\bs{n}\cdot\btheta'.
 \label{targetang}
 \end{equation}
- Given a true action $\bs{J}'$ and a trial set of coefficients
-$S_{\bs{n}}$, for each point on a regular grid in toy angle in $\btheta$ the
-corresponding toy actions $\bs{J}$ are found from equation~\eqref{toyact}.
+ Given a true action $\bs{J}$ and a trial set of coefficients
+$S_{\bs{n}}$, for each point on a regular grid in toy angle in $\btheta'$ the
+corresponding toy actions $\bs{J}'$ are found from equation~\eqref{toyact}.
 The coordinates $(\bs{x},\bs{v})$ are then recovered from the toy
 potential's analytic formulae, and the true Hamiltonian is evaluated at
 this phase-space point.  The Marquardt-Levenberg algorithm is used to adjust
@@ -454,7 +454,7 @@ With the $S_{\bs{n}}$ and $\partial S_{\bs{n}}/\partial \bs{J}$ found, the
 corresponding $(\bs{x},\bs{v})$ for any point $\btheta$ on the torus
 $\boldsymbol{J}$ can be found. This is ideal for many applications but for
 others one needs machinery to convert $(\bs{x},\bs{v})$ to
-$(\btheta,\boldsymbol{J})$ \citep{McMillanBinney2013}.
+$(\btheta,\boldsymbol{J})$ \citep[e.g.][]{McMillanBinney2013}.
 \cite{McMillanBinney2008} obtained $(\btheta,\boldsymbol{J})$ for given
 points $(\bs{x},\bs{v})$ by repeatedly constructing tori until one was
 obtained that passed through the given phase-space point. Their procedure was
@@ -497,9 +497,9 @@ for a time $N_T T$, where $T$ is the period of a circular orbit with the same
 energy. At each phase-space point the actions and angles in a toy potential
 are computed. These toy angle-actions are used to set up the linear equations
 \eqref{toyact} and \eqref{toyang}. Finally, the entire set of equations is
-solved for the unknowns: the true actions $\bs{J}'$, the Fourier
+solved for the unknowns: the true actions $\bs{J}$, the Fourier
 coefficients, $S_{\bs{n}}$, and their derivatives $\partial
-S_{\bs{n}}/\partial\bs{J}'$ plus $\btheta'(0)$ and $\bs{\Omega}'$. The
+S_{\bs{n}}/\partial\bs{J}$ plus $\btheta(0)$ and $\bs{\Omega}$. The
 vectors included in the sums are limited to $\bs{n}<N_\mathrm{max}$.
 
 In \cite{SandersBinney2014} the parameters of the toy potential were chosen
@@ -514,11 +514,11 @@ sufficient.
 
 Several criteria for a sufficient sampling of toy angle space were discussed
 by \cite{SandersBinney2014}. For each vector $\bs{n}$ we compute the minimum
-and maximum values of $\bs{n}\cdot\btheta$ (where $\btheta$ are unrolled continuous
+and maximum values of $\bs{n}\cdot\btheta'$ (where $\btheta'$ are unrolled continuous
 angles i.e. not $2\pi$ periodic). If the difference between the minimum and
-maximum value of $\bs{n}\cdot\btheta$ is less than $2\pi$ we repeat the algorithm
+maximum value of $\bs{n}\cdot\btheta'$ is less than $2\pi$ we repeat the algorithm
 with $N_T\rightarrow 2N_T$. Secondly if for any mode
-$\hbox{range}(\bs{n}\cdot\btheta)/N_T>\pi$ the density of the sampling is too low to
+$\hbox{range}(\bs{n}\cdot\btheta')/N_T>\pi$ the density of the sampling is too low to
 constrain the mode $\bs{n}$ and we repeat the algorithm with
 $N_\mathrm{samp}\rightarrow 2N_\mathrm{samp}$. For our standard setup we use
 $N_T=8$, $N_\mathrm{samp}=300$ and $N_{\rm max}=8$.
@@ -547,8 +547,8 @@ true actions:
 =\int{\mathrm{d}^3\btheta'\over(2\pi)^3}\,\boldsymbol{J}'.
 \end{equation}
  The task now is to estimate the value of the integral on the right given values
-of $\bs{J}$ at irregularly distributed points $\btheta$. This can be done to
-reasonable accuracy provided the points $\btheta$ provide good coverage of
+of $\bs{J}'$ at irregularly distributed points $\btheta'$. This can be done to
+reasonable accuracy provided the points $\btheta'$ provide good coverage of
 the basic cube of angle space. This ``AvGF'' method avoids solving elaborate matrix
 equations, so it is simple to code. For the standard setup we use the same
 parameters as for the O2GF method.
@@ -867,7 +867,7 @@ coordinates are related to the generating function, $S$, by
 In an axisymmetric  St\"ackel  potential this generating function has the form
 \begin{equation}
 S(\lambda,\phi,\nu,J_r,J_\phi,J_z) = \int^\lambda\mathrm{d}\lambda\,p_\lambda
-+\int^\phi\mathrm{d}\phi\,p_\phi+\int^z\mathrm{d}\nu\,p_\nu.
++\int^\phi\mathrm{d}\phi\,p_\phi+\int^\nu\mathrm{d}\nu\,p_\nu.
 \end{equation}
  The angle coordinates can be computed by writing
 \begin{equation}
@@ -929,8 +929,8 @@ level of accuracy. The  axisymmetric methods we compare are
 \item St\"ackel Fudge with $\Delta$ chosen from shell orbits (Fudge v2), Section~\ref{Method::SF}
 \item Locally fitting St\"ackel potentials (Fit), Section~\ref{Method::FIT}
 \item Iterative torus construction (ItTC), Section~\ref{Method::ItTorus}
-\item Averaging toy actions over toy angles (AvGF), Section~\ref{Method::AvGenfunc}
 \item Computing the generating function  from an orbit (O2GF), Section~\ref{Method::Genfunc}
+\item Averaging toy actions over toy angles (AvGF), Section~\ref{Method::AvGenfunc}
 \end{enumerate}
  We begin by inspecting numerically estimated actions at a series of times
 along single orbits (Section~\ref{SingleOrbs}) and we go on to investigate
@@ -1185,7 +1185,7 @@ replacing the realistic Galactic potential by a flattened
 logarithmic potential ($q=0.9$). The errors with the actions are much
 smoother in this case and resonances are not evident. The magnitude of
 the errors in the actions are very similar to those in the more realistic
-potential with all the non-convergent St\"ackel methods producing very similar magnitude errors that are a factor of ten smaller errors than the CAA and the AvGF and ItTC methods producing errors another factor of ten smaller for the most eccentric orbits. The O2GF method produces significantly smaller errors ($\sim$ a factor
+potential with all the non-convergent St\"ackel methods producing very similar magnitude errors that are a factor of ten smaller errors than the CAA, and the AvGF and ItTC methods producing errors another factor of ten smaller for the most eccentric orbits. The O2GF method produces significantly smaller errors ($\sim$ a factor
 of ten) as the smoothness of the potential means fewer terms are
 required in the generating function.
 
@@ -1298,8 +1298,8 @@ method.
 There are three parameters to choose for the O2GF method: the
 integration time $N_T$, the number of samples $N_\mathrm{samp}$ and the
 number of Fourier coefficients (controlled by the parameter
-$N_\mathrm{max}$). We found that the error in the action
-was most strongly a function of the number of Fourier coefficients. For the
+$N_\mathrm{max}$). The error in the action proves to be 
+most strongly a function of the number of Fourier coefficients. For the
 frequencies and angles the error is also affected by the total integration
 time.
 
@@ -1380,13 +1380,13 @@ We began by comparing the actions estimated along four representative orbits
 in a multi-component axisymmetric Galactic potential. We went on to compare
 the accuracy of the actions, frequencies and angles for a large number of
 orbits in the same potential, and we finally discussed the computational
-speed of each method. The time required to compute an action varies by three
+speed of each method. The time required to compute an action varies by three to four
 orders of magnitude between the cheapest method, the St\"ackel Fudge, and the
 most expensive method, ItTC.  We gave distribution functions for components of the Milky Way and compared the accuracy of the action estimates yielded from the various methods with the relative error in the corresponding evaluation of the distribution function. The accuracy of
-St\"ackel Fudge v1 is sufficient for most applications with the possible
+St\"ackel Fudge v1 is sufficient for modelling the smooth phase-mixed components of the Galaxy (the disc and halo) with the possible
 exception of some thick-disc orbits. The convergent methods O2GF and
-ItTC provide significantly more accuracy that one normally requires,
-except possibly at powerful resonances.
+ItTC provide significantly more accuracy than one normally requires,
+except possibly at powerful resonances and when modelling cold structures such as tidal streams.
 
 The accuracy of all methods deteriorates in the vicinity of major resonances
 such as the resonance $\Omega_r/\Omega_z=1$. Orbits can become trapped at
@@ -1404,7 +1404,7 @@ actions and angles of trapped orbits can be evaluated by torus mapping.
 Action, angle and frequency variables have proved important tools for modelling dynamical systems, and with arrival of the Gaia data on the horizon the need for robust, accurate and rapid routines for estimating the actions is great. We have demonstrated that there are powerful algorithms that are appropriate for a wide range of modelling requirements and that promise to be indispensable for understanding and dissecting the Gaia data.
 
 \section*{Acknowledgments}
-We thank Angus Williams for reading a draft of this paper and constructing the backronym `The Action Computation Tool' for the \texttt{tact} code.
+JLS acknowledges the financial support of the Science and Technologies Facilities Council (STFC). This project was made possible through the use of following open-source software: the Gnu Science Library \citep[GSL]{GSL}, the \texttt{cuba} multidimensional integration library \citep{cuba}, and the Python packages \texttt{numpy} \citep{numpy} and \texttt{matplotlib} \citep{matplotlib}. We thank Angus Williams for reading a draft of this paper and constructing the backronym `The Action Computation Tool' for the \texttt{tact} code.
 
 \bibliography{bibliography}
 \bibliographystyle{mn2e}
