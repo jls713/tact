@@ -230,12 +230,12 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 		haloJRerr=1./halo_dff(J,alpha0,alphainf,f,delta,v0,r0,rad=True)
 		haloJzerr=1./halo_dff(J,alpha0,alphainf,f,delta,v0,r0,rad=False)
 
-		a[0].fill_between(JRJz,errfac1*haloJRerr,errfac2*haloJRerr,alpha=0.2,color=sns.color_palette()[2])
-		a[1].fill_between(JRJz,errfac1*haloJzerr,errfac2*haloJzerr,alpha=0.2,color=sns.color_palette()[2])
+		a[0].fill_between(JRJz,errfac1*haloJRerr,errfac2*haloJRerr,alpha=0.4,color=sns.color_palette()[4])
+		a[1].fill_between(JRJz,errfac1*haloJzerr,errfac2*haloJzerr,alpha=0.4,color=sns.color_palette()[4])
 		a[0].annotate('Halo', xy=(0.0012,errfac2*haloJRerr[0]), fontsize=12,
-		                horizontalalignment='left', verticalalignment='bottom',color=sns.color_palette()[2])
+		                horizontalalignment='left', verticalalignment='bottom',color=sns.color_palette()[4])
 		a[1].annotate('Halo', xy=(0.0012,errfac2*haloJzerr[0]), fontsize=12,
-		                horizontalalignment='left', verticalalignment='bottom',color=sns.color_palette()[2])
+		                horizontalalignment='left', verticalalignment='bottom',color=sns.color_palette()[4])
 
 		streamJRerr=(results.T[5]-results.T[4])/np.pi
 		streamLzerr = results.T[4]/np.pi
@@ -245,13 +245,13 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 
 		a[0].set_xlim(0.001,0.6) #JRJz[-1])
 		a[1].set_xlim(0.001,0.6) #JRJz[-1])
-		a[0].fill_between(JRJz,sigmav1*streamJRerr,sigmav2*streamJRerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[4])
-		a[1].fill_between(JRJz,sigmav1*streamJzerr,sigmav2*streamJzerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[4])
+		a[0].fill_between(JRJz,sigmav1*streamJRerr,sigmav2*streamJRerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[2])
+		a[1].fill_between(JRJz,sigmav1*streamJzerr,sigmav2*streamJzerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[2])
 		if(JRJz[-1]>0.01):
 			a[0].annotate('Stream', xy=(JRJz[JRJz>0.01][0],sigmav1*1.3*streamJRerr[JRJz>0.01][0]), fontsize=12,
-		                horizontalalignment='left', verticalalignment='top',color=sns.color_palette()[4],rotation=20)
+		                horizontalalignment='left', verticalalignment='top',color=sns.color_palette()[2],rotation=20)
 			a[1].annotate('Stream', xy=(JRJz[JRJz>0.01][0],sigmav1*1.3*streamJzerr[JRJz>0.01][0]), fontsize=12,
-		                horizontalalignment='left', verticalalignment='top',color=sns.color_palette()[4],rotation=20)
+		                horizontalalignment='left', verticalalignment='top',color=sns.color_palette()[2],rotation=20)
 
 	offsets=[1.,1.5,1.,1.15,0.85,1.,1.,1.]
 	offsets2=[1.,1.,1.,1.1,0.9,1.,1.,1.]
@@ -385,9 +385,9 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 		streamOmperr=np.sqrt(Omg[:,1,1])
 		streamOmzerr=np.sqrt(Omg[:,2,2])
 
-		a[0].fill_between(JRJz,sigmav1*streamOmRerr,sigmav2*streamOmRerr,where=(JRJz>0.01)*(JRJz<0.38),alpha=0.2,color=sns.color_palette()[4])
-		a[1].fill_between(JRJz,sigmav1*streamOmperr,sigmav2*streamOmperr,where=(JRJz>0.01)*(JRJz<0.38),alpha=0.2,color=sns.color_palette()[4])
-		a[2].fill_between(JRJz,sigmav1*streamOmzerr,sigmav2*streamOmzerr,where=(JRJz>0.01)*(JRJz<0.38),alpha=0.2,color=sns.color_palette()[4])
+		a[0].fill_between(JRJz,sigmav1*streamOmRerr,sigmav2*streamOmRerr,where=(JRJz>0.01)*(JRJz<0.38),alpha=0.2,color=sns.color_palette()[2])
+		a[1].fill_between(JRJz,sigmav1*streamOmperr,sigmav2*streamOmperr,where=(JRJz>0.01)*(JRJz<0.38),alpha=0.2,color=sns.color_palette()[2])
+		a[2].fill_between(JRJz,sigmav1*streamOmzerr,sigmav2*streamOmzerr,where=(JRJz>0.01)*(JRJz<0.38),alpha=0.2,color=sns.color_palette()[2])
 	# if(JRJz[-1]>0.01):
 	# 	a[0].annotate('Stream', xy=(JRJz[1:][JRJz[1:]>0.01][0],sigmav1*2.7*streamOmRerr[JRJz[1:]>0.01][0]), fontsize=12,
 	#                 horizontalalignment='left', verticalalignment='top',color=sns.color_palette()[4],rotation=10)
@@ -455,9 +455,9 @@ def time_plot(results_file,with_res=False,with_boxes=False):
 		r1=0.1
 		r2=0.01
 
-		a[0].fill_between(JRJz,r1*streamThRerr,r2*streamThRerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[4])
-		a[1].fill_between(JRJz,r1*streamThperr,r2*streamThperr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[4])
-		a[2].fill_between(JRJz,r1*streamThzerr,r2*streamThzerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[4])
+		a[0].fill_between(JRJz,r1*streamThRerr,r2*streamThRerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[2])
+		a[1].fill_between(JRJz,r1*streamThperr,r2*streamThperr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[2])
+		a[2].fill_between(JRJz,r1*streamThzerr,r2*streamThzerr,where=JRJz>0.01,alpha=0.2,color=sns.color_palette()[2])
 	# if(JRJz[-1]>0.01):
 	# 	a[0].annotate('Stream', xy=(JRJz[JRJz>0.01][0],r1*0.9*streamThRerr[JRJz>0.01][0]), fontsize=12,
 	#                 horizontalalignment='left', verticalalignment='top',color=sns.color_palette()[4],rotation=-15)

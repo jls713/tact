@@ -353,8 +353,8 @@ From equation~\eqref{eqn::axi_stackel} we see that the derivative
 \frac{\partial^2}{\partial\lambda\partial\nu}\Big[(\lambda-\nu)\Phi_{\rm S,obl}\Big]=0.
 \]
 This expression can be rewritten in terms of $R$ and $z$ derivatives
-as\footnote{Note that in equation (8) of \cite{Sanders2012a} a minus sign is
-missing on the right hand side.}
+as\footnote{This equation corresponds to equation (8) of \cite{Sanders2012a} except in that paper a minus sign is
+missing on the right hand side of the equation.}
 \begin{equation}
 \begin{split}
 \Delta^2 &= a^2-c^2 \\
@@ -365,8 +365,7 @@ z^2}\Big)\Big]\bigg/\frac{\partial^2 \Phi}{\partial R\partial z},
 \end{split}
 \label{DeltaGuess}
 \end{equation}
-where we have dropped the subscript S,obl for brevity.
-
+where we have dropped the subscript S,obl for brevity. We will use this expression to find an approximate $\Delta$ for general axisymmetric potentials in Section~\ref{Sect::MethodsNC}.
 
 
 \section{Convergent methods}\label{Sect::MethodsC}
@@ -422,7 +421,7 @@ while the angles are related by
 \label{targetang}
 \end{equation}
  Given a true action $\bs{J}$ and a trial set of coefficients
-$S_{\bs{n}}$, for each point on a regular grid in toy angle in $\btheta'$ the
+$S_{\bs{n}}$, for each point on a regular grid in toy angle $\btheta'$ the
 corresponding toy actions $\bs{J}'$ are found from equation~\eqref{toyact}.
 The coordinates $(\bs{x},\bs{v})$ are then recovered from the toy
 potential's analytic formulae, and the true Hamiltonian is evaluated at
@@ -603,7 +602,7 @@ argued that since the vertical frequency $\Omega_z$ of a disc star is
 significantly larger than its radial frequency $\Omega_r$, the potential that
 governs vertical oscillations may be considered to vary slowly as the star
 oscillates radially, with the consequence that $J_z$ is adiabatically
-invariant.  \citet{BinneyMcMillan2011} showed that a better approximations to
+invariant.  \citet{BinneyMcMillan2011} showed that a better approximation to
 orbits can be obtained by replacing $J_\phi$ by $|J_\phi|+J_z$ in the formula
 for the effective radial potential.  \citet{Schonrich2012} observed that
 conservation of energy requires that variation along the orbit in the energy
@@ -788,7 +787,7 @@ equation~\eqref{Eq::action}. We note that for the $\lambda$ integral we keep
 $\nu$ fixed at the input value, and vice versa.
 
 \cite{Binney2014_ISO} used an alternative to equation \eqref{DeltaGuess} as a
-method of estimating $\Delta$. At each energy and $L_z$ a shell orbit $J_r=0$
+method of estimating $\Delta$. At each energy and $J_\phi$ a shell orbit $J_r=0$
 is computed and an ellipse is fitted to the orbit in the meridional plane.
 The location of the focus of the ellipse gives an estimate of $\Delta$. When
 $\Delta$ is determined from equation \eqref{DeltaGuess} we shall refer to the
@@ -797,8 +796,7 @@ orbits as just described, we will call the method St\"ackel Fudge v2.
 We test both methods below.
 
 \subsubsection{Triaxial case}\label{Method::SF_Triax}
-
-Given a general triaxial potential, we define the quantities
+The above procedure is simply generalized to triaxial potentials. Given a general triaxial potential, we define the quantities
 \begin{equation}
 \begin{split}
 \chi_\lambda(\lambda,\mu,\nu) &\equiv (\lambda-\mu)(\nu-\lambda)\Phi(\lambda,\mu,\nu),\\
@@ -1095,9 +1093,9 @@ solid orange line is for the St\"ackel fitting method, the blue
 dashed line is for the ItTC method, the green dashed line is for the
 O2GF method and the pink dashed line is for the AvGF method.  The coloured
 bands show the region in which the relative error in the action-based
-distribution functions for the thin (red), thick (green) and halo (red)
+distribution functions for the thin (red), thick (green) and halo (yellow)
 components are between $1$ and $10\percent$. The upper and lower boundaries
-of the yellow band correspond to the action-space widths of a stream shed
+of the red band correspond to the action-space widths of a stream shed
 from a progenitor that has
 velocity dispersions of $5$ and $0.5\kms$. The chosen horizontal limits of
 these bands are $\log f/f_{\rm max}=-5$ for the thin and thick components and
@@ -1112,7 +1110,7 @@ $$\includegraphics[width=\columnwidth]{{{plots/many_tori_output.dat.freq}}}$$
 methods: the top panel shows the radial frequency, middle panel the azimuthal
 and bottom panel the vertical frequency. Each panel shows the root-mean-squared deviations of the estimates from the mean computed using the O2GF method. The colour-coding and range of
 orbits explored are as in Fig.~\protect\ref{MultiOrbits}. The solid black lines show the frequencies of the orbits computed using the O2GF method. The upper and lower
-boundaries of the yellow band correspond to the frequency widths of streams
+boundaries of the red band correspond to the frequency widths of streams
 with velocity dispersions of $5$ and $0.5\kms$. The vertical grey dashed
 lines correspond to resonances $x:y$ when $\Omega_R/\Omega_z=x/y$.}
 \label{MultiOrbits_Freq}
@@ -1124,7 +1122,7 @@ $$\includegraphics[width=\columnwidth]{{{plots/many_tori_output.dat.ang}}}$$
 methods for multiple orbits: the top panel shows the radial angle, middle
 panel the azimuthal and bottom the vertical. The colour-coding and the range
 of orbits explored are as in \protect\ref{MultiOrbits}. Each panel shows the root-mean-squared deviations of the estimates from the angles computed using the O2GF method. The O2GF line shows the root-mean-squared deviations from the angles computed using $\theta_i(0)+\langle\Omega_i\rangle t$. The upper and lower
-boundaries of the yellow band correspond to the angle widths of streams with
+boundaries of the red band correspond to the angle widths of streams with
 scale radii of $100$ and $10\pc$. The vertical grey dashed lines correspond
 to resonances $x:y$ when $\Omega_R/\Omega_z=x/y$.} \label{MultiOrbits_Ang}
 \end{figure}
@@ -1172,7 +1170,7 @@ from the mean of the frequencies returned by the O2GF method, and in
 Figure~\ref{MultiOrbits_Ang} we show the RMS deviation of the angles from
 those computed with the O2GF method. Again the O2GF
 method shows clear superiority at all eccentricities, followed by the
-ItTC method. Of the St\"ackel-based non-convergent methods the broad picutre is that St\"ackel fitting performs best followed by the St\"ackel Fudge, the SAA and finally the CAA. An exception to this in the azimuthal frequency, $\Omega_\phi$ where the SAA performs worst and the CAA is competitive with St\"ackel fitting. Additionally, the SAA angle estimation is very competetive at low eccentricities. The vertical frequency estimates for both the CAA and SAA are peaky due to the interpolation grid that is used. Again we see a striking deterioration in the performance
+ItTC method. Of the St\"ackel-based non-convergent methods the broad picture is that St\"ackel fitting performs best followed by the St\"ackel Fudge, the SAA and finally the CAA. An exception to this is the azimuthal frequency $\Omega_\phi$ where the SAA performs worst and the CAA is competitive with St\"ackel fitting. Additionally, the SAA angle estimation is very competitive at low eccentricities. The vertical frequency estimates for both the CAA and SAA are peaky due to the interpolation grid that is used. Again we see a striking deterioration in the performance
 of the O2GF method at resonances. The deleterious impact of resonances is
 particularly marked in the case of the angle variables.
 
@@ -1185,8 +1183,8 @@ replacing the realistic Galactic potential by a flattened
 logarithmic potential ($q=0.9$). The errors with the actions are much
 smoother in this case and resonances are not evident. The magnitude of
 the errors in the actions are very similar to those in the more realistic
-potential with all the non-convergent St\"ackel methods producing very similar magnitude errors that are a factor of ten smaller errors than the CAA, and the AvGF and ItTC methods producing errors another factor of ten smaller for the most eccentric orbits. The O2GF method produces significantly smaller errors ($\sim$ a factor
-of ten) as the smoothness of the potential means fewer terms are
+potential with all the non-convergent St\"ackel methods producing very similar magnitude errors that are a factor of ten smaller errors than the CAA, and the AvGF and ItTC methods producing errors another factor of ten smaller for the most eccentric orbits. The O2GF method produces significantly smaller errors in the logarithmic potential than in the multicomponent potential ($\sim$ a factor
+of ten) as the smoothness of the logarithmic potential means fewer terms are
 required in the generating function.
 
 \subsection{Computational time}
@@ -1284,7 +1282,7 @@ that the St\"ackel Fudge v1 comes too high for safety only in a small range
 of values of $(J_r+J_z)/|J_\phi|$, so even this cheap and cheerful method is
 adequate for all but a few thick-disc orbits.
 
-The spread in frequencies and angles we have computed is averaged over many orbital periods. In reality, when modelling a stream the stream particles are confined to a much narrower range of angles. The frequency estimation for the collection of particles may be systematically offset from the truth due to the phase of the stream but we anticipate the inter-particle frequency separations will be well resolved.
+The spread in frequencies and angles we have computed is averaged over many orbital periods. In reality, when modelling a stream the stream particles are confined to a much narrower range of angles. The frequency estimation for the collection of particles may be systematically offset from the truth due to the phase of the stream but we anticipate the inter-particle frequency separations will be well resolved. Therefore, we can perhaps get away with slightly larger errors in the frequency estimation than those suggested by the \emph{stream} band in Figure~\ref{MultiOrbits_Freq}.
 
 \subsection{Convergence of the O2GF method}
 
@@ -1298,7 +1296,7 @@ method.
 There are three parameters to choose for the O2GF method: the
 integration time $N_T$, the number of samples $N_\mathrm{samp}$ and the
 number of Fourier coefficients (controlled by the parameter
-$N_\mathrm{max}$). The error in the action proves to be 
+$N_\mathrm{max}$). The error in the action proves to be
 most strongly a function of the number of Fourier coefficients. For the
 frequencies and angles the error is also affected by the total integration
 time.
@@ -1347,8 +1345,8 @@ is described by \cite{BinneyMcMillan2015}.
 Each algorithm discussed in the paper is implemented as an
 \texttt{Action\_Finder} class. These classes take as arguments instances of a
 potential class (\texttt{Potential\_JS}), and all have methods
-\texttt{actions} and \texttt{angles} that return the actions, angles and
-frequencies given some Cartesian 6D phase-space point $(x,y,z,v_x,v_y,v_z)$.
+\texttt{actions} and \texttt{angles} that return the actions, and angles and
+frequencies respectively given some Cartesian 6D phase-space point $(x,y,z,v_x,v_y,v_z)$.
 It should be simple for users to specify their own potential by implementing
 an inherited class of \texttt{Potential\_JS} and defining a method
 \texttt{Phi} that returns the potential and a method \texttt{Forces} that
@@ -1357,7 +1355,7 @@ used with custom potentials.
 
 \section{Conclusions}\label{Sect::Conclusions}
 
-We have reviewed of the currently available algorithms for
+We have reviewed the currently available algorithms for
 estimating actions, angles and frequencies in general potentials. We began by presenting a discussion of the separable potentials in which these quantities can be expressed as simple quadratures. The most general such class of potentials is the triaxial St\"ackel potentials of which axisymmetric St\"ackel potentials and spherical potentials are limiting cases. The only case in which the actions can be computed analytically is the isochrone potential. The existence of actions in more general systems has been demonstrated from numerical experiments but there is no way to simply compute the actions in a general potential. The results from the special separable cases have inspired and aided work in creating numerical algorithms for action estimation in general potentials and we have collected together and summarised these algorithms.
 
 We focused
@@ -1401,7 +1399,7 @@ occur). Currently there is no general-purpose tool that will evaluate the
 true actions of a trapped orbit, although \cite{KaasalainenB} showed that the
 actions and angles of trapped orbits can be evaluated by torus mapping.
 
-Action, angle and frequency variables have proved important tools for modelling dynamical systems, and with arrival of the Gaia data on the horizon the need for robust, accurate and rapid routines for estimating the actions is great. We have demonstrated that there are powerful algorithms that are appropriate for a wide range of modelling requirements and that promise to be indispensable for understanding and dissecting the Gaia data.
+Action, angle and frequency variables have proved important tools for modelling dynamical systems, and with the arrival of the Gaia data on the horizon the need for robust, accurate and rapid routines for estimating the actions is great. We have demonstrated that there are powerful algorithms that are appropriate for a wide range of modelling requirements and that promise to be indispensable for understanding and dissecting the Gaia data.
 
 \section*{Acknowledgments}
 JLS acknowledges the financial support of the Science and Technologies Facilities Council (STFC). This project was made possible through the use of following open-source software: the Gnu Science Library \citep[GSL]{GSL}, the \texttt{cuba} multidimensional integration library \citep{cuba}, and the Python packages \texttt{numpy} \citep{numpy} and \texttt{matplotlib} \citep{matplotlib}. We thank Angus Williams for reading a draft of this paper and constructing the backronym `The Action Computation Tool' for the \texttt{tact} code.
@@ -1486,7 +1484,7 @@ constructed around the true torus. We use this matrix to convert the action
 spreads in equation~\eqref{ActionSpread} into frequency spreads
 $\bsigma_{\Omega i}$.
 
-McMillan (2016,in prep.) shows that the initial angle spreads of
+McMillan (2016, in prep.) shows that the initial angle spreads of
 particles released into a tidal stream from a progenitor are given by
 \begin{equation}
 \begin{split}
