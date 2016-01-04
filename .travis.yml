@@ -54,7 +54,7 @@ before_script:
   - if [ "$CXX" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
   - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
 
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4" CC="clang-3.4"; fi
   - sudo apt-get install -qq libgtest-dev
   - "cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -"
   - if [ "$TORUS" == 1 ]; then wget http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/libebf_c_cpp-0.0.3.tar.gz && tar -xvzf libebf_c_cpp-0.0.3.tar.gz && cd libebf_c_cpp-0.0.3 && ./configure --prefix=$(pwd) && make && make install && cd ..; fi
