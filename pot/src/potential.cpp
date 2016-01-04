@@ -586,6 +586,15 @@ double GalPot::Vc(double R){
 }
 
 #endif
+
+double PowerLawSphericalExpCut::Phi_r(double r){
+	double rrc2 = r/rc; rrc2*=rrc2;
+    return amp/r*(r/rc*sgk2*gamma_incP_fn(mk2,rrc2)-sg15k2*gamma_incP_fn(m5k2,rrc2));
+}
+double PowerLawSphericalExpCut::dPhi_r(double r){
+	double rrc2 = r/rc; rrc2*=rrc2;
+	return amp*gamma_incP_fn(m5k2,rrc2)*sg15k2/r/r;
+}
 // ============================================================================
 // Bowden NFW Potential
 // ============================================================================

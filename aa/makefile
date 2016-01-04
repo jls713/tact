@@ -118,7 +118,7 @@ genfunc_test.exe: $(OBJECTS)
 	$(CCOMPILER) $(OPTS) -o genfunc_test.exe $(OBJECTS) $(LIB) $(CUBA)
 
 test.exe: $(OBJECTS) $(OBJ)test.o
-	$(CCOMPILER) $(OPTS) -o test.exe $(OBJECTS) $(OBJ)test.o $(LIB) $(CUBA)
+	$(CCOMPILER) $(OPTS) -o test.exe $(OBJECTS) $(OBJ)test.o $(INC) $(LIB) $(CUBA) $(TORUSFLAG) $(LAPACKFLAG)
 
 mains/test_actions.exe: $(OBJECTS) $(OBJ)test_actions.o
 	$(CCOMPILER) $(OPTS) -o mains/test_actions.exe $(OBJECTS) $(OBJ)test_actions.o $(LIB) $(CUBA) -static-libstdc++

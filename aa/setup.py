@@ -85,6 +85,7 @@ setup(name="aa_py",
                     extra_compile_args=['-fPIC', '-shared', '-std=c++0x',
                                         '-Wall', '-O3',
                                         '-ffast-math', '-fPIC', '-fopenmp',
-                                        'TORUS='+str(TorusFlag),
-                                        'LAPACK='+str(LapackFlag)])
+                                        '-DTORUS','-DLAPACK'])
+                                        # 'TORUS='+str(TorusFlag),
+                                        # 'LAPACK='+str(LapackFlag)])
       ])

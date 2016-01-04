@@ -71,7 +71,7 @@
 \definecolor{darkblue}{rgb}{0.0, 0.0, 0.55}
  \definecolor{darkgreen}{rgb}{0.0, 0.2, 0.13}
 \usepackage[colorlinks=true,linkcolor=darkred,citecolor=darkblue,urlcolor=darkgreen]{hyperref}
-\title{A review of action estimation methods for galactic dynamics}
+\title[Action estimation methods for galactic dynamics]{A review of action estimation methods for galactic dynamics}
 \author[J. L. Sanders \& J. Binney]{Jason L. Sanders$^1$\thanks{E-mail: jls@ast.cam.ac.uk} \& James Binney$^2$\\
 $^1$Institute of Astronomy, Madingley Road, Cambridge, CB3 0HA\\
 $^2$Rudolf Peierls Centre for Theoretical Physics, Keble Road, Oxford, OX1 3NP, UK}
@@ -101,7 +101,7 @@ can be downloaded from
 \end{abstract}
 
 \begin{keywords}
-Galaxy, galaxies: kinematics and dynamics -- methods.
+Galaxy, galaxies: kinematics and dynamics -- methods: numerical.
 \end{keywords}
 
 \section{Introduction}
@@ -154,7 +154,7 @@ Approximation (SAA), has not been previously published. In
 Section~\ref{Sect::MethodComparison} we critically compare the methods under
 two headings: accuracy and computational cost. In Section \ref{Sect::Discuss}
 we compare the accuracy required in various applications to the accuracy
-achieved by the methods that deliver best value. We also
+achieved by the methods that deliver best value. The use of the presented methods in non-integrable Hamiltonians and the impact of resonant trapping is discussed. We also
 briefly discuss how changes of parameters affect the accuracy of one of the
 most powerful methods, and we outline the structure of the code we have made
 available. Section \ref{Sect::Conclusions} sums up. An appendix gives
@@ -955,6 +955,13 @@ $$\includegraphics[width=\columnwidth]{{{plots/halo.action}}}$$
 \centering
 $$\includegraphics[width=\columnwidth]{{{plots/stream.action}}}$$
 \end{minipage}
+%$$\includegraphics[width=\textwidth]{{{plots/thin.action}}}$$
+%\vspace{-0.9cm}
+%$$\includegraphics[width=\textwidth]{{{plots/thick.action}}}$$
+%\vspace{-0.92cm}
+%$$\includegraphics[width=\textwidth]{{{plots/halo.action}}}$$
+%\vspace{-0.9cm}
+%$$\includegraphics[width=\textwidth]{{{plots/stream.action}}}$$
 \caption{Comparison of action estimation methods for single orbits.
 In each set of panels the orbit's trace in the
 meridional plane $(R,z)$ is shown on the right.  The set
@@ -1093,7 +1100,7 @@ solid orange line is for the St\"ackel fitting method, the blue
 dashed line is for the ItTC method, the green dashed line is for the
 O2GF method and the pink dashed line is for the AvGF method.  The coloured
 bands show the region in which the relative error in the action-based
-distribution functions for the thin (red), thick (green) and halo (yellow)
+distribution functions for the thin (blue), thick (green) and halo (yellow)
 components are between $1$ and $10\percent$. The upper and lower boundaries
 of the red band correspond to the action-space widths of a stream shed
 from a progenitor that has
@@ -1282,7 +1289,62 @@ that the St\"ackel Fudge v1 comes too high for safety only in a small range
 of values of $(J_r+J_z)/|J_\phi|$, so even this cheap and cheerful method is
 adequate for all but a few thick-disc orbits.
 
-The spread in frequencies and angles we have computed is averaged over many orbital periods. In reality, when modelling a stream the stream particles are confined to a much narrower range of angles. The frequency estimation for the collection of particles may be systematically offset from the truth due to the phase of the stream but we anticipate the inter-particle frequency separations will be well resolved. Therefore, we can perhaps get away with slightly larger errors in the frequency estimation than those suggested by the \emph{stream} band in Figure~\ref{MultiOrbits_Freq}.
+The spread in frequencies and angles we have computed is averaged over many
+orbital periods. In reality, when modelling a stream the stream particles are
+confined to a much narrower range of angles. The frequency estimation for the
+collection of particles may be systematically offset from the truth due to
+the phase of the stream but we anticipate the inter-particle frequency
+separations will be well resolved. Therefore, we can perhaps get away with
+slightly larger errors in the frequency estimation than those suggested by
+the \emph{stream} band in Figure~\ref{MultiOrbits_Freq}.
+
+\subsection{Trapping by resonances}
+
+We have seen that results from different methods tend to diverge for orbits
+on which $\Omega_r{:}\Omega_z$ approaches a simple ratio such as 1:2 or 2:3.
+This finding arises because these orbits have become trapped by a resonance.
+The pre-requisite to a clear discussion of resonant trapping is the existence
+of a Hamiltonian $H_0$ that is similar to the actual Hamiltonian $H$ but in which
+resonant trapping does not occur. That is, for an  orbit $\vJ^{(0)}$ in
+$H_0$,
+$\Omega_r/\Omega_z=m/n$ for small integers $m$ and $n$, but on neighbouring
+orbits $\Omega_r/\Omega_z$ is an irrational number close to $m/n$. Given the
+existence of $H_0$ one can then understand resonant trapping by considering
+the impact on orbits in $H_0$ of the small perturbation $\Delta\equiv H-H_0$
+\citep[e.g.][]{Binney2013}.
+
+Perturbation theory allows one to estimate the extent of the region in action
+space within which the perturbation $\Delta$ will cause orbits to become
+trapped by the $m{:}n$ resonance. It may happen that this region overlaps
+with the region of entrapment by another resonance, associated with different
+integers. In this case, $\Delta$ causes orbits in $H_0$ that lie in the
+overlap region to become chaotic in the sense that they cease to be
+quasi-periodic \citep{Chirikov1979,Binney2013}.
+
+Resonantly trapped quasi-periodic orbits have actions, but we cannot take
+two of these actions to be $J_r$ and $J_z$; instead we must use a linear combination
+of $J_r$ and $J_z$ complemented by a new action that quantifies the extent of
+their libration about the underlying resonant orbit. Chaotic orbits do not
+admit a full complement of action integrals.
+
+The applications we have in mind for actions assume that negligibly few
+orbits are resonantly trapped, so all orbits can be characterised by
+$J_r,J_\phi$ and $J_z$.  Consequently, what we ask of a method of action
+determination, is that when it is confronted by a trapped orbit, it returns
+the actions of one of the orbits in $H_0$ that is trapped into the given
+orbit. We say ``one of'' because a given orbit in $H_0$ can be trapped into
+many different orbits in $H$, and a given orbit in $H$ can be reached from
+many orbits in $H_0$. Hence resonant trapping obliges us to allow a certain
+fuzziness in the meaning of actions. If the \df\ returns similar values for
+all actions in the range of a given region of entrapment, this fuzziness is
+likely to be unimportant. Thus, the criterion for resonant trapping to be
+unimportant is closely related to the criterion we have explored for errors
+from action finders being unimportant.
+
+The nearby integrable Hamiltonian $H_0$ can be constructed by torus mapping
+\citep{KaJJB94:PhysRev,BinneyMcMillan2015},
+and we hope shortly to present practical details of how this is best
+achieved.
 
 \subsection{Convergence of the O2GF method}
 

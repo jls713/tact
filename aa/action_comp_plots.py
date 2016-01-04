@@ -17,12 +17,12 @@ import seaborn as sns
 
 kms2kpcGyr = 1000./977.775
 
-def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None):
+def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None,MNL=[5,5]):
 	results = np.genfromtxt(results_file)
 	labels = [r'Fudge v1','ItTC','O2GF','AvGF',r'Fudge v2','CAA','SAA',r'Fit']
-	f = plt.figure(figsize=(6.64,3))
+	f = plt.figure(figsize=(4.,2.))
 
-	a=[plt.subplot2grid((2,2),(i,0),colspan=1,rowspan=1) for i in range(2)]
+	a=[plt.subplot2grid((2,4),(i,0),colspan=3,rowspan=1) for i in range(2)]
 
 	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[5],sns.color_palette()[4],sns.color_palette("Set1",5,desat=.6)[4]]
 
@@ -30,7 +30,107 @@ def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None):
 
 	times = results.T[0]
 
-	plt.subplots_adjust(hspace=0.)
+	plt.subplots_adjust(hspace=0.,wspace=0.6)
+	JR = np.mean(results.T[5])
+	Jz = np.mean(results.T[6])
+	R = np.sqrt(results.T[17]*results.T[17]+results.T[18]*results.T[18])
+	T=[0.,0.]
+	NN=0
+	for i in range(1,len(R)-2):
+		if(R[i-1]>R[i] and R[i+1]>R[i]):
+			if(T[0]==0.):
+				T[0]=times[i]
+			else:
+				T[1]=times[i]
+				NN+=1
+			# for i in range(2):
+	# 	a[i].set_xlim(0.,1000.)
+	TR = (T[1]-T[0])/NN
+	Mx = times[-1]/TR
+	if(rangess):
+		Mx=rangess
+	spreads = np.zeros(shape=(9,2))
+	spreads[0][0]=np.mean(results.T[5]) # pass actions as first argument
+	spreads[0][1]=np.mean(results.T[6])
+	for N,i in enumerate([5,6,0,4,7,1,3,2]):
+		JRspread = np.std(results.T[i*2+1])
+		Jzspread = np.std(results.T[i*2+2])
+		## pass back std wrt genfunc method
+		spreads[N+1]=np.array([np.sqrt(np.mean((results.T[i*2+1]-spreads[0][0])**2)),
+		                       np.sqrt(np.mean((results.T[i*2+2]-spreads[0][1])**2))])
+		n=i
+		if(i>5):
+			n=i-6
+		if i in dontplot:
+			continue
+		l1, = a[0].plot((times-T[0])/TR,results.T[i*2+1],label=labels[i],lw=.5,ls=dashed[i],color=colors[i])
+		l2, = a[1].plot((times-T[0])/TR,results.T[i*2+2],lw=0.5,ls=dashed[i],color=colors[i])
+		if(i==1 or i==2 or i==3):
+			l1.set_dashes((2,1))
+			l2.set_dashes((2,1))
+		x,y=np.array([[1.02*Mx+Mx*0.015*N,1.02*Mx+Mx*0.015*N],[JR-JRspread,JR+JRspread]])
+		line = lines.Line2D(x, y, lw=2.,ls=dashed[i],color=colors[i])
+		if(i==1 or i==2 or i==3):
+			line.set_dashes((0.5,0.25))
+		line.set_clip_on(False)
+		a[0].add_line(line)
+		x,y=np.array([[1.02*Mx+Mx*0.015*N,1.02*Mx+Mx*0.015*N],[Jz-Jzspread,Jz+Jzspread]])
+		line = lines.Line2D(x, y, lw=2.,ls=dashed[i],color=colors[i])
+		if(i==1 or i==2 or i==3):
+			line.set_dashes((0.5,0.25))
+		line.set_clip_on(False)
+		a[1].add_line(line)
+	if(Jranges):
+		a[0].set_ylim(Jranges[0][0],Jranges[0][1])
+		a[1].set_ylim(Jranges[1][0],Jranges[1][1])
+
+	plt.setp(a[0].get_xticklabels(),visible=False)
+	plt.setp(a[1].get_yticklabels()[-1],visible=False)
+
+	a[0].set_xlabel(r'$t/T_R$')
+	a[1].set_xlabel(r'$t/T_R$')
+	a[0].set_ylabel(r'$J_R/\mathrm{kpc\,km\,s}^{-1}$')
+	a[1].set_ylabel(r'$J_z/\mathrm{kpc\,km\,s}^{-1}$')
+
+	leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower left', bbox_to_anchor=(-0.05, 1.0),fontsize=10)
+	# set the linewidth of each legend object
+	for legobj in leg.legendHandles:
+	    legobj.set_linewidth(2.0)
+	a[0].set_xlim(0.,Mx)
+	a[1].set_xlim(0.,Mx)
+
+	a = plt.subplot2grid((2,4),(0,3),colspan=1,rowspan=2)
+	a.plot(R,results.T[19],lw=0.5,color='k')
+	a.set_ylabel(r'$z/\mathrm{kpc}$')
+	a.set_xlabel(r'$R/\mathrm{kpc}$')
+	a.set_aspect('equal')
+	a.yaxis.tick_right()
+	a.yaxis.set_label_position("right")
+	a.annotate(name, xy=(0.95,1.02), xycoords='axes fraction', fontsize=14,
+	                horizontalalignment='right', verticalalignment='bottom')
+	a.xaxis.set_major_locator(MaxNLocator(MNL[0]))
+	a.yaxis.set_major_locator(MaxNLocator(MNL[1]))
+	a.tick_params('both', length=3, width=1, which='major')
+	plt.savefig(results_file+'.action.pdf',bbox_inches='tight')
+	return spreads
+
+from matplotlib import gridspec
+from matplotlib.ticker import MaxNLocator
+
+def method_comparison2(results_file,name,dontplot=[],rangess=None,Jranges=None,legend=False,MNL=[5,5]):
+	results = np.genfromtxt(results_file)
+	labels = [r'Fudge v1','ItTC','O2GF','AvGF',r'Fudge v2','CAA','SAA',r'Fit']
+	f = plt.figure(figsize=(9.,2.))
+	gs = gridspec.GridSpec(1,3,width_ratios=[1,1,0.6])
+	a=[plt.subplot(gs[i]) for i in range(3)]
+
+	colors = [sns.color_palette()[2],sns.color_palette()[0],sns.color_palette()[1],sns.color_palette("Set2", 10)[3],sns.color_palette()[3],sns.color_palette()[5],sns.color_palette()[4],sns.color_palette("Set1",5,desat=.6)[4]]
+
+	dashed=['-','--','--','--','-','-','-','-']
+
+	times = results.T[0]
+
+	plt.subplots_adjust(hspace=0.,wspace=0.4)
 	JR = np.mean(results.T[5])
 	Jz = np.mean(results.T[6])
 	R = np.sqrt(results.T[17]*results.T[17]+results.T[18]*results.T[18])
@@ -84,7 +184,6 @@ def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None):
 		a[0].set_ylim(Jranges[0][0],Jranges[0][1])
 		a[1].set_ylim(Jranges[1][0],Jranges[1][1])
 
-	plt.setp(a[0].get_xticklabels(),visible=False)
 	plt.setp(a[1].get_yticklabels()[-1],visible=False)
 
 	a[0].set_xlabel(r'$t/T_R$')
@@ -92,22 +191,24 @@ def method_comparison(results_file,name,dontplot=[],rangess=None,Jranges=None):
 	a[0].set_ylabel(r'$J_R/\mathrm{kpc\,km\,s}^{-1}$')
 	a[1].set_ylabel(r'$J_z/\mathrm{kpc\,km\,s}^{-1}$')
 
-	leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower left', bbox_to_anchor=(0.05, 1.0),fontsize=10)
-	# set the linewidth of each legend object
-	for legobj in leg.legendHandles:
-	    legobj.set_linewidth(2.0)
+	if(legend):
+		leg=a[0].legend(handlelength=0.8, scatterpoints=1, numpoints=1,frameon=False,ncol=4,loc='lower center', bbox_to_anchor=(1.1, 1.0),fontsize=10)
+		# set the linewidth of each legend object
+		for legobj in leg.legendHandles:
+	    		legobj.set_linewidth(2.0)
 	a[0].set_xlim(0.,Mx)
 	a[1].set_xlim(0.,Mx)
 
-	a = plt.subplot2grid((2,2),(0,1),colspan=1,rowspan=2)
-	a.plot(R,results.T[19],lw=0.5,color='k')
-	a.set_ylabel(r'$z/\mathrm{kpc}$')
-	a.set_xlabel(r'$R/\mathrm{kpc}$')
-	a.set_aspect('equal')
-	a.yaxis.tick_right()
-	a.yaxis.set_label_position("right")
-	a.annotate(name, xy=(0.95,1.02), xycoords='axes fraction', fontsize=16,
+	a[2].plot(R,results.T[19],lw=0.5,color='k')
+	a[2].set_ylabel(r'$z/\mathrm{kpc}$')
+	a[2].set_xlabel(r'$R/\mathrm{kpc}$')
+	a[2].set_aspect('equal')
+	a[2].yaxis.tick_right()
+	a[2].yaxis.set_label_position("right")
+	a[2].annotate(name, xy=(0.95,1.02), xycoords='axes fraction', fontsize=16,
 	                horizontalalignment='right', verticalalignment='bottom')
+	a[2].xaxis.set_major_locator(MaxNLocator(MNL[0]))
+	a[2].yaxis.set_major_locator(MaxNLocator(MNL[1]))
 	plt.savefig(results_file+'.action.pdf',bbox_inches='tight')
 	return spreads
 
@@ -546,8 +647,15 @@ def make_table(files,names,dontplot,Jranges):
 			spreadscon[i-5][0]=actmethods[i]
 		else:
 			spreadsnon[i][0]=actmethods[i]
-	for N,(f,n,d) in enumerate(zip(files,names,dontplot)):
-		r = method_comparison(f,n,dontplot=d,rangess=5.,Jranges=Jranges[N])
+	MNL=[[3,3],[5,4],[5,5],[6,7]]
+	# MNL=[[2,2],[2,2],[2,2],[2,2]]
+
+	for N,(f,n,d,mnl) in enumerate(zip(files,names,dontplot,MNL)):
+		l=True
+		if(N>0):
+			l=False
+		#r = method_comparison2(f,n,dontplot=d,rangess=5.,Jranges=Jranges[N],legend=l,MNL=mnl)
+		r = method_comparison(f,n,dontplot=d,rangess=5.,Jranges=Jranges[N],MNL=mnl)
 		acts[0][1+2*N]=r[0][0]
 		acts[0][2+2*N]=r[0][1]
 		for i in range(len(r)-1):

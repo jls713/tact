@@ -608,6 +608,8 @@ inline double erfc(double x){return gsl_sf_erfc (x);}
 inline double besselI(double x, int n){return gsl_sf_bessel_In (n,x);}
 inline double besselJ(double x, int n){return gsl_sf_bessel_Jn (n,x);}
 inline double gamma_fn(double x){return gsl_sf_gamma (x);}
+inline double gamma_inc_fn(double a, double x){return gsl_sf_gamma_inc (a,x);}
+inline double gamma_incP_fn(double a, double x){return gsl_sf_gamma_inc_P (a,x);}
 inline double ellint_first(double phi, double k){ return gsl_sf_ellint_F(phi,k,(gsl_mode_t)1e-15);}
 // F(\phi,k) = \int_0^\phi \d t \, \frac{1}{\sqrt{1-k^2\sin^2 t}}
 inline double ellint_second(double phi, double k){ return gsl_sf_ellint_E(phi,k,(gsl_mode_t)1e-15);}

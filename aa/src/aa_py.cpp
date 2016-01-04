@@ -265,6 +265,9 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
   "Triaxial NFW from Bowden, Evans & Belokurov (2014)\n"
   "\tTakes 6 parameters: the usual central density (rho0) and scale (rs),"
   "and the z and y flattenings at zero(q0,p0) and inf(qinf,pinf)",init<double,double,double,double,double,double>());
+  class_<MWPotential2014, bases<Potential_JS>>("MWPotential2014",
+  "Bovy's MWPotential2014 (2014)\n"
+  "\tPower Law bulge with exp cut off, Miyamoto-Nagai disc, NFW halo",init<>());
 
 // ============================================================================
 // Action Finders

@@ -48,6 +48,7 @@
  *  19. PowerLawSpherical-- spherical power-law potential
  *  20. BowdenNFW -- flattened NFW from Bowden et al.(2014)
  *  21. WrapperTorusPotential -- wraps potentials from Torus code
+ *  22. PowerLawSphericalExpCut -- Spherical power law with exponential cutoff
  */
 //============================================================================
 
@@ -470,6 +471,9 @@ class MiyamotoNagai_JS: public Potential_JS{
 	public:
 		MiyamotoNagai_JS(double gm, double a, double b)
 			: GM(gm), A(a), Bq(b*b){}
+		inline void set_params(double gm, double a, double b){
+			GM=gm; A=a; Bq=b*b;
+		}
 		double Phi(const VecDoub& x);
 		double Vc(double R);
 		VecDoub Forces(const VecDoub& x);
@@ -624,33 +628,6 @@ class MultiComponentSphericalPotential: public SphericalPotential{
 };
 
 
-//============================================================================
-
-class AndreasPotential: public Potential_JS{
-private:
-	Bulge *bulge;
-	MiyamotoNagai_JS *disc;
-	NFW *halo;
-	MultiComponentPotential<Potential_JS> *MC;
-	const double Grav = 4.300918e-6;
-public:
-	AndreasPotential(NFW *H, Bulge *B = 0, MiyamotoNagai_JS *D = 0){
-		std::cerr<<"NEED TO SET THE UNITS TO KPC_KMS_MSUN\n";
-		if(B) bulge = B;
-		else bulge = new Bulge(0.7,3.4e10*Grav,1.,1.);
-		if(D) disc = D;
-		else disc = new MiyamotoNagai_JS(1e11*Grav,6.5,0.26);
-		if(H) halo = H;
-		else halo = new NFW(Grav*1.81194e12,32.26,1.,0.8140);
-		MC = new MultiComponentPotential<Potential_JS>({bulge,disc,halo});
-	}
-	double Phi(const VecDoub &x){return MC->Phi(x);}
-	VecDoub Forces(const VecDoub &x){ return MC->Forces(x);}
-	VecDoub NFWForces(const VecDoub &x){ return bulge->Forces(x);}
-	VecDoub DiscForces(const VecDoub &x){ return halo->Forces(x);}
-	VecDoub BulgeForces(const VecDoub &x){ return disc->Forces(x);}
-};
-
 class NFWSpherical: public SphericalPotential{
 	private:
 		const std::string desc =
@@ -664,6 +641,9 @@ class NFWSpherical: public SphericalPotential{
 		inline std::string name(void) const {return desc;}
 		inline std::string params(void) const {
 			return "GM = "+std::to_string(GM)+", r_s = "+std::to_string(rs);
+		}
+		inline void set_params(double GM1, double rs1){
+			GM=GM1;rs=rs1;
 		}
 		inline double Phi_r(double r) {return -GM*log(1.+r/rs)/r;}
 		inline double dPhi_r(double r){return GM*(log(1.+r/rs)/r-1./rs/(1.+r/rs))/r;}
@@ -706,6 +686,40 @@ class PowerLawSpherical: public SphericalPotential{
 		inline double dPhi_r(double r){return k*GM*pow(r,-k-1);}
 };
 
+
+class PowerLawSphericalExpCut: public SphericalPotential{
+	private:
+		double GM, k, rc;
+		double rc3k, sgk2, sg15k2,mk2,m5k2,amp;
+		const std::string desc =
+		"Power-law spherical potential:Phi ="
+			"-GM/r^k exp(-(r/rc)^2)"
+		"\n\tTakes three parameters:\n\t\t"
+		"G*mass: GM, the power: k, the cutoff radius: rc";
+	public:
+		PowerLawSphericalExpCut(double GM, double k, double rc): GM(GM),k(k),rc(rc){
+			rc3k = pow(rc,3.-k);
+			mk2 = 1.-k/2.;
+			m5k2 = 1.5-k/2.;
+			sgk2 = gamma_fn(mk2);
+			sg15k2 = gamma_fn(m5k2);
+			amp= TPI*GM*rc3k;
+		}
+		inline std::string name(void) const {return desc;}
+		inline std::string params(void) const {
+			return "GM = "+std::to_string(GM)+", k = "+std::to_string(k)+", rc = "+std::to_string(rc);
+		}
+		inline void set_params(double GM1, double k1, double rc1){
+			GM=GM1;rc=rc1;k=k1;
+			rc3k = pow(rc,3-k);			mk2 = 1.-k/2.;
+			m5k2 = 1.5-k/2.;			sgk2 = gamma_fn(mk2);
+			sg15k2 = gamma_fn(m5k2);
+			amp= TPI*GM*rc3k;
+		}
+		double Phi_r(double r);
+		double dPhi_r(double r);
+};
+
 class BowdenNFW: public Potential_JS{
 private:
 	double rho0, rs, q0, qinf, p0, pinf;
@@ -735,6 +749,80 @@ public:
 	VecDoub Forces(const VecDoub& x);
 };
 
+
+//============================================================================
+
+class AndreasPotential: public Potential_JS{
+private:
+	Bulge *bulge;
+	MiyamotoNagai_JS *disc;
+	NFW *halo;
+	MultiComponentPotential<Potential_JS> *MC;
+	const double Grav = 4.300918e-6;
+public:
+	AndreasPotential(NFW *H, Bulge *B = 0, MiyamotoNagai_JS *D = 0){
+		std::cerr<<"NEED TO SET THE UNITS TO KPC_KMS_MSUN\n";
+		if(B) bulge = B;
+		else bulge = new Bulge(0.7,3.4e10*Grav,1.,1.);
+		if(D) disc = D;
+		else disc = new MiyamotoNagai_JS(1e11*Grav,6.5,0.26);
+		if(H) halo = H;
+		else halo = new NFW(Grav*1.81194e12,32.26,1.,0.8140);
+		MC = new MultiComponentPotential<Potential_JS>({bulge,disc,halo});
+	}
+	double Phi(const VecDoub &x){return MC->Phi(x);}
+	VecDoub Forces(const VecDoub &x){ return MC->Forces(x);}
+	VecDoub NFWForces(const VecDoub &x){ return halo->Forces(x);}
+	VecDoub DiscForces(const VecDoub &x){ return disc->Forces(x);}
+	VecDoub BulgeForces(const VecDoub &x){ return bulge->Forces(x);}
+};
+
+
+class MWPotential2014: public Potential_JS{
+private:
+	PowerLawSphericalExpCut *bulge;
+	MiyamotoNagai_JS *disc;
+	NFWSpherical *halo;
+	MultiComponentPotential<Potential_JS> *MC;
+public:
+	MWPotential2014(void){
+		double GMb=1.,kb=1.8,rcb=1.9;
+		double GMd=1.,ad=3.,bd=0.28;
+		double GMh=1.,ah=16.;
+		bulge = new PowerLawSphericalExpCut(GMb,kb,rcb);
+		disc = new MiyamotoNagai_JS(GMd,ad,bd);
+		halo = new NFWSpherical(GMh,ah);
+
+		double Fb = -bulge->Forces({8.,0.,0.})[0];
+		double Fd = -disc->Forces({8.,0.,0.})[0];
+		double Fh = -halo->Forces({8.,0.,0.})[0];
+
+		double Ftottarget = 220.*220./8.;
+		double fb = 0.05;
+		GMb = fb*Ftottarget/Fb;
+		double fd = 0.6;
+		GMd = fd*Ftottarget/Fd;
+		double fh = 0.35;
+		GMh = fh*Ftottarget/Fh;
+
+		bulge->set_params(GMb,kb,rcb);
+		disc->set_params(GMd,ad,bd);
+		halo->set_params(GMh,ah);
+
+		MC = new MultiComponentPotential<Potential_JS>({bulge,disc,halo});
+
+		std::cout<<sqrt(8.*-Forces({8.,0.,0.})[0])<<" "
+		<<BulgeForces({8.,0.,0.})[0]<<" "
+		<<DiscForces({8.,0.,0.})[0]<<" "
+		<<NFWForces({8.,0.,0.})[0]<<std::endl;
+
+	}
+	double Phi(const VecDoub &x){return MC->Phi(x);}
+	VecDoub Forces(const VecDoub &x){ return MC->Forces(x);}
+	VecDoub NFWForces(const VecDoub &x){ return halo->Forces(x);}
+	VecDoub DiscForces(const VecDoub &x){ return disc->Forces(x);}
+	VecDoub BulgeForces(const VecDoub &x){ return bulge->Forces(x);}
+};
 #ifdef TORUS
 template<class c>
 void vec2torus(VecDoub a, c &C){
