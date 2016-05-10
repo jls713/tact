@@ -137,6 +137,12 @@ TEST(ActionTest_Zeros,StackelFudge){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
+  
+  X = {40.,0.,40.,0.,0.,0.};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[0]>10.,1);
+  X = {40.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
 
@@ -310,6 +316,11 @@ TEST(ActionTest_Zeros,StackelCAA){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
+  X = {40.,0.,40.,0.,0.,0.};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[0]>10.,1);
+  X = {40.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
 
@@ -644,6 +655,10 @@ TEST(ActionTest_Small,Genfunc){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+
+  X = {40.,0.,40.,0.,0.,0.};
+  printVector(AA.actions(X));
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 //=============================================================================
 
@@ -702,6 +717,10 @@ TEST(ActionTest,StackelUV){
   EXPECT_NEAR(AngsTrue[3],Angs[3],0.02);
   EXPECT_NEAR(AngsTrue[4],Angs[4],0.02);
   EXPECT_NEAR(AngsTrue[5],Angs[5],0.065);
+  X = {40.,0.,40.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
+  X = {40.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
 TEST(ActionTest,StackelF){
@@ -839,6 +858,11 @@ TEST(ActionTest_Zeros,StackelFit){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
+  X = {40.,0.,40.,0.,0.,0.};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[0]>.1,1);
+  X = {40.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
 
@@ -1011,6 +1035,11 @@ TEST(ActionTest_Zeros,StackelSAA){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
+  X = {40.,0.,40.,0.,0.,0.};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[0]>10.,1);
+  X = {40.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
 TEST(ActionTest_Zero,StackelSAA){

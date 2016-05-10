@@ -67,23 +67,27 @@ VecDoub Actions_AxisymmetricStackel::find_limits(const VecDoub& tau, const VecDo
 	root_struct_axi RS(Pot,ints);
 	// find roots of p^2(lam)
 	double laminner=lambda, lamouter=lambda;
-	if(ptau2ROOT_AxiSym(lambda, &RS)>0.0){
-		while(ptau2ROOT_AxiSym(laminner, &RS)>0.0
+	if(ptau2ROOT_AxiSym(lambda, &RS)>=0.0){
+		while(ptau2ROOT_AxiSym(laminner, &RS)>=0.0
 		      and (laminner+Pot->alpha())>tiny_number)
 			laminner-=.1*(laminner+Pot->alpha());
-		while(ptau2ROOT_AxiSym(lamouter, &RS)>0.)	lamouter*=1.1;
-
+		while(ptau2ROOT_AxiSym(lamouter, &RS)>=0.)	lamouter*=1.1;
 		if((laminner+Pot->alpha())>tiny_number)
 			limits.push_back(
 			    RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda,&RS));
 		else limits.push_back(-Pot->alpha());
 		limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,lambda,lamouter,&RS));
+		if(fabs(limits[0]-limits[1])<TINY){
+		    if(ptau2ROOT_AxiSym(lambda-5*TINY, &RS)>0.0)
+			limits[0]=RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda-5*TINY,&RS);
+	            else
+			limits[1]=RF.findroot(&ptau2ROOT_AxiSym,lambda+5*TINY,lamouter,&RS);
+		}	
 	}
 	else{
 		limits.push_back(lambda-tiny_number);
 		limits.push_back(lambda+tiny_number);
 	}
-
 	limits.push_back(-Pot->gamma()+TINY);
 	// find root of p^2(nu)
 	double nuouter=nu;
@@ -593,17 +597,23 @@ VecDoub Actions_AxisymmetricStackel_Fudge::find_limits(const VecDoub& tau){
 
 	// find roots of p^2(lam)
 	double laminner=lambda, lamouter=lambda;
-	if(ptau2ROOT_AxiSym_Fudge(lambda, &RS_l)>0.0){
-		while(ptau2ROOT_AxiSym_Fudge(laminner, &RS_l)>0.0
+	if(ptau2ROOT_AxiSym_Fudge(lambda, &RS_l)>=0.0){
+		while(ptau2ROOT_AxiSym_Fudge(laminner, &RS_l)>=0.0
 		      and (laminner+CS->alpha())>tiny_number)
 			laminner-=.1*(laminner+CS->alpha());
-		while(ptau2ROOT_AxiSym_Fudge(lamouter, &RS_l)>0.)	lamouter*=1.1;
+		while(ptau2ROOT_AxiSym_Fudge(lamouter, &RS_l)>=0.)	lamouter*=1.1;
 
 		if((laminner+CS->alpha())>tiny_number)
 			limits.push_back(
 			    RF.findroot(&ptau2ROOT_AxiSym_Fudge,laminner,lambda,&RS_l));
 		else limits.push_back(-CS->alpha());
 		limits.push_back(RF.findroot(&ptau2ROOT_AxiSym_Fudge,lambda,lamouter,&RS_l));
+		if(fabs(limits[0]-limits[1])<TINY){
+		    if(ptau2ROOT_AxiSym(lambda-5*TINY, &RS_l)>0.0)
+			limits[0]=RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda-5*TINY,&RS_l);
+	            else
+			limits[1]=RF.findroot(&ptau2ROOT_AxiSym,lambda+5*TINY,lamouter,&RS_l);
+		}	
 	}
 	else{
 		limits.push_back(lambda-tiny_number);
@@ -693,7 +703,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
 
 	VecDoub tau = CS->xv2tau(x);
-
+	
 	E = Pot->H(x);
 	if(E>0){
 		std::cout<<"You have passed an unbound orbit:"<<std::endl;
@@ -711,7 +721,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 	action_struct_axi_fudge AS(this,ints,tau,taubar,Delta,0, 0.);
 	actions[0]=Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
 	// Lz
-	actions[1]=sqrt(2.0*I2);
+	actions[1]=Pot->Lz(x);
 	// Jz
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);

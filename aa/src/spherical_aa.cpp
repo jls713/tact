@@ -119,7 +119,9 @@ VecDoub Actions_Spherical::actions(const VecDoub &x, void *params){
     if(E>0.){
         return {std::numeric_limits<double>::infinity(),Lz,L-fabs(Lz)};
     }
-    VecDoub limits = find_limits(r,E,L);
+    VecDoub limits;
+    if(sqrt(x[3]*x[3]+x[4]*x[4]+x[5]*x[5])==0.) limits={0.,r};
+    else limits = find_limits(r,E,L);
     double taubar = 0.5*(limits[0]+limits[1]);
     double Delta = 0.5*(limits[1]-limits[0]);
     Actions_Spherical_data_struct Act(Pot,E,L,Lz,Delta,taubar);
@@ -136,7 +138,9 @@ VecDoub Actions_Spherical::angles_and_freqs(const VecDoub &x){
                 std::numeric_limits<double>::infinity()};
     }
     double r = sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2]);
-    VecDoub limits = find_limits(r,E,L);
+    VecDoub limits;
+    if(sqrt(x[3]*x[3]+x[4]*x[4]+x[5]*x[5])==0.) limits={0.,r};
+    else limits = find_limits(r,E,L);
     double taubar = 0.5*(limits[0]+limits[1]);
     double Delta = 0.5*(limits[1]-limits[0]);
     Actions_Spherical_data_struct Act(Pot,E,L,Lz,Delta,taubar);
@@ -198,7 +202,9 @@ VecDoub Actions_Spherical::Hessian(const VecDoub &x){
     Freq[0]=AF[3];Freq[1]=AF[4];
     double E = Pot->H(x), L = Pot->L(x), Lz = Pot->Lz(x);
     double r = sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2]);
-    VecDoub limits = find_limits(r,E,L);
+    VecDoub limits;
+    if(sqrt(x[3]*x[3]+x[4]*x[4]+x[5]*x[5])==0.) limits={0.,r};
+    else limits = find_limits(r,E,L);
     double taubar = 0.5*(limits[0]+limits[1]);
     double Delta = 0.5*(limits[1]-limits[0]);
     double drpdH = dr0dH(limits[0],L);

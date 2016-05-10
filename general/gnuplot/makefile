@@ -3,6 +3,8 @@ include ../../Makefile.inc
 .cpp.o:
 	$(CCOMPILER) -c $(OPTS) $<
 
+default: clean all
+
 all::	libplot.a
 
 gnuplot_i.o:	gnuplot_i.cpp

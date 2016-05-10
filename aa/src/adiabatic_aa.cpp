@@ -277,11 +277,11 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::find_lamlimits(double Elam, do
 	double lambda=tau[0], tiny_number=TINY;
 	root_find RF(TINY,100);
 	double laminner=lambda, lamouter=lambda;
-	if(plam_squared(lambda, &RS)>0.0){
-		while(plam_squared(laminner, &RS)>0.0
+	if(plam_squared(lambda, &RS)>=0.0){
+		while(plam_squared(laminner, &RS)>=0.0
 		      and (laminner+CS->alpha())>tiny_number)
 			laminner-=.1*(laminner+CS->alpha());
-		while(plam_squared(lamouter, &RS)>0.)	lamouter*=1.1;
+		while(plam_squared(lamouter, &RS)>=0.)	lamouter*=1.1;
 
 		if((laminner+CS->alpha())>tiny_number)
 			limits.push_back(
@@ -670,10 +670,10 @@ VecDoub Actions_CylindricalAdiabaticApproximation::find_Rlimits(double R, double
 
 	PolarAA_Ractions_struct RS(this,Etot,Lz2,Jz,0.,0.,0.);
 	double Rin = R, Rout = R;
-	while(pR_squared(Rout, &RS)>0.) Rout*=1.01;
-	while(pR_squared(Rin, &RS)>0.)  Rin*=.99;
+	while(pR_squared(Rout, &RS)>=0.) Rout*=1.01;
+	while(pR_squared(Rin, &RS)>=0.)  Rin*=.99;
 	root_find RF(TINY,100);
-	return {RF.findroot(&pR_squared,Rin,Rin/.99,&RS),
+	return {Lz2>0.?RF.findroot(&pR_squared,Rin,Rin/.99,&RS):0.,
 				RF.findroot(&pR_squared,Rout/1.01,Rout,&RS)};
 }
 

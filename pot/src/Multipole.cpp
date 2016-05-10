@@ -114,9 +114,9 @@ VecDoub TriaxialPotential::Forces(const VecDoub& x){
 // ============================================================================
 
 MultipoleExpansion::MultipoleExpansion(Density *rho,int NR, int NA, int LMAX1, int MMAX1, double a0, double rmin, double rmax,
-    bool axisymmetric, bool triaxial, bool flip, double err)
+    bool axisymmetric, bool triaxial, bool flip, double err,bool vocal)
     :rho(rho), NR(NR), NA(NA), a0(a0),rmin(rmin),rmax(rmax),
-     axisymmetric(axisymmetric), triaxial(triaxial), flip(flip), err(err){
+     axisymmetric(axisymmetric), triaxial(triaxial), flip(flip), err(err), vocal(vocal){
 
     NA_phi = axisymmetric?1:NA;
     NA_theta = NA;
@@ -238,7 +238,8 @@ void MultipoleExpansion::fill_density_grid(void){
             double pu = ym-dy, pd = ym+dy;
                 rho_grid[NA_theta-1+i][NA_phi-1+j][k]=
                     rho->density_sph({radial_grid[k],pu,tu});
-                std::cerr<<OUTPUT(i)<<OUTPUT(j)<<OUTPUT(radial_grid[k])
+                if(vocal)
+                    std::cerr<<OUTPUT(i)<<OUTPUT(j)<<OUTPUT(radial_grid[k])
                 <<OUTPUTE(rho_grid[NA_theta-1+i][NA_phi-1+j][k]);
                 if(i==0 and j==0) continue;
                 rho_grid[NA_theta-1-i][NA_phi-1+j][k]=
@@ -273,7 +274,8 @@ void MultipoleExpansion::extend_density_grid(void){
             double pu = ym-dy, pd = ym+dy;
                 rho_grid[NA_theta-1+i][NA_phi-1+j].push_back(
                     rho->density_sph({radial_grid.back(),pu,tu}));
-                std::cerr<<OUTPUT(i)<<OUTPUT(j)<<OUTPUT(radial_grid.back())
+                if(vocal)
+                    std::cerr<<OUTPUT(i)<<OUTPUT(j)<<OUTPUT(radial_grid.back())
                 <<OUTPUTE(rho_grid[NA_theta-1+i][NA_phi-1+j].back());
                 if(i==0 and j==0) continue;
                 rho_grid[NA_theta-1-i][NA_phi-1+j].push_back(
@@ -400,10 +402,10 @@ void MultipoleExpansion::fillPhigrid(){
             fillPhigrid();
             return;
         }
-        std::cout<<"New grid size: NR = "<<NR<<", rmax="<<rmax<<std::endl;
+        if(vocal) std::cout<<"New grid size: NR = "<<NR<<", rmax="<<rmax<<std::endl;
     }
 
-    std::cout<<"Potential calculated: M(r_max)="<<
+    if(vocal) std::cout<<"Potential calculated: M(r_max)="<<
             	Mass(radial_grid[NR-1])<<std::endl;
     return;
 }

@@ -59,6 +59,7 @@ struct Actions_Genfunc_data_structure{
     double NTMAX;                      /*! Max number of time samples */
     double maxtimescale;                     /*! Max integration time */
     bool axisymmetric;           /*! axisymmetric (1) or triaxial (0) */
+    bool output_Sn;                /*! output Sn (or dSndJ if angles) */
     /*! Actions_Genfunc_data_structure constructor.
         \param tt total integration time
         \param nt total time samples
@@ -68,7 +69,7 @@ struct Actions_Genfunc_data_structure{
         \param maxtimescale max integration time
         \param axisymmetric -- axisymmetric (1) or triaxial (0)
     */
-	Actions_Genfunc_data_structure(double tt,unsigned int nt, unsigned int N_mat,double oe, int NTMAX, double maxtimescale, bool axisymmetric=false):total_T(tt), N_T(nt),N_matrix(N_mat),orbit_eps(oe), NTMAX(NTMAX),maxtimescale(maxtimescale),axisymmetric(axisymmetric){
+	Actions_Genfunc_data_structure(double tt,unsigned int nt, unsigned int N_mat,double oe, int NTMAX, double maxtimescale, bool axisymmetric=false, bool output_Sn=false):total_T(tt), N_T(nt),N_matrix(N_mat),orbit_eps(oe), NTMAX(NTMAX),maxtimescale(maxtimescale),axisymmetric(axisymmetric),output_Sn(output_Sn){
 		stepsize=total_T/(double)N_T;
         if(N_T<(axisymmetric==true ? 1.:N_mat)*N_mat*N_mat/2.)
             std::cerr<<"Not enough time samples ("<<N_mat
@@ -159,6 +160,27 @@ class Actions_Genfunc : public Action_Finder{
                 6D vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z)
         */
         VecDoub full_angles(const VecDoub& x, int NT,int Nsamp,int Nmax);
+        //! Finds actions and Sn
+        /*!
+          \param x phase-space point (x,v)
+          \param NT number of orbital times to integrate for
+          \param Nsamp number of time samples
+          \param Nmax number of Fourier coefficients Sn
+
+          \return actions and Sn -- vector J=(J_R,J_phi,J_z,S_{n=0,0,1},...)
+        */
+        VecDoub actions_withSn(const VecDoub& x, int NT,int Nsamp,int Nmax);
+        //! Finds angles and dSndJ
+        /*!
+          \param x phase-space point (x,v)
+          \param NT number of orbital times to integrate for
+          \param Nsamp number of time samples
+          \param Nmax number of Fourier coefficients Sn
+
+          \return angles and frequencies and dSndJ --
+                vector (theta_R,theta_phi,theta_z,Omega_R,Omega_phi,Omega_z, dS_{n=0,0,1}dJ_1, ...)
+        */
+        VecDoub angles_withdSndJ(const VecDoub& x, int NT,int Nsamp,int Nmax);
 };
 
 //============================================================================

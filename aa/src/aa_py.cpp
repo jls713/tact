@@ -508,6 +508,11 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
        " in:  Cartesian = (x,y,z,vx,vy,vz)\n"
        " out: Polar = (R,phi,z,vR,vphi,vz)\n"
       "\n");
+  def("PolarToCartesian",conv::PolarToCartesian,
+      "\n"
+       " in:  Polar = (R,phi,z,vR,vphi,vz)\n"
+       " out: Cartesian = (x,y,z,vx,vy,vz)\n"
+      "\n");
   def("CartesianToGalactic",conv::CartesianToGalactic,
       "\n"
        " in:  Cartesian = (x,y,z,vx,vy,vz):\n"
@@ -530,11 +535,20 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
       "  in: Equatorial =(alpha,delta,s,vlos,mu_alphacos(delta),mu_delta)\n"
       "  out: Galactic = (l,b,s,vlos,mu_lcos(b),mu_b)\n"
       "\n");
-
+  def("EquatorialToGalacticwithErrors",conv::EquatorialToGalacticwithErrors,
+      "\n"
+      "  in: Equatorial =(alpha,delta,s,vlos,mu_alphacos(delta),mu_delta)\n"
+      "  in: EqErrs =(e_alpha,e_delta,e_s,e_vlos,e_mu_alphacos(delta),e_mu_delta)\n"
+      "  out: Galactic = ((l,b,s,vlos,mu_lcos(b),mu_b),(e_l,e_b,e_s,e_vlos,e_mu_lcos(b),e_mu_b))\n"
+      "\n");
 
 
   to_python_converter<VecDoub, vector_to_ndarray<double>>();
   vector_from_ndarray<double>();
+  to_python_converter<std::vector<VecDoub>, vector_to_ndarray<VecDoub>>();
+  vector_from_ndarray<VecDoub>();
+  to_python_converter<std::vector<Potential_JS*>, vector_to_ndarray<Potential_JS*>>();
+  vector_from_ndarray<Potential_JS*>();
   import_array();
 }
 

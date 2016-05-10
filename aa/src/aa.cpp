@@ -39,7 +39,7 @@ int action_check(const VecDoub &x, VecDoub &acts, Potential_JS *Pot){
     acts[1]=Polar[0]*Polar[4];
     if(fabs(x[2])<SMALL and fabs(x[5])<SMALL){
         acts[2]=0.;
-        if(fabs(Polar[3])<SMALL){
+        if(fabs(Polar[3])<TINY and fabs(Polar[0])<0.01*SMALL){
             acts[0]=0.;
             return 1;
         }

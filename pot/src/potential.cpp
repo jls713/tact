@@ -655,6 +655,8 @@ double WrapperTorusPotential::operator()(const double R, const double z, double&
 }
 double WrapperTorusPotential::RfromLc(const double L_in, double* dR) const
 {
+
+
   bool more=false;
   double R,lR=0.,dlR=0.001,dPR,dPz,LcR,oldL,L=fabs(L_in);
   R=exp(lR);

@@ -9,7 +9,7 @@ CCOMPILER=$(CXX)
 
 ## 3. You will need to set the path to gsl
 
-GSLPATH =/opt/ioa/software/gsl/1.16/
+GSLPATH =/opt/ioa/software/gsl/2.1/
 <!-- GSLPATH =/usr/local/Cellar/gsl/1.16/ -->
 
 ####################################################################
@@ -28,7 +28,7 @@ GTESTPATH=/data/jls/gtest-1.7.0/
 ###		with ebf library (http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/)
 ### 1.2. Set Torus and ebf paths
 
-TORUSPATH=../Torus
+TORUSPATH=/home/jls/work/code/Torus_github/Torus/
 EBFPATH=../libebf_c_cpp-0.0.3
 
 ### 1.3. Compile with "make TORUS=1"
@@ -54,7 +54,7 @@ LAPACKPATH = general/lapack/
 
 BOOSTINCPATH =/opt/ioa/software/boost/1.55.0/include
 BOOSTLIBPATH =-L/opt/ioa/software/boost/1.55.0/lib
-PYTHONINCPATH=/usr/include/python2.7/
+PYTHONINCPATH=/opt/ioa/software/python/2.7.8/include/python2.7
 PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 
 

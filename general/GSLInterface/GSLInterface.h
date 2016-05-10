@@ -33,6 +33,13 @@
 #include <gsl/gsl_roots.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
+#ifdef INTERP2D
+#include <interp2d.h>
+#include <interp2d_spline.h>
+#else
+#include <gsl/gsl_interp2d.h>
+#include <gsl/gsl_spline2d.h>
+#endif
 #include <gsl/gsl_sort_double.h>
 #include <gsl/gsl_permute.h>
 #include <gsl/gsl_odeiv2.h>
@@ -286,6 +293,62 @@ class interpolator{
         }
 };
 
+class interpolator2D{
+	private:
+		gsl_interp_accel *xacc, *yacc;
+		#ifdef INTERP2D
+		interp2d_spline *spline;
+		#else
+		gsl_spline2d *spline;
+		#endif
+	public:
+		interpolator2D(std::vector<double> x, std::vector<double> y, std::vector<std::vector<double>> z){
+			xacc = gsl_interp_accel_alloc();
+			yacc = gsl_interp_accel_alloc();
+			auto nx = x.size(), ny = y.size();
+			double zval[nx*ny];
+			for(unsigned i=0;i<nx;i++)
+			for(unsigned j=0;j<ny;j++)
+				zval[i+j*nx]=z[i][j];
+			#ifdef INTERP2D
+			spline = interp2d_spline_alloc(interp2d_bicubic,nx,ny);
+		    interp2d_spline_init(spline, &x[0], &y[0], zval, nx, ny);
+			#else
+			spline = gsl_spline2d_alloc(gsl_interp2d_bicubic,nx,ny);
+			gsl_spline2d_init (spline, &x[0], &y[0], zval, nx, ny);
+			#endif
+		}
+		~interpolator2D(){
+			#ifdef INTERP2D
+		    interp2d_spline_free(spline);
+			#else
+			gsl_spline2d_free (spline);
+        	#endif
+         	gsl_interp_accel_free (xacc);
+         	gsl_interp_accel_free (yacc);
+        }
+        double interpolate(double xi, double yi){
+			#ifdef INTERP2D
+        	return interp2d_spline_eval(spline, xi, yi, xacc, yacc);
+			#else
+        	return gsl_spline2d_eval (spline, xi, yi, xacc, yacc);
+        	#endif
+        }
+        double derivative_x(double xi, double yi){
+			#ifdef INTERP2D
+        	return interp2d_spline_eval_deriv_x(spline, xi, yi, xacc, yacc);
+			#else
+        	return gsl_spline2d_eval_deriv_x(spline, xi, yi, xacc, yacc);
+        	#endif
+        }
+        double derivative_y(double xi, double yi){
+			#ifdef INTERP2D
+        	return interp2d_spline_eval_deriv_y(spline, xi, yi, xacc, yacc);
+			#else
+        	return gsl_spline2d_eval_deriv_y(spline, xi, yi, xacc, yacc);
+        	#endif
+        }
+};
 //=============================================================================
 // SORTING //
 // sorting algorithm

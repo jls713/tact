@@ -268,6 +268,7 @@ private:
     std::unique_ptr<GaussLegendreIntegrator> GLphi;/*! Gaussian integrator for phi */
     const bool loggrid = true;/*! if true, use a logarithmically-spaced grid or if false, a sinh-spaced */
     const double err;
+    bool vocal;
 
     void fill_radial_grid(double aa0, double rrmin, double rrmax);
     void add_radial_gridpoint(void);
@@ -290,7 +291,7 @@ public:
         \param triaxial -- if true, use triaxial symmetry
         \param flip -- if true, use up-down symmetry
     */
-    MultipoleExpansion(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100., bool axisymmetric = false, bool triaxial = false, bool flip = true, double err=0.);
+    MultipoleExpansion(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100., bool axisymmetric = false, bool triaxial = false, bool flip = true, double err=0.,bool vocal=false);
     MultipoleExpansion(void):err(0.){};
     MultipoleExpansion(const std::string&);
     virtual ~MultipoleExpansion(void){};
@@ -326,8 +327,8 @@ public:
         \param rmin minimum radius
         \param rmax maximum radius
     */
-    MultipoleExpansion_UpDownSymmetric(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.)
-     :MultipoleExpansion(rho,NR,NA,LMAX,MMAX,a0,rmin,rmax,false,false,true){};
+    MultipoleExpansion_UpDownSymmetric(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,bool vocal=false)
+     :MultipoleExpansion(rho,NR,NA,LMAX,MMAX,a0,rmin,rmax,false,false,true,0.,vocal){};
     MultipoleExpansion_UpDownSymmetric(const std::string& s)
      :MultipoleExpansion(s){}
 };
@@ -346,8 +347,8 @@ public:
         \param rmin minimum radius
         \param rmax maximum radius
     */
-    MultipoleExpansion_Triaxial(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01)
-     :MultipoleExpansion(rho,NR,NA,LMAX,MMAX,a0,rmin,rmax,false,true,true,err){};
+    MultipoleExpansion_Triaxial(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, int MMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01,bool vocal=false)
+     :MultipoleExpansion(rho,NR,NA,LMAX,MMAX,a0,rmin,rmax,false,true,true,err,vocal){};
     MultipoleExpansion_Triaxial(const std::string& s)
      :MultipoleExpansion(s){}
 };
@@ -365,8 +366,8 @@ public:
         \param rmin minimum radius
         \param rmax maximum radius
     */
-    MultipoleExpansion_Axisymmetric(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01)
-     :MultipoleExpansion(rho,NR,NA,LMAX,-1,a0,rmin,rmax,true,true,true,err){};
+    MultipoleExpansion_Axisymmetric(Density *rho, int NR = 50, int NA = 8, int LMAX = -1, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01,bool vocal=false)
+     :MultipoleExpansion(rho,NR,NA,LMAX,-1,a0,rmin,rmax,true,true,true,err,vocal){};
     MultipoleExpansion_Axisymmetric(const std::string& s)
      :MultipoleExpansion(s){}
 };
@@ -382,8 +383,8 @@ public:
         \param rmin minimum radius
         \param rmax maximum radius
     */
-    MultipoleExpansion_Spherical(Density *rho, int NR = 50, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01)
-     :MultipoleExpansion(rho,NR,1,1,0,a0,rmin,rmax,true,true,true,err){};
+    MultipoleExpansion_Spherical(Density *rho, int NR = 50, double a0=1.,double rmin=0.01,double rmax=100.,double err=0.01,bool vocal=false)
+     :MultipoleExpansion(rho,NR,1,1,0,a0,rmin,rmax,true,true,true,err,vocal){};
     MultipoleExpansion_Spherical(const std::string& s)
      :MultipoleExpansion(s){}
 };

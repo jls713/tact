@@ -58,7 +58,8 @@ VecDoub Actions_HarmonicOscillator::actions(const VecDoub& x, void *params){
 VecDoub Actions_HarmonicOscillator::angles(const VecDoub& x, void *params){
     VecDoub Theta(3,0);
     for(int i=0;i<3;i++){
-        Theta[i] = atan(-x[3+i]/Om[i]/x[i])+(x[i]>0.?PI:0.);
+        if(x[i]==0.) Theta[i]=(x[3+i]>0.?0.:PI);
+        else Theta[i] = atan(-x[3+i]/Om[i]/x[i])+(x[i]>0.?PI:0.);
         if(Theta[i]<0.)Theta[i]+=2.*PI;
         if(Theta[i]>2.*PI)Theta[i]-=2.*PI;
     }

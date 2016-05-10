@@ -181,7 +181,8 @@ int main(){
 		// 7.1 Setup minimiser for quad
 		double bracket[2] = {-10.,10.};
 		double initial = 2.;
-		minimiser1D M1D(&quad,initial,bracket[0],bracket[1],eps,NULL);
+		int status;
+		minimiser1D M1D(&quad,initial,bracket[0],bracket[1],0.,eps,&status,NULL);
 
 		// 7.2 Minimise with a max number of 1000 steps
 		double result = M1D.minimise(1000);

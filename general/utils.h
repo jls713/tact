@@ -34,6 +34,7 @@
 
 #include <vector>
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -469,6 +470,7 @@ void output_to_tmpfile(std::vector<std::vector<c>> A,std::string f){
 
 template<class c>
 std::vector<c> create_range(c min, c max, int length){
+    assert(length>=1);
     std::vector<c> P(length);
     for(int i=0;i<length;i++) P[i]=min+(max-min)*i/(c)(length-1);
     return P;
@@ -565,6 +567,88 @@ inline VecDoub GaussianQuad_Weights_8(int i){
 
 inline double GFunction(double Foff,double sigF){return exp(-Foff*Foff/(2.0*sigF*sigF))/(sqrt(TPI)*sigF);}
 
+
+
+// calculate the cofactor of element (row,col)
+template<class c>
+int GetMinor(const std::vector<std::vector<c>> &src, std::vector<std::vector<c>> &dest, int row, int col, int order)
+{
+    // indicate which col and row is being copied to dest
+    int colCount=0,rowCount=0;
+
+    for(int i = 0; i < order; i++ )
+    {
+        if( i != row )
+        {
+            colCount = 0;
+            for(int j = 0; j < order; j++ )
+            {
+                // when j is not the element
+                if( j != col )
+                {
+                    dest[rowCount][colCount] = src[i][j];
+                    colCount++;
+                }
+            }
+            rowCount++;
+        }
+    }
+
+    return 1;
+}
+
+// Calculate the determinant recursively.
+template<class c>
+double CalcDeterminant(const std::vector<std::vector<c>> &mat, int order)
+{
+    // order must be >= 0
+    // stop the recursion when matrix is a single element
+    if( order == 1 )
+        return mat[0][0];
+
+    // the determinant value
+    c det = 0;
+
+    // allocate the cofactor matrix
+    std::vector<std::vector<c>> minor = std::vector<std::vector<c> >(order,std::vector<c>(order,0.));
+
+
+    for(int i = 0; i < order; i++ )
+    {
+        // get minor of element (0,i)
+        GetMinor( mat, minor, 0, i , order);
+        // the recusion is here!
+        det += (i%2==1?-1.0:1.0) * mat[0][i] * CalcDeterminant(minor,order-1);
+    }
+
+    return det;
+}
+
+
+// matrix inversion
+// the result is put in Y
+template<class c>
+void MatrixInversion(const std::vector<std::vector<c>> &A, std::vector<std::vector<c>> &Y)
+{
+    int order = A[0].size();
+    // get the determinant of a
+    c det = 1.0/CalcDeterminant(A,order);
+
+    // memory allocation
+    std::vector<std::vector<c>> minor = std::vector<std::vector<c> >(order,std::vector<c>(order,0.));
+
+    for(int j=0;j<order;j++)
+    {
+        for(int i=0;i<order;i++)
+        {
+            // get the co-factor (matrix) of A(j,i)
+            GetMinor(A,minor,j,i,order);
+            Y[i][j] = det*CalcDeterminant(minor,order-1);
+            if( (i+j)%2 == 1)
+                Y[i][j] = -Y[i][j];
+        }
+    }
+}
 
 #endif
 

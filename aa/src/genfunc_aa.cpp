@@ -76,8 +76,8 @@ std::vector<int> Actions_Genfunc::loop(const std::vector<VecDoub> &orbit_samples
     // ang mom or zero otherwise
 	std::vector<int> l(3,true);
 	std::vector<int> l0=angular_momentum(orbit_samples[0]);
-    std::vector<int> result = l0;
-	for(auto it = std::begin(orbit_samples)+1;
+        std::vector<int> result = l0;
+        for(auto it = std::begin(orbit_samples)+1;
 	    	 it!=std::end(orbit_samples);
 	    	 ++it)
 	{
@@ -167,7 +167,7 @@ VecDoub Actions_Genfunc::find_isochrone_params_minvar(const std::vector<VecDoub>
 }
 
 VecDoub Actions_Genfunc::find_box_params(const std::vector<VecDoub> &orbit_samples){
-    VecDoub xmax(3,0);
+    VecDoub xmax(3,TINY);
     for(auto i:orbit_samples){
         for(int j=0;j<3;j++) if(i[j]>xmax[j]) xmax[j]=i[j];
     }
@@ -245,7 +245,6 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
 	std::vector<int> loopi = loop(orbit.results());
 	int total_loop=0;
     for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
-
     if(total_loop==0){
 		// VecDoub Om = find_box_params_minvar(orbit.results());
         VecDoub Om = find_box_params(orbit.results());
@@ -268,11 +267,10 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
             std::cerr<<". Assuming box.\n";
         }
         VecDoub Om = find_box_params(orbit.results());
-        ToyAct = new Actions_HarmonicOscillator(Om);
+	 ToyAct = new Actions_HarmonicOscillator(Om);
         // VecDoub ff = find_isochrone_params(orbit.results());
         // ToyAct = new Actions_Isochrone(ff[0],ff[1]);
     }
-
 	// Fill an array with the appropriate vectors n
     std::vector<std::vector<int>> n_vectors;
     int symNx = 2; if(loopi[0]!=0 or loopi[2]!=0) symNx = 1;
@@ -319,9 +317,8 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         orient_orbit(i,loopi);
         if(total_loop==1)
             sign[1] = SIGN(TargetPot->Lz(i));
-
     	acts = ToyAct->actions(i);
-    	angs = ToyAct->angles(i);
+	angs = ToyAct->angles(i);
         if(nn>0)
             for(int j=0;j<3;++j)
                 if((angs[j]-angs_p[j]+PI/2.*sign[j])*sign[j]<0.)
@@ -522,6 +519,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         std::cerr<<"Returning with "<<AA->N_T/AA->NTMAX
                  <<" fraction of max steps and "<<AA->total_T/AA->maxtimescale
                  <<" fraction of max time"<<std::endl;
+    if(AA->output_Sn) return b;
     // for(auto i: AF->actions(x)) std::cout<<i<<" ";
 	return {b[0],b[1],b[2]};
 }
@@ -715,7 +713,6 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
 
     #endif
 
-
     // Now check the results
 
     // sort out loop orientations
@@ -762,6 +759,7 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
                  <<" fraction of max steps and "<<AA->total_T/AA->maxtimescale
                  <<" fraction of max time"<<std::endl;
     for(int i=0;i<3;++i){ b[i]=fmod(b[i],TPI); if(b[i]<0.) b[i]+=TPI;}
+    if(AA->output_Sn) return b;
     return {b[0],b[1],b[2],b[3],b[4],b[5]};
 }
 
@@ -776,6 +774,20 @@ VecDoub Actions_Genfunc::full_angles(const VecDoub &x,int NT,int Nsamp,int Nmax)
     Actions_Genfunc_data_structure *AA;
     double timescale = TargetPot->torb(x);
     AA = new Actions_Genfunc_data_structure(timescale*NT, Nsamp, Nmax, 1e-8,4*Nsamp,timescale*4.*NT,symmetry=="axisymmetric"?true:false);
+    return angles(x,AA);
+}
+
+VecDoub Actions_Genfunc::actions_withSn(const VecDoub &x,int NT,int Nsamp,int Nmax){
+    Actions_Genfunc_data_structure *AA;
+    double timescale = TargetPot->torb(x);
+    AA = new Actions_Genfunc_data_structure(timescale*NT, Nsamp, Nmax, 1e-8,4*Nsamp,timescale*4.*NT,symmetry=="axisymmetric"?true:false,true);
+    return actions(x,AA);
+}
+
+VecDoub Actions_Genfunc::angles_withdSndJ(const VecDoub &x,int NT,int Nsamp,int Nmax){
+    Actions_Genfunc_data_structure *AA;
+    double timescale = TargetPot->torb(x);
+    AA = new Actions_Genfunc_data_structure(timescale*NT, Nsamp, Nmax, 1e-8,4*Nsamp,timescale*4.*NT,symmetry=="axisymmetric"?true:false,true);
     return angles(x,AA);
 }
 
