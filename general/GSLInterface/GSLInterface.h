@@ -37,8 +37,10 @@
 #include <interp2d.h>
 #include <interp2d_spline.h>
 #else
+#ifdef GSL_2
 #include <gsl/gsl_interp2d.h>
 #include <gsl/gsl_spline2d.h>
+#endif
 #endif
 #include <gsl/gsl_sort_double.h>
 #include <gsl/gsl_permute.h>
@@ -292,7 +294,7 @@ class interpolator{
         	gsl_spline_init (spline, x, y, n);
         }
 };
-
+#ifdef GSL_2
 class interpolator2D{
 	private:
 		gsl_interp_accel *xacc, *yacc;
@@ -331,7 +333,7 @@ class interpolator2D{
 			#ifdef INTERP2D
         	return interp2d_spline_eval(spline, xi, yi, xacc, yacc);
 			#else
-        	return gsl_spline2d_eval (spline, xi, yi, xacc, yacc);
+		return gsl_spline2d_eval (spline, xi, yi, xacc, yacc);
         	#endif
         }
         double derivative_x(double xi, double yi){
@@ -349,6 +351,7 @@ class interpolator2D{
         	#endif
         }
 };
+#endif
 //=============================================================================
 // SORTING //
 // sorting algorithm
