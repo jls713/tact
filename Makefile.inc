@@ -12,6 +12,7 @@ CCOMPILER=$(CXX)
 GSLPATH =/usr/local/Cellar/gsl/1.16/
 if ($(USER,jls))
 	GSLPATH =/opt/ioa/software/gsl/2.1/
+endif
 
 ####################################################################
 
@@ -32,6 +33,7 @@ GTESTPATH=/data/jls/gtest-1.7.0/
 TORUSPATH=../Torus
 ifeq ($(USER),jls)
 	TORUSPATH=/home/jls/work/code/Torus_github/Torus/
+endif
 EBFPATH=../libebf_c_cpp-0.0.3
 
 ### 1.3. Compile with "make TORUS=1"
@@ -60,6 +62,7 @@ BOOSTLIBPATH =-L/opt/ioa/software/boost/1.55.0/lib
 PYTHONINCPATH=/usr/include/python2.7/
 ifeq ($(USER),jls)
 	PYTHONINCPATH=/opt/ioa/software/python/2.7.8/include/python2.7
+endif
 PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 
 
