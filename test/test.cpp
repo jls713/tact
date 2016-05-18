@@ -41,6 +41,13 @@
 
 namespace {
 
+TEST(GusTest,Number1){
+  VecDoub x = {0.184035,0.184035,0.476411,-97.8458,70.3121,15.3668};
+  PowerLaw pot(430107.95338751527*.5,0.5,1.,0.9);
+  Actions_AxisymmetricStackel_Fudge af(&pot,5.);
+  printVector(af.actions(x));
+}
+
 TEST(PotentialTest,Isochrone){
   IsochronePotential ISO(1.,1.);
   EXPECT_DOUBLE_EQ(-1./3.,ISO.Phi({1.,1.,1.}));
@@ -137,7 +144,7 @@ TEST(ActionTest_Zeros,StackelFudge){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
-  
+
   X = {40.,0.,40.,0.,0.,0.};
   Acs = AA.actions(X);
   EXPECT_EQ(Acs[0]>10.,1);

@@ -82,7 +82,7 @@ VecDoub Actions_AxisymmetricStackel::find_limits(const VecDoub& tau, const VecDo
 			limits[0]=RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda-5*TINY,&RS);
 	            else
 			limits[1]=RF.findroot(&ptau2ROOT_AxiSym,lambda+5*TINY,lamouter,&RS);
-		}	
+		}
 	}
 	else{
 		limits.push_back(lambda-tiny_number);
@@ -609,11 +609,11 @@ VecDoub Actions_AxisymmetricStackel_Fudge::find_limits(const VecDoub& tau){
 		else limits.push_back(-CS->alpha());
 		limits.push_back(RF.findroot(&ptau2ROOT_AxiSym_Fudge,lambda,lamouter,&RS_l));
 		if(fabs(limits[0]-limits[1])<TINY){
-		    if(ptau2ROOT_AxiSym(lambda-5*TINY, &RS_l)>0.0)
-			limits[0]=RF.findroot(&ptau2ROOT_AxiSym,laminner,lambda-5*TINY,&RS_l);
+		    if(ptau2ROOT_AxiSym_Fudge(lambda-5*TINY, &RS_l)>0.0)
+			limits[0]=RF.findroot(&ptau2ROOT_AxiSym_Fudge,laminner,lambda-5*TINY,&RS_l);
 	            else
-			limits[1]=RF.findroot(&ptau2ROOT_AxiSym,lambda+5*TINY,lamouter,&RS_l);
-		}	
+			limits[1]=RF.findroot(&ptau2ROOT_AxiSym_Fudge,lambda+5*TINY,lamouter,&RS_l);
+		}
 	}
 	else{
 		limits.push_back(lambda-tiny_number);
@@ -703,7 +703,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
 
 	VecDoub tau = CS->xv2tau(x);
-	
+
 	E = Pot->H(x);
 	if(E>0){
 		std::cout<<"You have passed an unbound orbit:"<<std::endl;
