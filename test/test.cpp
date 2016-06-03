@@ -87,6 +87,24 @@ TEST(PotentialTest,IsochroneActions){
 
 //=============================================================================
 
+TEST(ActionTest_TriaxialStack,StackelFudge){
+  StackelTriaxial Pot(1.,-30.,-20.);
+  Actions_TriaxialStackel_Fudge AA(&Pot,-30.,-20.);
+  Actions_TriaxialStackel AAS(&Pot);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
+  VecDoub ActsTrue = AAS.actions(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
+}
+
+TEST(ActionTest_TriaxialStack,StackelFudgeWrongAlphaBeta){
+  StackelTriaxial Pot(1.,30.,20.);
+  Actions_TriaxialStackel_Fudge AA(&Pot,30.,20.);
+}
 TEST(ActionTest_Iso,StackelFudge){
   Isochrone Pot(1.,1.,0.99999);
   Actions_AxisymmetricStackel_Fudge AA(&Pot,1.);

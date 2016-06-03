@@ -39,6 +39,7 @@
 #define AA_H
 
 #include "utils.h"
+#include <stdexcept>
 #include "potential.h"
 
 // ============================================================================

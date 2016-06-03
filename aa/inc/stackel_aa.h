@@ -146,6 +146,7 @@ class Actions_AxisymmetricStackel_Fudge : public Action_Finder{
 		}
 		inline double chi_lam(const VecDoub& tau){return -(tau[0]-tau[2])*Phi_tau(tau);}
 		inline double chi_nu(const VecDoub& tau){ return -(tau[2]-tau[0])*Phi_tau(tau);}
+		inline double delta(void){return sqrt(CS->gamma()-CS->alpha());}
 		//! Finds actions
 	    /*!
 	      \param x phase-space point (x,v)
@@ -250,6 +251,10 @@ class Actions_TriaxialStackel_Fudge : public Action_Finder{
 	      \param b   beta for coordinate system
 	    */
 		Actions_TriaxialStackel_Fudge(Potential_JS *pot,double a,double b): Pot(pot){
+			if(b>-1.)
+				throw std::invalid_argument("Beta must be less than Gamma=-1 in Actions_TriaxialStackel_Fudge");
+			if(a>b)
+				throw std::invalid_argument("Alpha must be less than Beta in Actions_TriaxialStackel_Fudge");
 			CS = std::unique_ptr<ConfocalEllipsoidalCoordSys>
 				(new ConfocalEllipsoidalCoordSys(a,b));
 			Jt.resize(3,0);Kt.resize(3,0);
