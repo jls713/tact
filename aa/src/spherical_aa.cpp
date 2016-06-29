@@ -105,11 +105,14 @@ VecDoub Actions_Spherical::find_limits(double r, double E, double L){
     Actions_Spherical_limits_struct Act(Pot,E,L);
     double r_in=r, r_out=r;
     root_find RF(SMALL,100);
-    if(p_r(0.,&Act)>0) r_in=0.;
-    else while(p_r(r_in,&Act)>=0.0) r_in*=0.9;
-    while(p_r(r_out,&Act)>=0.0) r_out*=1.1;
-    limits.push_back(RF.findroot(&p_r,r_in,r,&Act));
-    limits.push_back(RF.findroot(&p_r,r,r_out,&Act));
+    if(p_r(r,&Act)>=0.){
+        if(p_r(0.,&Act)>0) r_in=0.;
+        else while(p_r(r_in,&Act)>=0.0) r_in*=0.9;
+        while(p_r(r_out,&Act)>=0.0) r_out*=1.1;
+        limits.push_back(RF.findroot(&p_r,r_in,r,&Act));
+        limits.push_back(RF.findroot(&p_r,r,r_out,&Act));
+    }
+    else{limits.push_back(r-TINY);limits.push_back(r+TINY);}
     return limits;
 }
 

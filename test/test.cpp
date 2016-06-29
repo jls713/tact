@@ -28,6 +28,7 @@
 #include "../general/utils.h"
 #include "../pot/inc/potential.h"
 #include "../pot/inc/orbit.h"
+#include "../aa/inc/spherical_aa.h"
 #include "../aa/inc/analytic_aa.h"
 #include "../aa/inc/adiabatic_aa.h"
 #include "../aa/inc/stackel_aa.h"
@@ -83,6 +84,20 @@ TEST(PotentialTest,IsochroneActions){
   EXPECT_DOUBLE_EQ(-1.2160333333333331,ISO.Hessian({1.,1.,1.,0.1,0.1,0.1})[0]);
   EXPECT_DOUBLE_EQ(-0.60801666666666654,ISO.Hessian({1.,1.,1.,0.1,0.1,0.1})[1]);
   EXPECT_DOUBLE_EQ(-0.17700703011750593,ISO.Hessian({1.,1.,1.,0.1,0.1,0.1})[2]);
+}
+//=============================================================================
+TEST(ActionTest_Spherical,Spherical){
+  IsochronePotential Pot(1.,1.);
+  Actions_Spherical AA(&Pot);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({radius,0.,0.})[0]);
+  VecDoub X = {radius,0.,0.,0.,Vc,0.};
+  Actions_Isochrone Iso(1.,1.);
+  VecDoub ActsTrue = Iso.actions(X);
+  VecDoub Acts = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acts[0],0.001);
+  EXPECT_NEAR(ActsTrue[1],Acts[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acts[2],0.001);
 }
 
 //=============================================================================

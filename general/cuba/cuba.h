@@ -28,7 +28,7 @@ extern "C" {
 #define MAXCHISQ 10.
 #define MINDEVIATION .25
 #define NGIVEN 0
-#define LDXGIVEN 4
+// #define LDXGIVEN 4
 #define NEXTRA 0
 #define KEY 0
 #define SPIN NULL
