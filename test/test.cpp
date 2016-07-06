@@ -347,7 +347,7 @@ TEST(ActionTest_Stack,StackelCAA){
 
 TEST(ActionTest_Zeros,StackelCAA){
   Logarithmic Pot(1.,1.,0.9);
-  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,4.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.00001,3.,4.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {1.,0.,0.,0.,Vc,0.};
