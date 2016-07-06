@@ -44,6 +44,7 @@ class delta_st{
         double dv0dD2(double R,double z);
         double ds2dD2(double R,double z);
         double get_delta2(void);
+        double find_focus(void);
 };
 
 
