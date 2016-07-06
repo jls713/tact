@@ -183,17 +183,18 @@ double Actions_SpheroidalAdiabaticApproximation::Ez_from_grid(double Lz2,double 
 		int botR,topR;
 		if(R<Rgrid[0]) R = Rgrid[0];
 		if(R>Rgrid[NGRID-1]) R = Rgrid[NGRID-1];
-		topbottom<double>(Rgrid,R,&botR,&topR);
+		topbottom<double>(Rgrid,R,&botR,&topR,"SAA Ez_from_grid R");
 
 		double Lz = sqrt(Lz2);
 		int botL,topL;
 		if(Lz<Lgrid[0]) Lz = Lgrid[0];
 		if(Lz>Lgrid[NL-1]) Lz = Lgrid[NL-1];
-		topbottom<double>(Lgrid,Lz,&botL,&topL);
+		topbottom<double>(Lgrid,Lz,&botL,&topL,"SAA Ez_from_grid Lz");
 
 		double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
 		double fac2=(Lz-Lgrid[botL])/(Lgrid[topL]-Lgrid[botL]);
 
+		// std::cout<<Jz<<std::endl;
 		double Ezb=linterp<double>(Jzgrid[botL][botR],Ezgrid[botL][botR],MIN(Jz,Jzgrid[botL][botR][NGRID-1]));
 		double Ezt=linterp(Jzgrid[botL][topR],Ezgrid[botL][topR],MIN(Jz,Jzgrid[botL][topR][NGRID-1]));
 
@@ -213,13 +214,13 @@ double Actions_SpheroidalAdiabaticApproximation::Jz_from_grid(double Lz2,double 
 		int botR,topR;
 		if(R<Rgrid[0]) R = Rgrid[0];
 		if(R>Rgrid[NGRID-1]) R = Rgrid[NGRID-1];
-		topbottom<double>(Rgrid,R,&botR,&topR);
+		topbottom<double>(Rgrid,R,&botR,&topR,"SAA Jz_from_grid R");
 
 		double Lz = sqrt(Lz2);
 		int botL,topL;
 		if(Lz<Lgrid[0]) Lz = Lgrid[0];
 		if(Lz>Lgrid[NL-1]) Lz = Lgrid[NL-1];
-		topbottom<double>(Lgrid,Lz,&botL,&topL);
+		topbottom<double>(Lgrid,Lz,&botL,&topL,"SAA Jz_from_grid Lz");
 
 		double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
 		double fac2=(Lz-Lgrid[botL])/(Lgrid[topL]-Lgrid[botL]);
@@ -258,8 +259,8 @@ double Actions_SpheroidalAdiabaticApproximation::find_nulimit(double ENu, double
 	SpheroidalAA_zactions_struct RS(this,ENu,Lz2,tau[0],0.,0.,0.);
 	double nu=tau[2],nutry = tau[2];double tiny_number=TINY;
 	root_find RF(TINY,100);
-	if(pnu_squared(nu, &RS)>0.0){
-		while(pnu_squared(nutry, &RS)>0.
+	if(pnu_squared(nu, &RS)>=0.0){
+		while(pnu_squared(nutry, &RS)>=0.
 		      and -(nutry+CS->alpha())>tiny_number)
 			nutry+=0.1*(-CS->alpha()-nutry);
 		if(-(nutry+CS->alpha())>tiny_number)
@@ -288,6 +289,12 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::find_lamlimits(double Elam, do
 			    RF.findroot(&plam_squared,laminner,lambda,&RS));
 		else limits.push_back(-CS->alpha());
 		limits.push_back(RF.findroot(&plam_squared,lambda,lamouter,&RS));
+		if(fabs(limits[0]-limits[1])<TINY){
+		    if(plam_squared(lambda-5*TINY, &RS)>0.0)
+			limits[0]=RF.findroot(&plam_squared,laminner,lambda-5*TINY,&RS);
+	            else
+			limits[1]=RF.findroot(&plam_squared,lambda+5*TINY,lamouter,&RS);
+		}
 	}
 	else{
 		limits.push_back(lambda-tiny_number);
@@ -309,8 +316,8 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
 
 	VecDoub acts(3,0.);
     if(action_check(x,acts,Pot)) return acts;
-	if(fabs(x[2])>ZMAX) std::cerr<<"z outside grid range"<<std::endl;
-
+	if(fabs(x[2])>ZMAX)
+		std::cerr<<"z outside grid range: Pass larger ZMAX to constructor"<<std::endl;
 	if(params){
 		double *deltaguess = (double *) params;
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
@@ -324,9 +331,13 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::actions(const VecDoub& x, void
         CS->newalpha(CS->gamma()-0.1);
 	}
 	VecDoub tau = CS->xv2tau(x);
+	// If exactly on the plane we integrate a bit
+	if(x[2]==0)
+		tau = CS->xv2tau(integrate_a_bit(x,Pot));
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
+	// if vz is small use Enu \approx Ez = 1/2 vz^2 + Pot(R,z)-Pot(R,0)
 	double ENu = (fabs(tau[5])>TINY?(tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
-	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:0.)
+	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:.5*x[5]*x[5]+Pot->Phi(x)-Pot->Phi({x[0],0.,0.}))
 				 +Phi_nu(tau,Lz2);
 
 	double nulim = tau[2];
@@ -363,14 +374,18 @@ VecDoub Actions_SpheroidalAdiabaticApproximation::angles(const VecDoub& x, void 
 	VecDoub angles(6,0.);
 
 	VecDoub tau = CS->xv2tau(x);
-	if(tau[2]==-CS->gamma())tau[2]+=TINY;
+	// If exactly on the plane we integrate a bit
+	if(x[2]==0.)
+		tau = CS->xv2tau(integrate_a_bit(x,Pot));
 	double Lz = Pot->Lz(x), Lz2 = Lz*Lz;
+	// if vz is small use Enu \approx Ez = 1/2 vz^2 + Pot(R,z)-Pot(R,0)
 	double ENu = (fabs(tau[5])>TINY?(tau[2]-tau[0])/(8.*(tau[2]+CS->alpha())
-	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:0.)
+	               *(tau[2]+CS->gamma()))*tau[5]*tau[5]:.5*x[5]*x[5]+Pot->Phi(x)-Pot->Phi({x[0],0.,0.}))
 				 +Phi_nu(tau,Lz2);
 
 	double tn = estimate_tiny(ENu, tau[0], tau[2], Lz2);
-	if(tn==0.)tn=1e-20;
+	std::cout<<tn<<" "<<ENu<<std::endl;
+	if(tn==0.)tn=1e-15;
 	double nulim = tau[2];
 	double Jz = actions_Jz(ENu, Lz2, tau, &nulim);
 	double Delta = .5*(nulim+CS->gamma()), taubar = .5*(nulim-CS->gamma());
@@ -598,8 +613,8 @@ double Actions_CylindricalAdiabaticApproximation::Ez_from_grid(double R,double J
 		return 0;
 	else{
 		int botR,topR;
-		if(R<Rgrid[0]){ R = Rgrid[0]; std::cerr<<"Outside R grid in PAA:"<<R<<"\n";}
-		if(R>Rgrid[NGRID-1]){ R = Rgrid[NGRID-1]; std::cerr<<"Outside R grid in PAA:"<<R<<"\n";}
+		if(R<Rgrid[0]){ R = Rgrid[0]; std::cerr<<"Outside R grid in CAA:"<<R<<". Pass smaller Rmin to constructor.\n";}
+		if(R>Rgrid[NGRID-1]){ R = Rgrid[NGRID-1]; std::cerr<<"Outside R grid in CAA:"<<R<<". Pass larger Rmax to constructor.\n";}
 		topbottom<double>(Rgrid,R,&botR,&topR);
 		double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
 		double Ezb=linterp<double>(Jzgrid[botR],Ezgrid[botR],MIN(Jz,Jzgrid[botR][NGRID-1]));
@@ -615,8 +630,8 @@ double Actions_CylindricalAdiabaticApproximation::Jz_from_grid(double R,double E
 		return 0;
 	else{
 		int botR,topR;
-		if(R<Rgrid[0]){ R = Rgrid[0]; std::cerr<<"Outside R grid in PAA:"<<R<<"\n";}
-		if(R>Rgrid[NGRID-1]){ R = Rgrid[NGRID-1]; std::cerr<<"Outside R grid in PAA:"<<R<<"\n";}
+		if(R<Rgrid[0]){ R = Rgrid[0]; std::cerr<<"Outside R grid in CAA:"<<R<<". Pass smaller Rmin to constructor.\n";}
+		if(R>Rgrid[NGRID-1]){ R = Rgrid[NGRID-1]; std::cerr<<"Outside R grid in CAA:"<<R<<". Pass larger Rmax to constructor.\n";}
 		topbottom<double>(Rgrid,R,&botR,&topR);
 		double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
 		double Jzb=linterp<double>(Ezgrid[botR],Jzgrid[botR],MIN(Ez,Ezgrid[botR][NGRID-1]));
@@ -626,20 +641,6 @@ double Actions_CylindricalAdiabaticApproximation::Jz_from_grid(double R,double E
 }
 
 double Actions_CylindricalAdiabaticApproximation::dJzdEz(double R, double Jz){
-	// dJzdEz at fixed R_0
-	// int bbotJ,btopJ,tbotJ,ttopJ,botR,topR;
-	// if(R<Rgrid[0]) R=Rgrid[0];
-	// if(R>Rgrid[NGRID-1]) R = Rgrid[NGRID-1];
-	// topbottom<double>(Rgrid,R,&botR,&topR);
-	// double fac=(R-Rgrid[botR])/(Rgrid[topR]-Rgrid[botR]);
-	// if(Jz<Jzgrid[botR][0]){bbotJ=0;btopJ=1;}
-	// else if(Jz>Jzgrid[botR][NGRID-1]){bbotJ=NGRID-2;btopJ=NGRID-1;}
-	// else topbottom<double>(Jzgrid[botR],Jz,&bbotJ,&btopJ);
-	// if(Jz<Jzgrid[topR][0]){tbotJ=0;ttopJ=1;}
-	// else if(Jz>Jzgrid[topR][NGRID-1]){tbotJ=NGRID-2;ttopJ=NGRID-1;}
-	// else topbottom<double>(Jzgrid[topR],Jz,&tbotJ,&ttopJ);
-	// return (fac*(Jzgrid[topR][ttopJ]-Jzgrid[topR][tbotJ])/(Ezgrid[topR][ttopJ]-Ezgrid[topR][tbotJ])+(1-fac)*(Jzgrid[botR][btopJ]-Jzgrid[botR][bbotJ])/(Ezgrid[botR][btopJ]-Ezgrid[botR][bbotJ]));
-
 	// dJzdEz at fixed R0
 	double dJ = 0.1*Jz;
 	double Eu = Ez_from_grid(R,Jz+dJ);
@@ -759,7 +760,7 @@ VecDoub Actions_CylindricalAdiabaticApproximation::angles(const VecDoub& x, void
 	dSdI[0] += lsign*Delta*GaussLegendreQuad(&dJRdEint,-.5*PI,anglim,&RA,8);
 	dSdI[1] += lsign*Delta*GaussLegendreQuad(&dJRdLzint,-.5*PI,anglim,&RA,8);
 	dSdI[2] += lsign*Delta*GaussLegendreQuad(&dJRdJzint,-.5*PI,anglim,&RA,8);
-	
+
 	VecDoub dJdIp = {0.,1.,0.};
 
 	double Determinant = dJdIp[1]*(dJdIl[0]*dJdIn[2]-dJdIl[2]*dJdIn[0]);

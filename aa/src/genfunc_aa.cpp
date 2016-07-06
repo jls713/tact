@@ -223,12 +223,12 @@ VecDoub Actions_Genfunc::find_isochrone_params(const std::vector<VecDoub> &orbit
 VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     // for(auto i: AF->actions(x)) std::cout<<i<<" ";
     // Set the parameters -- N_T, N_max, Total_T
-	Actions_Genfunc_data_structure *AA;
-    if(params!=nullptr) AA = (Actions_Genfunc_data_structure *)params;
-    else{
-        double timescale = TargetPot->torb(x);
-        AA = new Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,1200,timescale*32.,symmetry=="axisymmetric"?true:false);
-    }
+
+    double timescale = TargetPot->torb(x);
+    Actions_Genfunc_data_structure AAR = Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,1200,timescale*32.,symmetry=="axisymmetric"?true:false);
+    if(params!=nullptr) AAR = *((Actions_Genfunc_data_structure *)params);
+    Actions_Genfunc_data_structure *AA=&AAR;
+
     // superlong: 800, 20000, 80000, 3200
 
 	// std::cout<<AA->total_T<<" ";
@@ -488,6 +488,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     if(need_to_repeat)
         if(AA->N_T<AA->NTMAX and AA->total_T<AA->maxtimescale){
             Actions_Genfunc_data_structure AA2 = *AA;
+        delete ToyAct;
             return actions(x,&AA2);
         }
 
@@ -519,6 +520,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         std::cerr<<"Returning with "<<AA->N_T/AA->NTMAX
                  <<" fraction of max steps and "<<AA->total_T/AA->maxtimescale
                  <<" fraction of max time"<<std::endl;
+    delete ToyAct;
     if(AA->output_Sn) return b;
     // for(auto i: AF->actions(x)) std::cout<<i<<" ";
 	return {b[0],b[1],b[2]};
@@ -527,12 +529,11 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
 VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
 
     // Set the parameters -- N_T, N_max, Total_T
-    Actions_Genfunc_data_structure *AA;
-    if(params!=nullptr) AA = (Actions_Genfunc_data_structure *)params;
-    else{
-        double timescale = TargetPot->torb(x);
-        AA = new Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,1200,timescale*32.,symmetry=="axisymmetric"?true:false);
-    }
+    double timescale = TargetPot->torb(x);
+    Actions_Genfunc_data_structure AAR = Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,1200,timescale*32.,symmetry=="axisymmetric"?true:false);
+    if(params!=nullptr) AAR = *((Actions_Genfunc_data_structure *)params);
+    Actions_Genfunc_data_structure *AA=&AAR;
+
     // Integrate the orbit
     Orbit orbit(TargetPot,AA->orbit_eps);
     orbit.integrate(x,AA->total_T,AA->stepsize,false);
@@ -751,6 +752,7 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
     if(need_to_repeat)
         if(AA->N_T<AA->NTMAX and AA->total_T<AA->maxtimescale){
             Actions_Genfunc_data_structure AA2 = *AA;
+        delete ToyAct;
             return angles(x,&AA2);
         }
 
@@ -758,6 +760,7 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
         std::cerr<<"Returning with "<<AA->N_T/AA->NTMAX
                  <<" fraction of max steps and "<<AA->total_T/AA->maxtimescale
                  <<" fraction of max time"<<std::endl;
+        delete ToyAct;
     for(int i=0;i<3;++i){ b[i]=fmod(b[i],TPI); if(b[i]<0.) b[i]+=TPI;}
     if(AA->output_Sn) return b;
     return {b[0],b[1],b[2],b[3],b[4],b[5]};
@@ -800,12 +803,12 @@ VecDoub Actions_Genfunc::angles_withdSndJ(const VecDoub &x,int NT,int Nsamp,int 
 VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
 
     // Set the parameters -- N_T, N_max, Total_T
-    Actions_Genfunc_data_structure *AA;
-    if(params!=nullptr) AA = (Actions_Genfunc_data_structure *)params;
-    else{
-        double timescale = TargetPot->torb(x);
-        AA = new Actions_Genfunc_data_structure(timescale*8., 300, 6, 1e-8,500,32.*timescale,symmetry=="axisymmetric"?true:false);
-    }
+
+    double timescale = TargetPot->torb(x);
+    Actions_Genfunc_data_structure AAR = Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,1200,timescale*32.,symmetry=="axisymmetric"?true:false);
+    if(params!=nullptr) AAR = *((Actions_Genfunc_data_structure *)params);
+    Actions_Genfunc_data_structure *AA=&AAR;
+
     // Integrate the orbit
     Orbit orbit(TargetPot,AA->orbit_eps);
     orbit.integrate(x,AA->total_T,AA->stepsize,false);
@@ -897,6 +900,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
         AA->total_T*=10.;
         AA->N_T*=10.;
         Actions_Genfunc_data_structure AA2 = *AA;
+        delete ToyAct;
         return actions(x,&AA2);
     }
 
@@ -920,6 +924,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
             double tmp = av_acts[0];av_acts[0]=av_acts[1];av_acts[1]=tmp;
         }
     }}
+        delete ToyAct;
     return av_acts;
 
 }

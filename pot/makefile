@@ -44,7 +44,7 @@ LIBPY = #$(PYTHONLIBPATH) $(BOOSTLIBPATH) $(BOOSTLIB)
 #------------------------------------------------------
 
 $(OBJ)%.o : $(SRC)%.cpp ${HEADERS}
-	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG) $(DEBUG)
+	$(CCOMPILER) $(OPTS) -c $< -o $@ $(INC) $(TORUSFLAG)
 
 multipole_test.exe: $(OBJECTS)
 	$(CCOMPILER) $(OPTS) -o multipole_test.exe $(OBJECTS) $(LIB)

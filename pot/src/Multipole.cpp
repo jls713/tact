@@ -325,7 +325,7 @@ double MultipoleExpansion::rholm_s(int i, int l, int m){
 }
 
 void MultipoleExpansion::fillPhigrid(){
-    VecDoub rlm(NR,0), y2(NR,0);
+    VecDoub rlm(NR,0), rholm(NR,0.), y2(NR,0);
     double xl, xh, m_min, m_max, m_skip=1, l_skip=1;
 
     if(flip or triaxial) l_skip = 2;
@@ -345,7 +345,8 @@ void MultipoleExpansion::fillPhigrid(){
             double jac = sqrt(a0*a0+drr*drr);
             if(loggrid)
                 jac = drr;
-            rlm[i]=rholm_s(i,l,m)
+            rholm[i]=rholm_s(i,l,m);
+            rlm[i]=rholm[i]
                         *pow(radial_grid[i],l+2)
                         *jac;
         }
@@ -374,7 +375,19 @@ void MultipoleExpansion::fillPhigrid(){
         }
 
         // 2. Calculate rho*Ylm*r^(-l+1) at radial grid points
-        for(int i=0;i<NR;i++) rlm[i]=rlm[i]*pow(radial_grid[i],-2*l-1);
+        for(int i=0;i<NR;i++){
+            // Note that the following line is a quick way to find rho*Ylm*r^(-l+1) but produces underflow for small radial_grid[i] and large l.
+            // Therefore, we go for the slightly more expensive option.
+            // rlm[i]=rlm[i]*pow(radial_grid[i],-2*l-1);
+
+            double drr = radial_grid[i];
+            double jac = sqrt(a0*a0+drr*drr);
+            if(loggrid)
+                jac = drr;
+            rlm[i]=rholm[i]
+                        *pow(radial_grid[i],-l+1)
+                        *jac;
+        }
 
         // Make a spline in rlm -- not currently used
         // spline(delta_grid,rlm,1e30,1e30,y2);

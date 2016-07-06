@@ -45,6 +45,7 @@
 #include "GSLInterface/GSLInterface.h"
 #include "utils.h"
 #include "potential.h"
+#include "orbit.h"
 #include "stackel_aa.h"
 #include "debug.h"
 
@@ -92,16 +93,16 @@ VecDoub Actions_AxisymmetricStackel::find_limits(const VecDoub& tau, const VecDo
 	// find root of p^2(nu)
 	double nuouter=nu;
 	RS = root_struct_axi(Pot, {ints[0],ints[1],ints[3]});
-	if(ptau2ROOT_AxiSym(nu, &RS)<0.0){
-		while(ptau2ROOT_AxiSym(nuouter, &RS)<0.
-		      and -(nuouter+Pot->alpha())>tiny_number)
+	if(ptau2ROOT_AxiSym(nu, &RS)<=0.0){
+        while(ptau2ROOT_AxiSym(nuouter, &RS)<=0.
+		    and -(nuouter+Pot->alpha())>tiny_number)
 			nuouter+=0.1*(-Pot->alpha()-nuouter);
 		if(-(nuouter+Pot->alpha())>tiny_number)
-			limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,nu,nuouter,&RS));
+			limits.push_back(RF.findroot(&ptau2ROOT_AxiSym,nu+TINY,nuouter,&RS));
 		else limits.push_back(-Pot->alpha());
 	}
 	else limits.push_back(nu+tiny_number);
-	return limits;
+          return limits;
 }
 
 double ptau2_AxiSym(double tau, void *params){
@@ -114,6 +115,7 @@ double ptau2_AxiSym(double tau, void *params){
 double J_integrand_AxiSym(double theta, void *params){
 	action_struct_axi * AS = (action_struct_axi *) params;
 	double tau=AS->taubargl+AS->Deltagl*sin(theta);
+	// std::cout<<tau<<" "<<ptau2_AxiSym(tau,&(AS->RS))<<std::endl;
 	return sqrt(MAX(0.,ptau2_AxiSym(tau,&(AS->RS))))*cos(theta);
 }
 
@@ -357,9 +359,11 @@ VecDoub Actions_AxisymmetricStackel::actions(const VecDoub& x, void *params){
 
 	VecDoub tau = Pot->xv2tau(x);
 	if(tau[2]==-Pot->gamma())tau[2]+=TINY;
+	// If exactly on the plane we integrate a bit
+	// if(tau[2]==-Pot->gamma() and tau[5]==0.)
+	//     tau = Pot->xv2tau(integrate_a_bit(x,Pot));
 	VecDoub integrals = Pot->x2ints(x,&tau);
 	VecDoub limits = find_limits(tau,integrals);
-
 	VecDoub actions(3,0.);
 	// JR
 	double taubar = 0.5*(limits[0]+limits[1]);
@@ -625,12 +629,14 @@ VecDoub Actions_AxisymmetricStackel_Fudge::find_limits(const VecDoub& tau){
 	double nuouter=nu;
 	ints[2]=Kt[1];
 	root_struct_axi_fudge RS_n(this,ints,tau,1);
-	if(ptau2ROOT_AxiSym_Fudge(nu, &RS_n)<0.0){
-		while(ptau2ROOT_AxiSym_Fudge(nuouter, &RS_n)<0.
+
+	if(ptau2ROOT_AxiSym_Fudge(nu, &RS_n)<=0.0){
+		while(ptau2ROOT_AxiSym_Fudge(nuouter, &RS_n)<=0.
 		      and -(nuouter+CS->alpha())>tiny_number)
 			nuouter+=0.1*(-CS->alpha()-nuouter);
-		if(-(nuouter+CS->alpha())>tiny_number)
+		if(-(nuouter+CS->alpha())>tiny_number){
 			limits.push_back(RF.findroot(&ptau2ROOT_AxiSym_Fudge,nu,nuouter,&RS_n));
+		}
 		else limits.push_back(-CS->alpha());
 	}
 	else limits.push_back(nu+tiny_number);
@@ -694,15 +700,19 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
     VecDoub actions(3,0.);
     if(action_check(x,actions,Pot)) return actions;
 
-	if(params){
+    if(params){
 		double *deltaguess = (double *) params;
 		if(*deltaguess>0.) CS->newalpha(-Pot->DeltaGuess(x)+CS->gamma());
 		else CS->newalpha(*deltaguess);
 	}
 
+
 	if(CS->alpha()>CS->gamma())CS->newalpha(CS->gamma()-0.1);
 
 	VecDoub tau = CS->xv2tau(x);
+	// If exactly on the plane we integrate a bit
+	if(x[2]==0.)
+		tau = CS->xv2tau(integrate_a_bit(x,Pot));
 
 	E = Pot->H(x);
 	if(E>0){
@@ -726,6 +736,7 @@ VecDoub Actions_AxisymmetricStackel_Fudge::actions(const VecDoub& x, void *param
 	taubar = 0.5*(limits[2]+limits[3]);
 	Delta = 0.5*(limits[3]-limits[2]);
 	ints[2]=Kt[1];
+
 	AS = action_struct_axi_fudge(this,ints,tau,taubar,Delta,1, 0.);
 	actions[2]=2.*Delta*GaussLegendreQuad(&J_integrand_AxiSym_Fudge,-.5*PI,.5*PI,&AS)/PI;
 	if(x[2]==0. and x[5]==0.) actions[2]=0.;
@@ -748,6 +759,9 @@ VecDoub Actions_AxisymmetricStackel_Fudge::angles(const VecDoub& x, void *params
         CS->newalpha(CS->gamma()-0.1);
 	}
 	VecDoub tau = CS->xv2tau(x);
+	// If exactly on the plane we integrate a bit
+	if(x[2]==0.)
+		tau = CS->xv2tau(integrate_a_bit(x,Pot));
 	double tn = (x[3]*x[3]+x[4]*x[4]+x[5]*x[5])/5.e11;
 	E = Pot->H(x); I2 = 0.5*(x[0]*x[4]-x[1]*x[3])*(x[0]*x[4]-x[1]*x[3]);
 	integrals(tau);

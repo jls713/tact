@@ -79,7 +79,7 @@ class find_best_delta{
 
             \return Delta
         */
-        double delta(double x0);
+        VecDoub delta(double x0, int iter=0);
 
         // Functions that must be accessed by root-finding but not public
         double vsqx(double x);

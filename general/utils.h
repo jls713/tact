@@ -35,6 +35,7 @@
 #include <vector>
 #include <cmath>
 #include <exception>
+#include <stdexcept>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -395,10 +396,8 @@ template<class c>
 inline void topbottom(const std::vector<c> &xm,c x,int *botx,int *topx, std::string name=""){
     int n=xm.size();
     int m, top=n-1, bot=0;
-    if((xm[top]-x)*(x-xm[bot])<0.){
-        std::cout<<"improper x input to topbottom: "<<xm[bot]<<" "<<xm[top]<<" "<<x<<" "<<name<<std::endl;
-        exit(0);
-    }
+    if((xm[top]-x)*(x-xm[bot])<0.)
+        throw std::runtime_error("improper x input to topbottom: "+std::to_string(xm[bot])+" "+std::to_string(xm[top])+" "+std::to_string(x)+" "+name+"\n");
     while(top-bot>1){
         m=(top+bot)/2;
         if((xm[top]-x)*(x-xm[m])>=0) bot=m;

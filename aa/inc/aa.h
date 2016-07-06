@@ -41,6 +41,7 @@
 #include "utils.h"
 #include <stdexcept>
 #include "potential.h"
+#include "orbit.h"
 
 // ============================================================================
 
@@ -66,6 +67,7 @@ class Action_Finder{
         std::cout<<"You shouldn't be in L_circ"<<std::endl;
         return 0.;
     }
+    virtual ~Action_Finder(){}
 
 };
 
@@ -79,5 +81,16 @@ int action_check(const VecDoub &x, VecDoub &acts, Potential_JS *Pot);
     Checks input for actions
 */
 int angle_check(const VecDoub &x, VecDoub &angs, Potential_JS *Pot);
+// ============================================================================
+/**
+ * @brief integrate for a short time
+ * @details integrates the orbit for 1/1000 of an orbital time
+ *
+ * @param x phase-space point
+ * @param Pot potential
+ *
+ * @return new phase-space point
+ */
+VecDoub integrate_a_bit(VecDoub x, Potential_JS *Pot);
 #endif
 // ============================================================================

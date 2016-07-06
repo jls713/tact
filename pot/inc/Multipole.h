@@ -191,7 +191,17 @@ public:
         return {x[0]*P,x[1]*P,x[2]*P};
     }
 };
-
+class TestDensity_Plummer: public TriaxialDensity{
+private:
+    double GM, rs;
+    VecDoub a;
+public:
+    TestDensity_Plummer(double GM, double rs, VecDoub a)
+        :TriaxialDensity(a),GM(GM/(a[0]*a[1]*a[2])),rs(rs),a(a){};
+    double density_m2(double m){
+        return .75*GM*rs*rs*rs*pow(1.+m/rs/rs,-2.5)/conv::FPG;
+    }
+};
 class TestDensity_Isochrone: public TriaxialDensity{
 private:
     double GM, rs;

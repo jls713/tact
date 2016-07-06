@@ -27,6 +27,7 @@
 
 #include "../general/utils.h"
 #include "../pot/inc/potential.h"
+#include "../pot/inc/Multipole.h"
 #include "../pot/inc/orbit.h"
 #include "../aa/inc/spherical_aa.h"
 #include "../aa/inc/analytic_aa.h"
@@ -118,7 +119,7 @@ TEST(ActionTest_TriaxialStack,StackelFudge){
 
 TEST(ActionTest_TriaxialStack,StackelFudgeWrongAlphaBeta){
   StackelTriaxial Pot(1.,30.,20.);
-  Actions_TriaxialStackel_Fudge AA(&Pot,30.,20.);
+  ASSERT_THROW(Actions_TriaxialStackel_Fudge AA(&Pot,30.,20.),std::invalid_argument);
 }
 TEST(ActionTest_Iso,StackelFudge){
   Isochrone Pot(1.,1.,0.99999);
@@ -178,11 +179,18 @@ TEST(ActionTest_Zeros,StackelFudge){
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
 
-  X = {40.,0.,40.,0.,0.,0.};
+  X = {40.,0.,40.,0.,0.,0.0};
   Acs = AA.actions(X);
   EXPECT_EQ(Acs[0]>10.,1);
+  printVector(Acs);
   X = {40.,0.,0.,0.,0.,0.};
   EXPECT_EQ(AA.actions(X)[0]>10.,1);
+  X = {40.,0.,0.,0.,0.,.2};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[2]>0.,1);
+  X = {40.,0.,0.,0.,0.,0.};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[2]==0.,1);
 }
 
 
@@ -318,30 +326,28 @@ TEST(ActionTest_Iso,StackelCAA){
   EXPECT_NEAR(FreqsTrue[2],Angs[5],0.008);
 }
 
-// NANs in Stackel forces on axis
-
-// TEST(ActionTest_Stack,StackelCAA){
-//   StackelOblate_PerfectEllipsoid Pot(1.,-30.);
-//   Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
-//   Actions_AxisymmetricStackel AAS(&Pot);
-//   double radius = 1.;
-//   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
-//   VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
-//   VecDoub ActsTrue = AAS.actions(X);
-//   VecDoub FreqsTrue = AAS.angles(X);
-//   VecDoub Angs = AA.angles(X);
-//   VecDoub Acs = AA.actions(X);
-//   EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
-//   EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
-//   EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
-//   EXPECT_NEAR(FreqsTrue[3],Angs[3],0.001);
-//   EXPECT_NEAR(FreqsTrue[4],Angs[4],0.001);
-//   EXPECT_NEAR(FreqsTrue[5],Angs[5],0.004);
-// }
+TEST(ActionTest_Stack,StackelCAA){
+  StackelOblate_PerfectEllipsoid Pot(1.,-30.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
+  Actions_AxisymmetricStackel AAS(&Pot);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
+  VecDoub ActsTrue = AAS.actions(X);
+  VecDoub FreqsTrue = AAS.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
+  EXPECT_NEAR(FreqsTrue[3],Angs[3],0.001);
+  EXPECT_NEAR(FreqsTrue[4],Angs[4],0.001);
+  EXPECT_NEAR(FreqsTrue[5],Angs[5],0.004);
+}
 
 TEST(ActionTest_Zeros,StackelCAA){
   Logarithmic Pot(1.,1.,0.9);
-  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,2.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.02,3.,4.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
   VecDoub X = {1.,0.,0.,0.,Vc,0.};
@@ -356,11 +362,14 @@ TEST(ActionTest_Zeros,StackelCAA){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
-  X = {40.,0.,40.,0.,0.,0.};
+  X = {1.,0.,1.,0.,0.,0.};
   Acs = AA.actions(X);
-  EXPECT_EQ(Acs[0]>10.,1);
-  X = {40.,0.,0.,0.,0.,0.};
-  EXPECT_EQ(AA.actions(X)[0]>10.,1);
+  EXPECT_EQ(Acs[0]>0.,1);
+  X = {1.,0.,0.,0.,0.,0.2};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[2]>0.,1);
+  X = {1.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>0.,1);
 }
 
 
@@ -763,6 +772,14 @@ TEST(ActionTest,StackelUV){
   EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
+TEST(DeltaTest,StackelUV){
+  VecDoub X = {0.15,0.01,0.01,0.02,0.02,0.2};
+  TestDensity_Plummer Plum(1.,1.,{1.,1.,0.9});
+  MultipoleExpansion_Axisymmetric Pot(&Plum,150,12,-1,1.,0.001,1000.);
+  uv_orb AA(&Pot,0.01,100.,10,10,"");
+  printVector(AA.actions(X));
+}
+
 TEST(ActionTest,StackelF){
   Logarithmic Pot(1.,1.,0.8);
   Actions_AxisymmetricStackel_Fudge AA(&Pot,100.);
@@ -775,6 +792,7 @@ TEST(ActionTest,StackelF){
   double guess_alpha=1.;
   VecDoub Angs = AA.angles(X,&guess_alpha);
   VecDoub Acs = AA.actions(X,&guess_alpha);
+  printVector(Acs);
   EXPECT_NEAR(ActsTrue[0],Acs[0],0.003);
   EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
   EXPECT_NEAR(ActsTrue[2],Acs[2],0.005);
@@ -861,24 +879,25 @@ TEST(ActionTest_Iso,StackelFit){
   EXPECT_NEAR(FreqsTrue[2],Angs[5],0.004);
 }
 
-// TEST(ActionTest_Stack,StackelFit){
-//   StackelOblate_PerfectEllipsoid Pot(100.,-30.);
-//   Actions_StackelFit AA(&Pot);
-//   Actions_AxisymmetricStackel AAS(&Pot);
-//   double radius = 1.;
-//   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
-//   VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
-//   VecDoub ActsTrue = AAS.actions(X);
-//   VecDoub FreqsTrue = AAS.angles(X);
-//   VecDoub Angs = AA.angles(X);
-//   VecDoub Acs = AA.actions(X);
-//   EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
-//   EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
-//   EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
-//   EXPECT_NEAR(FreqsTrue[0],Angs[3],0.001);
-//   EXPECT_NEAR(FreqsTrue[1],Angs[4],0.001);
-//   EXPECT_NEAR(FreqsTrue[2],Angs[5],0.004);
-// }
+TEST(ActionTest_Stack,StackelFit){
+  StackelOblate_PerfectEllipsoid Pot(100.,-30.);
+  Actions_StackelFit AA(&Pot);
+  Actions_AxisymmetricStackel AAS(&Pot);
+  // Actions_Genfunc AAS(&Pot,"axisymmetric");
+  double radius = 10.;
+  double Vc = sqrt(radius*-Pot.Forces({radius,0.1,0.1})[0]);
+  VecDoub X = {radius,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
+  VecDoub ActsTrue = AAS.actions(X);
+  VecDoub FreqsTrue = AAS.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
+  EXPECT_NEAR(FreqsTrue[3],Angs[3],0.004);
+  EXPECT_NEAR(FreqsTrue[4],Angs[4],0.004);
+  EXPECT_NEAR(FreqsTrue[5],Angs[5],0.004);
+}
 
 
 TEST(ActionTest_Zeros,StackelFit){
@@ -901,6 +920,9 @@ TEST(ActionTest_Zeros,StackelFit){
   X = {40.,0.,40.,0.,0.,0.};
   Acs = AA.actions(X);
   EXPECT_EQ(Acs[0]>.1,1);
+  X = {40.,0.,0.,0.,0.,0.2};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[2]>0.,1);
   X = {40.,0.,0.,0.,0.,0.};
   EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
@@ -1037,26 +1059,24 @@ TEST(ActionTest_Iso,StackelSAA){
   EXPECT_NEAR(FreqsTrue[2],Angs[5],0.008);
 }
 
-// NANs in Stackel forces on axis
-
-// TEST(ActionTest_Stack,StackelSAA){
-//   StackelOblate_PerfectEllipsoid Pot(1.,-30.);
-//   Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
-//   Actions_AxisymmetricStackel AAS(&Pot);
-//   double radius = 1.;
-//   double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
-//   VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
-//   VecDoub ActsTrue = AAS.actions(X);
-//   VecDoub FreqsTrue = AAS.angles(X);
-//   VecDoub Angs = AA.angles(X);
-//   VecDoub Acs = AA.actions(X);
-//   EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
-//   EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
-//   EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
-//   EXPECT_NEAR(FreqsTrue[3],Angs[3],0.001);
-//   EXPECT_NEAR(FreqsTrue[4],Angs[4],0.001);
-//   EXPECT_NEAR(FreqsTrue[5],Angs[5],0.004);
-// }
+TEST(ActionTest_Stack,StackelSAA){
+  StackelOblate_PerfectEllipsoid Pot(1.,-30.);
+  Actions_CylindricalAdiabaticApproximation AA(&Pot,"",false,false,0.2,3.,2.);
+  Actions_AxisymmetricStackel AAS(&Pot);
+  double radius = 1.;
+  double Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
+  VecDoub X = {1.,0.1,0.1,0.1*Vc,Vc,0.1*Vc};
+  VecDoub ActsTrue = AAS.actions(X);
+  VecDoub FreqsTrue = AAS.angles(X);
+  VecDoub Angs = AA.angles(X);
+  VecDoub Acs = AA.actions(X);
+  EXPECT_NEAR(ActsTrue[0],Acs[0],0.001);
+  EXPECT_NEAR(ActsTrue[1],Acs[1],0.001);
+  EXPECT_NEAR(ActsTrue[2],Acs[2],0.001);
+  EXPECT_NEAR(FreqsTrue[3],Angs[3],0.001);
+  EXPECT_NEAR(FreqsTrue[4],Angs[4],0.001);
+  EXPECT_NEAR(FreqsTrue[5],Angs[5],0.004);
+}
 
 TEST(ActionTest_Zeros,StackelSAA){
   Logarithmic Pot(1.,1.,0.9);
@@ -1075,11 +1095,14 @@ TEST(ActionTest_Zeros,StackelSAA){
   EXPECT_DOUBLE_EQ(0.,Angs[3]);
   EXPECT_DOUBLE_EQ(Vc,Angs[4]);
   EXPECT_DOUBLE_EQ(0.,Angs[5]);
-  X = {40.,0.,40.,0.,0.,0.};
+  X = {1.,0.,1.,0.,0.,0.};
   Acs = AA.actions(X);
-  EXPECT_EQ(Acs[0]>10.,1);
-  X = {40.,0.,0.,0.,0.,0.};
-  EXPECT_EQ(AA.actions(X)[0]>10.,1);
+  EXPECT_EQ(Acs[0]>0.,1);
+  X = {1.,0.,0.,0.,0.,0.2};
+  Acs = AA.actions(X);
+  EXPECT_EQ(Acs[2]>0.,1);
+  X = {1.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>0.,1);
 }
 
 TEST(ActionTest_Zero,StackelSAA){
@@ -1125,52 +1148,56 @@ TEST(ActionTest_Small,StackelSAA){
   Actions_SpheroidalAdiabaticApproximation AA(&Pot,"",false,false,100.,0.02,3.,2.);
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
-  // std::cout<<"small z, zero vR, zero vz"<<std::endl;
-  // VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
-  // VecDoub Acs = AA.actions(X);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
-  // VecDoub Angs = AA.angles(X);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  // std::cout<<"zero z, small vR, small vz"<<std::endl;
-  // X = {1.,0.,0.,2e-5,Vc,2e-5};
-  // Acs = AA.actions(X);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
-  // Angs = AA.angles(X);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  // std::cout<<"small z, small vR, small vz"<<std::endl;
-  // X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
-  // Acs = AA.actions(X);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
-  // Angs = AA.angles(X);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
-  // EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
-  std::cout<<"small z, small vz"<<std::endl;
-  VecDoub X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
+  std::cout<<"small z, zero vR, zero vz"<<std::endl;
+  VecDoub X = {1.,2e-5,2e-5,0.,Vc,0.};
   VecDoub Acs = AA.actions(X);
+  printVector(Acs);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
   VecDoub Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"zero z, small vR, small vz"<<std::endl;
+  X = {1.,0.,0.,2e-5,Vc,2e-5};
+  Acs = AA.actions(X);
+  printVector(Acs);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  printVector(Angs);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+  std::cout<<"small z, small vR, small vz"<<std::endl;
+  X = {1.,2e-5,2e-5,2e-5,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+
+  std::cout<<"small z, small vz"<<std::endl;
+  X = {1.,2e-5,2e-5,.2*Vc,Vc,2e-5};
+  Acs = AA.actions(X);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[0] or Acs[0]!=Acs[0],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[1] or Acs[1]!=Acs[1],false);
+  EXPECT_EQ(std::numeric_limits<double>::infinity()==Acs[2] or Acs[2]!=Acs[2],false);
+  Angs = AA.angles(X);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[0] or Angs[0]!=Angs[0],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[1] or Angs[1]!=Angs[1],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[2] or Angs[2]!=Angs[2],false);
@@ -1190,6 +1217,7 @@ TEST(ActionTest_Small,StackelSAA){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[3] or Angs[3]!=Angs[3],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[4] or Angs[4]!=Angs[4],false);
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
+
 }}  // namespace
 
 int main(int argc, char **argv) {

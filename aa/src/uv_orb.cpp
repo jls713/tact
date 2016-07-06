@@ -67,13 +67,16 @@ void uv_orb::fillDeltagrids(const std::string& file){
     Delta = std::vector<VecDoub>(NE,VecDoub(NL,0.));
     #pragma omp parallel for schedule (dynamic)
     for(int i=0; i<NE;i++){
-        double R = Pot->R_E(E_delta[i]);
+        double R = .9*Pot->R_E(E_delta[i]);
+        VecDoub DeltaResult(2,0.);
         for(double j=0;j<NL;j++){
             L_delta[i][j] = Pot->L_circ(R)*(j*0.8/(double)(NL-1)+0.001);
             find_best_delta DD(Pot, E_delta[i], L_delta[i][j]);
-            Delta[i][j]=DD.delta(R*.9);
-            if(Delta[i][j]<0. or Delta[i][j]!=Delta[i][j])
-            	Delta[i][j]=R/5.;
+            DeltaResult = DD.delta(R);
+            if(DeltaResult[1]>0.) R = DeltaResult[0];
+            Delta[i][j]=DeltaResult[1];
+    	    if(Delta[i][j]<0. or Delta[i][j]!=Delta[i][j])
+                	Delta[i][j]=R/5.;
             if(debug_deltaGrid)
 		std::cerr<<"DeltaGrid: "
             	<<OUTPUT(E_delta[i])

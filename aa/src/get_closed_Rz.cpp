@@ -89,14 +89,16 @@ double delta_st::ds2dD2(double R, double z){
 }
 
 double delta_st::get_delta2(void){
-    double D2min=-.001,D2max=5;
+    double D2min=0.2*R0,D2max=5.*R0;
     double dsdDmin=ds2totaldD2(D2min,this),dsdDmax=ds2totaldD2(D2max,this);
     while(dsdDmin*dsdDmax>0){
         if(dsdDmax<0){
-            D2max*=5; dsdDmax=ds2totaldD2(D2max,this);
+            D2max*=2.; dsdDmax=ds2totaldD2(D2max,this);
         }else{
-            D2min-=.1; dsdDmin=ds2totaldD2(D2min,this);
+            if(D2min<1e-10){D2max*=2.; dsdDmax=ds2totaldD2(D2max,this);}
+            D2min*=.5; dsdDmin=ds2totaldD2(D2min,this);
         }
+        if(D2max>1e10) return D2min; // near-circular case
     }
     if(dsdDmin*dsdDmax<0){
         root_find RF(1e-10,25);
@@ -169,8 +171,6 @@ int find_best_delta::go_up(double x,double *Ri,double *zi,int nmaxR){//throws up
         htry=hnext;
         Ri[j]=x2[0]; zi[j]=x2[1]; j++; if(j==nmaxR) break;
     }
-    // std::cout<<zi[j]<<" ";
-    //if(Ri[0]<zi[j-1]) setcolour("black"); else setcolour("red");
     return j;
 }
 
@@ -184,13 +184,17 @@ double find_best_delta::sorted(double x0){
     return x0;
 }
 
-double find_best_delta::delta(double x0){
+VecDoub find_best_delta::delta(double x0, int iter){
+    if(iter>5)
+        return {x0,-1};
     // finds closed shell
+    double x00=x0;
 
     x0=sorted(x0);// ensure vsq>=0
     double x1,dx0,dx1;
     dx0=goround(x0,this);
     double dx=.8; x1=sorted(x0/dx); dx1=goround(x1,this);
+
     int k=0,bo=0;
     while(dx0*dx1>0){//we haven't bracketed the root
         if(fabs(dx1)<fabs(dx0)){//more of same
@@ -203,12 +207,14 @@ double find_best_delta::delta(double x0){
         x1=sorted(x0*dx);dx1=goround(x1,this);
         k++;
         if(k==21){
-            printf("get_closed: %f %f %g %g %g\n",x0,x1,dx0,dx1,dx);
+            // printf("get_closed: %f %f %g %g %g\n",x0,x1,dx0,dx1,dx);
             if(fabs(dx0)<1.e-7){
-                return dx0;
+                // return dx0;
+        return delta(x0*.5,++iter);
             }else{
-                printf("problem in get_closed(): %f %f %f %f\n",x0,x1,dx0,dx1);
-                return -1;
+                // printf("problem in get_closed(): %f %f %f %f\n",x0,x1,dx0,dx1);
+                // return -1.;
+        return delta(x0*.5,++iter);
             }
         }
     }
@@ -217,11 +223,15 @@ double find_best_delta::delta(double x0){
     double R0=RF.findroot(&goround,x0,x1,this);
     double Ri[nmaxRi],zi[nmaxRi];
     int np=go_up(R0,Ri,zi,nmaxRi);
+    if(Ri[np-1]>R0)
+        return delta(x00*1.4,++iter);
     // and fits ellipse
     delta_st DD(R0,Ri,zi,np);
     double max=0.;
     for(int i=0;i<np;i++) if(zi[i]>max) max = zi[i];
-    return sqrt(DD.get_delta2());
+    // for(int kk=0;kk<nmaxRi;++kk)std::cout<<Ri[kk]<<" "<<zi[kk]<<" "<<E<<" "<<Lzsq<<std::endl;
+
+    return {R0,sqrt(DD.get_delta2())};
 }
 
 

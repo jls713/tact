@@ -161,26 +161,28 @@ double Potential_JS::find_potential_intercept(double Phi0, int direction,double 
 double StackelOblate_PerfectEllipsoid::G(double tau){
 	/* de Zeeuw's G(tau) function */
 	double Gamma = CS->gamma();
-	if(tau+Gamma<SMALL) return Const;
+	if(tau+Gamma<SMALL) return Const*(1.-(tau+Gamma)/3.);
 	double sqG =sqrt(-Gamma/(tau+Gamma));
 	return Const*sqG*atan(1./sqG);
 }
 double StackelOblate_PerfectEllipsoid::GPrime(double tau){
 	/* derivative of G wrt tau */
-	double Gamma = CS->gamma(), sqG =sqrt(-Gamma/(tau+Gamma));
+	double Gamma = CS->gamma();
+	if(tau+Gamma<SMALL) return 0.5*Const*(-2./3.+4.*(tau+Gamma)/5.);
+	double sqG =sqrt(-Gamma/(tau+Gamma));
 	return 0.5*Const*sqG*sqG*(sqG*atan(1./sqG)/Gamma+1./tau);
 }
 
 VecDoub StackelOblate_PerfectEllipsoid::Vderivs(const VecDoub& tau){
 	/* Calculates the derivatives of the Potential_JS wrt tau given tau=(l,v) */
-	double Gl = G(tau[0]), Gv = G(tau[1]), Gamma = CS->gamma();
+        double Gl = G(tau[0]), Gv = G(tau[1]), Gamma = CS->gamma();
 	double dVdl = 	(-GPrime(tau[0])*(tau[0]+Gamma)-Gl
 			+(Gl*(tau[0]+Gamma)-Gv*(tau[1]+Gamma))/(tau[0]-tau[1]))
 			/(tau[0]-tau[1]);
 	double dVdv = 	(GPrime(tau[1])*(tau[1]+Gamma)+Gv
 			-(Gl*(tau[0]+Gamma)-Gv*(tau[1]+Gamma))/(tau[0]-tau[1]))
 			/(tau[0]-tau[1]);
-	VecDoub derivs = {dVdl, dVdv};
+        VecDoub derivs = {dVdl, dVdv};
 	return derivs;
 }
 
@@ -190,7 +192,6 @@ VecDoub StackelOblate_PerfectEllipsoid::Forces(const VecDoub& x){
 	VecDoub derivs = CS->derivs(x);
 	VecDoub tau = {derivs[0],derivs[1]};
 	VecDoub Vderiv = Vderivs(tau);
-
 	double dvdR = -Vderiv[0]*derivs[2]-Vderiv[1]*derivs[4];
 	double R = norm<double>({x[0],x[1]});
 	VecDoub result ={ 	x[0]*dvdR/R, x[1]*dvdR/R,

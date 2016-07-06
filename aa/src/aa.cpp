@@ -38,7 +38,7 @@ int action_check(const VecDoub &x, VecDoub &acts, Potential_JS *Pot){
     }
     acts[1]=Polar[0]*Polar[4];
     if(fabs(x[2])<SMALL and fabs(x[5])<SMALL){
-        acts[2]=0.;
+         acts[2]=0.;
         if(fabs(Polar[3])<TINY and fabs(Polar[0])<0.01*SMALL){
             acts[0]=0.;
             return 1;
@@ -93,3 +93,9 @@ int angle_check(const VecDoub &x, VecDoub &angs, Potential_JS *Pot){
     }
     return 0;
     }
+// ============================================================================
+VecDoub integrate_a_bit(VecDoub x, Potential_JS *Pot){
+    Orbit Orb(Pot);
+    double torb = Pot->torb(x);
+    return Orb.integrate(x,torb/1000.,torb/1000.,false);
+}
