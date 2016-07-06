@@ -240,36 +240,44 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     // SymplecticOrbit orbit(TargetPot,50.);
     // orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
-    // Assess the angular momentum of the orbit and choose an appropriate
-    // toy potential
-	std::vector<int> loopi = loop(orbit.results());
-	int total_loop=0;
-    for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
-    if(total_loop==0){
-		// VecDoub Om = find_box_params_minvar(orbit.results());
-        VecDoub Om = find_box_params(orbit.results());
-		ToyAct = new Actions_HarmonicOscillator(Om);
-	}
-	else if(total_loop==1){
-        // VecDoub ff = find_isochrone_params_minvar(orbit.results());
+
+    if(symmetry == "axisymmetric"){
+        //in an axisymmetric potential we should always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
-		ToyAct = new Actions_Isochrone(ff[0],ff[1]);
-	}
-    else if(AA->total_T<AA->maxtimescale){
-        AA->total_T*=2.;
-        Actions_Genfunc_data_structure AA2 = *AA;
-        return actions(x,&AA2);
+        ToyAct = new Actions_Isochrone(ff[0],ff[1]);
     }
     else{
-        if(debug_genfunc){
-            std::cerr<<"Cannot find ascertain orbit type for: ";
-            for(auto i:x) std::cerr<<i<<" ";
-            std::cerr<<". Assuming box.\n";
+        // Assess the angular momentum of the orbit and choose an appropriate
+        // toy potential (triaxial potentials only)
+    	std::vector<int> loopi = loop(orbit.results());
+    	int total_loop=0;
+        for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
+        if(total_loop==0){
+    		// VecDoub Om = find_box_params_minvar(orbit.results());
+            VecDoub Om = find_box_params(orbit.results());
+    		ToyAct = new Actions_HarmonicOscillator(Om);
+    	}
+    	else if(total_loop==1){
+            // VecDoub ff = find_isochrone_params_minvar(orbit.results());
+            VecDoub ff = find_isochrone_params(orbit.results());
+    		ToyAct = new Actions_Isochrone(ff[0],ff[1]);
+    	}
+        else if(AA->total_T<AA->maxtimescale){
+            AA->total_T*=2.;
+            Actions_Genfunc_data_structure AA2 = *AA;
+            return actions(x,&AA2);
         }
-        VecDoub Om = find_box_params(orbit.results());
-	 ToyAct = new Actions_HarmonicOscillator(Om);
-        // VecDoub ff = find_isochrone_params(orbit.results());
-        // ToyAct = new Actions_Isochrone(ff[0],ff[1]);
+        else{
+            if(debug_genfunc){
+                std::cerr<<"Cannot find ascertain orbit type for: ";
+                for(auto i:x) std::cerr<<i<<" ";
+                std::cerr<<". Assuming box.\n";
+            }
+            VecDoub Om = find_box_params(orbit.results());
+    	 ToyAct = new Actions_HarmonicOscillator(Om);
+            // VecDoub ff = find_isochrone_params(orbit.results());
+            // ToyAct = new Actions_Isochrone(ff[0],ff[1]);
+        }
     }
 	// Fill an array with the appropriate vectors n
     std::vector<std::vector<int>> n_vectors;
@@ -541,37 +549,44 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
     // SymplecticOrbit orbit(TargetPot,50.);
     // orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
-    // Assess the angular momentum of the orbit and choose an appropriate
-    // toy potential
-    std::vector<int> loopi = loop(orbit.results());
-    int total_loop=0;
-    for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
 
-    if(total_loop==0){
-        // VecDoub Om = find_box_params_minvar(orbit.results());
-        VecDoub Om = find_box_params(orbit.results());
-        ToyAct = new Actions_HarmonicOscillator(Om);
-    }
-    else if(total_loop==1){
-        // VecDoub ff = find_isochrone_params_minvar(orbit.results());
+    if(symmetry == "axisymmetric"){
+        //if the potential is axisymmetric, we always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
-        ToyAct = new Actions_Isochrone(ff[0],ff[1]);
-    }
-    else if(AA->total_T<AA->maxtimescale){
-        AA->total_T*=2.;
-        Actions_Genfunc_data_structure AA2 = *AA;
-        return angles(x,&AA2);
+        ToyAct = new Actions_Isochrone(ff[0],ff[1]);       
     }
     else{
-        if(debug_genfunc){
-            std::cerr<<"Cannot find ascertain orbit type for: ";
-            for(auto i:x) std::cerr<<i<<" ";
-            std::cerr<<". Assuming box.\n";
-        }
-        VecDoub Om = find_box_params(orbit.results());
-        ToyAct = new Actions_HarmonicOscillator(Om);
-    }
+        // Assess the angular momentum of the orbit and choose an appropriate
+        // toy potential (triaxial potentials)
+        std::vector<int> loopi = loop(orbit.results());
+        int total_loop=0;
+        for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
 
+        if(total_loop==0){
+            // VecDoub Om = find_box_params_minvar(orbit.results());
+            VecDoub Om = find_box_params(orbit.results());
+            ToyAct = new Actions_HarmonicOscillator(Om);
+        }
+        else if(total_loop==1){
+            // VecDoub ff = find_isochrone_params_minvar(orbit.results());
+            VecDoub ff = find_isochrone_params(orbit.results());
+            ToyAct = new Actions_Isochrone(ff[0],ff[1]);
+        }
+        else if(AA->total_T<AA->maxtimescale){
+            AA->total_T*=2.;
+            Actions_Genfunc_data_structure AA2 = *AA;
+            return angles(x,&AA2);
+        }
+        else{
+            if(debug_genfunc){
+                std::cerr<<"Cannot find ascertain orbit type for: ";
+                for(auto i:x) std::cerr<<i<<" ";
+                std::cerr<<". Assuming box.\n";
+            }
+            VecDoub Om = find_box_params(orbit.results());
+            ToyAct = new Actions_HarmonicOscillator(Om);
+        }
+    }
     // Fill an array with the appropriate vectors n
     std::vector<std::vector<int>> n_vectors;
     int symNx = 2; if(loopi[0]!=0 or loopi[2]!=0) symNx = 1;
@@ -813,6 +828,12 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     Orbit orbit(TargetPot,AA->orbit_eps);
     orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
+    if(symmetry == "axisymmetric"){
+        //if the potential is axisymmetric we always use the isochrone
+        VecDoub ff = find_isochrone_params(orbit.results());
+        ToyAct = new Actions_Isochrone(ff[0],ff[1]);       
+    }
+    else{
     // Assess the angular momentum of the orbit and choose an appropriate
     // toy potential
     std::vector<int> loopi = loop(orbit.results());
@@ -838,7 +859,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
         VecDoub Om = find_box_params(orbit.results());
         ToyAct = new Actions_HarmonicOscillator(Om);
     }
-
+}   
     // We iterate over the orbit integration points, calculating the toy
     // actions and adding the appropriate terms to the grid
     VecDoub acts(3,0), angs(3,0);
