@@ -13,3 +13,4 @@ build/*
 *.a
 doc/html/*
 doc/latex/*
+Makefile.inc

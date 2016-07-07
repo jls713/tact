@@ -9,10 +9,8 @@ CCOMPILER=$(CXX)
 
 ## 3. You will need to set the path to gsl
 
-GSLPATH =/usr/local/Cellar/gsl/1.16/
-ifeq ($(USER),jls)
-	GSLPATH =/opt/ioa/software/gsl/2.1/
-endif
+GSLPATH =/opt/ioa/software/gsl/1.16/
+<!-- GSLPATH =/usr/local/Cellar/gsl/1.16/ -->
 
 ####################################################################
 
@@ -30,11 +28,8 @@ GTESTPATH=/data/jls/gtest-1.7.0/
 ###		with ebf library (http://sourceforge.net/projects/ebfformat/files/libebf/c-cpp/)
 ### 1.2. Set Torus and ebf paths
 
-TORUSPATH=../Torus
-ifeq ($(USER),jls)
-	TORUSPATH=/home/jls/work/code/Torus_github/Torus/
-endif
-EBFPATH=../libebf_c_cpp-0.0.3
+TORUSPATH = /home/aamw3/Dropbox/PhD_dd/misc/DONUT/Torus/
+EBFPATH = /home/aamw3/Dropbox/PhD_dd/misc/DONUT/libebf/
 
 ### 1.3. Compile with "make TORUS=1"
 
@@ -42,7 +37,7 @@ EBFPATH=../libebf_c_cpp-0.0.3
 ### 2.1. Install LAPACK from http://www.netlib.org/lapack/
 ### 2.2. Set LAPACK path
 
-LAPACKPATH = general/lapack/
+LAPACKPATH = /opt/ioa/lib
 
 ### 2.3. Compile with "make LAPACK=1"
 
@@ -60,16 +55,13 @@ LAPACKPATH = general/lapack/
 BOOSTINCPATH =/opt/ioa/software/boost/1.55.0/include
 BOOSTLIBPATH =-L/opt/ioa/software/boost/1.55.0/lib
 PYTHONINCPATH=/usr/include/python2.7/
-ifeq ($(USER),jls)
-	PYTHONINCPATH=/opt/ioa/software/python/2.7.8/include/python2.7
-endif
 PYTHONLIBPATH=-L/opt/ioa/software/python/2.7.8/lib/
 
 
 ####################################################################
 ## Compiler flags
 DEBUG = -ggdb3 #-ffast-math -Ofast
-OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC
+OPTS = $(CXXFLAGS) -std=c++0x -Wall -O2 -fopenmp -fPIC -ggdb3
 
 ####################################################################
 
