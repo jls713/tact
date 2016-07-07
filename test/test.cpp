@@ -706,8 +706,9 @@ TEST(ActionTest_Small,Genfunc){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
 
   X = {40.,0.,40.,0.,0.,0.};
-  printVector(AA.actions(X));
   EXPECT_EQ(AA.actions(X)[0]>10.,1);
+  X = {1.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>1.,1);
 }
 //=============================================================================
 

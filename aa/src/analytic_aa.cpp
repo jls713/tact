@@ -138,6 +138,7 @@ VecDoub Actions_Isochrone::angles(const VecDoub& x, void *params){
         while(Theta[i]<0.) Theta[i]+=2.*PI;
         while(Theta[i]>2.*PI) Theta[i]-=2.*PI;
     }
+    if(L_==0.) Theta[1]=0.; // If L_==0 the orbit is purely radial and Theta_phi is undefined -- we set it to zero.
     return Theta;
 }
 

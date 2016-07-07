@@ -54,38 +54,38 @@
 static void orient_orbit(VecDoub& x, const std::vector<int> &loop){
     // given which sign of the angular momentum is conserved, orients the orbit
     // appropriately
-	if(loop[0]){ // L_x sign preserved
-		double tmp = x[0];x[0]=-x[2];x[2]=tmp;
+    if(loop[0]){ // L_x sign preserved
+        double tmp = x[0];x[0]=-x[2];x[2]=tmp;
         tmp = x[3];x[3]=-x[5];x[5]=tmp;
-	}
-	if(loop[1]){ // L_y sign preserved
-		double tmp = x[1];x[1]=-x[2];x[2]=tmp;
+    }
+    if(loop[1]){ // L_y sign preserved
+        double tmp = x[1];x[1]=-x[2];x[2]=tmp;
         tmp = x[4];x[4]=-x[5];x[5]=tmp;
-	}
+    }
 }
 
 std::vector<int> Actions_Genfunc::angular_momentum(const VecDoub &x){
-	VecDoub xx = {x[0],x[1],x[2]}, vv = {x[3],x[4],x[5]};
-	VecDoub ll = cross_product<double>(xx,vv);
-	return {(int)sign(ll[0]),(int)sign(ll[1]),(int)sign(ll[2])};
+    VecDoub xx = {x[0],x[1],x[2]}, vv = {x[3],x[4],x[5]};
+    VecDoub ll = cross_product<double>(xx,vv);
+    return {(int)sign(ll[0]),(int)sign(ll[1]),(int)sign(ll[2])};
 }
 
 std::vector<int> Actions_Genfunc::loop(const std::vector<VecDoub> &orbit_samples){
     // from a series of phase-space points assesses whether signs of angular
     // momentum are conserved -- returns \pm 1 depending on sign of conserved
     // ang mom or zero otherwise
-	std::vector<int> l(3,true);
-	std::vector<int> l0=angular_momentum(orbit_samples[0]);
+    std::vector<int> l(3,true);
+    std::vector<int> l0=angular_momentum(orbit_samples[0]);
         std::vector<int> result = l0;
         for(auto it = std::begin(orbit_samples)+1;
-	    	 it!=std::end(orbit_samples);
-	    	 ++it)
-	{
-		l = angular_momentum(*it);
-		for(int i=0;i<3;i++) if(l[i]!=l0[i]) result[i] = 0;
-		if(result[0]==0 and result[1]==0 and result[2]==0) break;
-	}
-	return result;
+             it!=std::end(orbit_samples);
+             ++it)
+    {
+        l = angular_momentum(*it);
+        for(int i=0;i<3;i++) if(l[i]!=l0[i]) result[i] = 0;
+        if(result[0]==0 and result[1]==0 and result[2]==0) break;
+    }
+    return result;
 }
 
 // Interface with LAPACK
@@ -231,15 +231,14 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
 
     // superlong: 800, 20000, 80000, 3200
 
-	// std::cout<<AA->total_T<<" ";
+    // std::cout<<AA->total_T<<" ";
  //    for(auto i: AF->actions(x)) std::cout<<i<<" ";
     // Integrate the orbit
-	Orbit orbit(TargetPot,AA->orbit_eps);
-	orbit.integrate(x,AA->total_T,AA->stepsize,false);
+    Orbit orbit(TargetPot,AA->orbit_eps);
+    orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
     // SymplecticOrbit orbit(TargetPot,50.);
     // orbit.integrate(x,AA->total_T,AA->stepsize,false);
-
 
     std::vector<int> loopi = loop(orbit.results());
     int total_loop=0;
@@ -253,15 +252,15 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         // Assess the angular momentum of the orbit and choose an appropriate
         // toy potential (triaxial potentials only)
         if(total_loop==0){
-    		// VecDoub Om = find_box_params_minvar(orbit.results());
+            // VecDoub Om = find_box_params_minvar(orbit.results());
             VecDoub Om = find_box_params(orbit.results());
-    		ToyAct = new Actions_HarmonicOscillator(Om);
-    	}
-    	else if(total_loop==1){
+            ToyAct = new Actions_HarmonicOscillator(Om);
+        }
+        else if(total_loop==1){
             // VecDoub ff = find_isochrone_params_minvar(orbit.results());
             VecDoub ff = find_isochrone_params(orbit.results());
-    		ToyAct = new Actions_Isochrone(ff[0],ff[1]);
-    	}
+            ToyAct = new Actions_Isochrone(ff[0],ff[1]);
+        }
         else if(AA->total_T<AA->maxtimescale){
             AA->total_T*=2.;
             Actions_Genfunc_data_structure AA2 = *AA;
@@ -274,24 +273,24 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
                 std::cerr<<". Assuming box.\n";
             }
             VecDoub Om = find_box_params(orbit.results());
-    	 ToyAct = new Actions_HarmonicOscillator(Om);
+         ToyAct = new Actions_HarmonicOscillator(Om);
             // VecDoub ff = find_isochrone_params(orbit.results());
             // ToyAct = new Actions_Isochrone(ff[0],ff[1]);
         }
     }
-	// Fill an array with the appropriate vectors n
+    // Fill an array with the appropriate vectors n
     std::vector<std::vector<int>> n_vectors;
     int symNx = 2; if(loopi[0]!=0 or loopi[2]!=0) symNx = 1;
     for(int i=-AA->N_matrix;i<AA->N_matrix+1;i+=symNx)
     // specialise for axisymmetric
     for(int j=(AA->axisymmetric?0:-AA->N_matrix);j<(AA->axisymmetric?0:AA->N_matrix)+1;j+=2)
     for(int k=0;k<AA->N_matrix+1;k+=2){
-    	if(i==0 and j==0 and k==0) continue;
-   		if (k>0 or (k==0 and j>0) or (k==0 and j==0 and i>0))
-   		if(sqrt((double)(i*i+j*j+k*k))<=AA->N_matrix){
-    			n_vectors.push_back({i,j,k});
-    	}
-	}
+        if(i==0 and j==0 and k==0) continue;
+        if (k>0 or (k==0 and j>0) or (k==0 and j==0 and i>0))
+        if(sqrt((double)(i*i+j*j+k*k))<=AA->N_matrix){
+                n_vectors.push_back({i,j,k});
+        }
+    }
 
     // Now initialise the arrays. As a is symmetric we use the packed storage
     // format. We use upper-triangular matrix (uplo='U') below so
@@ -325,8 +324,8 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         orient_orbit(i,loopi);
         if(total_loop==1)
             sign[1] = SIGN(TargetPot->Lz(i));
-    	acts = ToyAct->actions(i);
-	angs = ToyAct->angles(i);
+        acts = ToyAct->actions(i);
+        angs = ToyAct->angles(i);
         if(nn>0)
             for(int j=0;j<3;++j)
                 if((angs[j]-angs_p[j]+PI/2.*sign[j])*sign[j]<0.)
@@ -350,11 +349,11 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
             av_acts = av_acts+dangs;
         }
         // b = (J,2(n.\theta)cos(n.\theta))
-    	for(int j=0;j<3;j++) b[j]+=acts[j];
-    	for(int j=0;j<N_SIZE-3;j++){
+        for(int j=0;j<3;j++) b[j]+=acts[j];
+        for(int j=0;j<N_SIZE-3;j++){
             double dd = dot_product_int<double>(n_vectors[j],angs);
             cd[j]=cos(dd);
-        	b[j+3]+=2.*dot_product_int<double>(n_vectors[j],acts)*cd[j];
+            b[j+3]+=2.*dot_product_int<double>(n_vectors[j],acts)*cd[j];
             if(dd<minAdot[j])minAdot[j]=dd;
             if(dd>maxAdot[j])maxAdot[j]=dd;
         }
@@ -362,11 +361,11 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
         // top three elements = 2 n_j cos(n.\theta) i.e. jth n vector
         // all others (k=0,1,...) = 4 dot(n_j,n_k) cos(n_j.\theta) cos(n_k.\theta) i.e. jth and kth n_vector
         for(int j=0;j<N_SIZE-3;j++){
-    		for(int k=0;k<3;k++) a[6+k+j*(j+7)/2]+=2.*n_vectors[j][k]*cd[j];
-    		for(int k=0;k<j+1;k++){
-    			a[9+k+j*(j+7)/2]+=4.*dot_product<int>(n_vectors[j],n_vectors[k])*cd[j]*cd[k];
-    		}
-    	}
+            for(int k=0;k<3;k++) a[6+k+j*(j+7)/2]+=2.*n_vectors[j][k]*cd[j];
+            for(int k=0;k<j+1;k++){
+                a[9+k+j*(j+7)/2]+=4.*dot_product<int>(n_vectors[j],n_vectors[k])*cd[j]*cd[k];
+            }
+        }
         acts_p=acts;
         angs_pp = angs_pu;
         angs_pu = angs;
@@ -531,7 +530,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     delete ToyAct;
     if(AA->output_Sn) return b;
     // for(auto i: AF->actions(x)) std::cout<<i<<" ";
-	return {b[0],b[1],b[2]};
+    return {b[0],b[1],b[2]};
 }
 
 VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
@@ -556,7 +555,7 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
     if(symmetry == "axisymmetric"){
         //if the potential is axisymmetric, we always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
-        ToyAct = new Actions_Isochrone(ff[0],ff[1]);       
+        ToyAct = new Actions_Isochrone(ff[0],ff[1]);
     }
     else{
         // Assess the angular momentum of the orbit and choose an appropriate
@@ -833,7 +832,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     if(symmetry == "axisymmetric"){
         //if the potential is axisymmetric we always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
-        ToyAct = new Actions_Isochrone(ff[0],ff[1]);       
+        ToyAct = new Actions_Isochrone(ff[0],ff[1]);
     }
     else{
     // Assess the angular momentum of the orbit and choose an appropriate
@@ -857,7 +856,7 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
         VecDoub Om = find_box_params(orbit.results());
         ToyAct = new Actions_HarmonicOscillator(Om);
     }
-}   
+}
     // We iterate over the orbit integration points, calculating the toy
     // actions and adding the appropriate terms to the grid
     VecDoub acts(3,0), angs(3,0);
@@ -979,30 +978,30 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
 */
 #ifdef TORUS
 VecDoub PhaseSpacePoint(VecDoub actions, VecDoub angles, Potential_JS *Pot){
-	Torus T; Actions Acts; Angles Angs;
-	WrapperTorusPotential TPot(Pot);
-	vec2torus(actions,Acts);
-	vec2torus(angles,Angs);
-	T.AutoFit(Acts,&TPot,1e-7,700,300,15,5,24,200,24,0);
-	return torusPSPT2cartvec(T.Map3D(Angs));
+    Torus T; Actions Acts; Angles Angs;
+    WrapperTorusPotential TPot(Pot);
+    vec2torus(actions,Acts);
+    vec2torus(angles,Angs);
+    T.AutoFit(Acts,&TPot,1e-7,700,300,15,5,24,200,24,0);
+    return torusPSPT2cartvec(T.Map3D(Angs));
 }
 #endif
 // #include "LogPot.h"
 // int main(){
-// 	double kk = 977.7775;
-// 	Logarithmic Log(220.,1.,0.9);
-// 	Actions_Genfunc GG(&Log,"axisymmetric",nullptr);
-// 	VecDoub X = {10.,4.,7.,80.,260.,40.};
-// 	VecDoub aa = GG.actions(X);
-// 	VecDoub ang = GG.angles(X);
-// 	Torus T;
-// 	LogPot Log2(220./kk,0.9,1e-5,0.);
-// 	Actions AA;AA[0]=aa[0];AA[1]=aa[2];AA[2]=aa[1];
-// 	AA/=kk;
-// 	T.AutoFit(AA,&Log2,1e-7,700,300,15,5,24,200,24,0);
-// 	Angles Ang;Ang[0]=ang[0];Ang[2]=ang[1];Ang[1]=ang[2];
-// 	PSPT FF = T.Map3D(Ang);
-// 	for(int i=3;i<6;++i)FF[i]*=kk;
+//  double kk = 977.7775;
+//  Logarithmic Log(220.,1.,0.9);
+//  Actions_Genfunc GG(&Log,"axisymmetric",nullptr);
+//  VecDoub X = {10.,4.,7.,80.,260.,40.};
+//  VecDoub aa = GG.actions(X);
+//  VecDoub ang = GG.angles(X);
+//  Torus T;
+//  LogPot Log2(220./kk,0.9,1e-5,0.);
+//  Actions AA;AA[0]=aa[0];AA[1]=aa[2];AA[2]=aa[1];
+//  AA/=kk;
+//  T.AutoFit(AA,&Log2,1e-7,700,300,15,5,24,200,24,0);
+//  Angles Ang;Ang[0]=ang[0];Ang[2]=ang[1];Ang[1]=ang[2];
+//  PSPT FF = T.Map3D(Ang);
+//  for(int i=3;i<6;++i)FF[i]*=kk;
 // }
 
 //      VecDoub X = {1e-5,2.,1e-5,0.001,0.1,0.23};
