@@ -241,6 +241,9 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     // orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
 
+    std::vector<int> loopi = loop(orbit.results());
+    int total_loop=0;
+    for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
     if(symmetry == "axisymmetric"){
         //in an axisymmetric potential we should always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
@@ -249,9 +252,6 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     else{
         // Assess the angular momentum of the orbit and choose an appropriate
         // toy potential (triaxial potentials only)
-    	std::vector<int> loopi = loop(orbit.results());
-    	int total_loop=0;
-        for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
         if(total_loop==0){
     		// VecDoub Om = find_box_params_minvar(orbit.results());
             VecDoub Om = find_box_params(orbit.results());
@@ -550,6 +550,9 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
     // orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
 
+    std::vector<int> loopi = loop(orbit.results());
+    int total_loop=0;
+    for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
     if(symmetry == "axisymmetric"){
         //if the potential is axisymmetric, we always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
@@ -558,10 +561,6 @@ VecDoub Actions_Genfunc::angles(const VecDoub &x, void *params){
     else{
         // Assess the angular momentum of the orbit and choose an appropriate
         // toy potential (triaxial potentials)
-        std::vector<int> loopi = loop(orbit.results());
-        int total_loop=0;
-        for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
-
         if(total_loop==0){
             // VecDoub Om = find_box_params_minvar(orbit.results());
             VecDoub Om = find_box_params(orbit.results());
@@ -828,6 +827,9 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     Orbit orbit(TargetPot,AA->orbit_eps);
     orbit.integrate(x,AA->total_T,AA->stepsize,false);
 
+    std::vector<int> loopi = loop(orbit.results());
+    int total_loop=0;
+    for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
     if(symmetry == "axisymmetric"){
         //if the potential is axisymmetric we always use the isochrone
         VecDoub ff = find_isochrone_params(orbit.results());
@@ -836,10 +838,6 @@ VecDoub Actions_Genfunc_Average::actions(const VecDoub &x, void *params){
     else{
     // Assess the angular momentum of the orbit and choose an appropriate
     // toy potential
-    std::vector<int> loopi = loop(orbit.results());
-    int total_loop=0;
-    for(int i=0;i<3;i++)total_loop+=abs(loopi[i]);
-
     if(total_loop==0){
         VecDoub Om = find_box_params(orbit.results());
         ToyAct = new Actions_HarmonicOscillator(Om);
