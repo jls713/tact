@@ -544,6 +544,23 @@ VecDoub Hernquist::Forces(const VecDoub& x){
 	Force = Force*(-dpdr/r);
 	return Force;
 }
+// ============================================================================
+// Plummer Potential
+// ============================================================================
+
+double Plummer::Phi(const VecDoub& x){
+	/* potential at Cartesian x */
+	double r2 = x[0]*x[0]+x[1]*x[1]/q1+x[2]*x[2]/q2;
+	return -GM/sqrt(rs*rs+r2);
+}
+VecDoub Plummer::Forces(const VecDoub& x){
+	/* Forces at Cartesian x */
+	double r2 = x[0]*x[0]+x[1]*x[1]/q1+x[2]*x[2]/q2;
+	double dpdr = GM/(rs*rs+r2)/sqrt(rs*rs+r2);
+	VecDoub Force = {x[0], x[1]/q1, x[2]/q2};
+	Force = Force*(-dpdr);
+	return Force;
+}
 #ifdef TORUS
 // ============================================================================
 // GalPot Potential for interface with Walter Dehnen's code

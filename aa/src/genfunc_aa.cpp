@@ -103,9 +103,9 @@ struct isoparams_st{
 };
 
 
-double iso_params(double b, void *params){
-    /* for finding roots of p_tau^2*2.0*(tau+Alpha)  */
+double iso_params(double sqb, void *params){
     isoparams_st *RS = (isoparams_st *) params;
+    double b = sqb*sqb;
     double r2b = sqrt(RS->r2*RS->r2+b*b), r1b = sqrt(RS->r1*RS->r1+b*b);
     return (b+r2b)*(b+r2b)*r2b/((b+r1b)*(b+r1b)*r1b)-RS->phi1*RS->r2/RS->phi2/RS->r1;
 }
@@ -199,9 +199,23 @@ VecDoub Actions_Genfunc::find_isochrone_params(const std::vector<VecDoub> &orbit
     for(int j=0;j<3;j++)innergrad-=innerg[j]*in[j];innergrad/=rmin;
     for(int j=0;j<3;j++)outergrad-=outerg[j]*out[j];outergrad/=rmax;
     isoparams_st isos(rmin,rmax,innergrad,outergrad);
-    root_find RF(0.01,100);
-    double b = RF.findroot(&iso_params,0.,100.,&isos);
-    if(b<0.)b=5.;
+
+    double sqb_lower = sqrt(0.1*rmin);
+    double sqb_upper = sqrt(10.*rmax);
+
+    while(iso_params(sqb_lower,&isos)*iso_params(sqb_upper,&isos)>0.){
+        if(sqb_lower<sqrt(0.01*rmin) or sqb_upper>sqrt(100.*rmax))
+            break;
+        sqb_lower*=0.5; sqb_upper*=2.;
+    }
+    double b = 0.;
+    if(sqb_lower<sqrt(0.01*rmin) or sqb_upper>sqrt(100.*rmax))
+        b = sqb_upper*sqb_upper;
+    else{
+        root_find RF(0.01,100);
+        double sqb = RF.findroot(&iso_params,sqb_lower,sqb_upper,&isos);
+        b = sqb*sqb;
+    }
     double GM = innergrad*(b+sqrt(rmin*rmin+b*b))*(b+sqrt(rmin*rmin+b*b))*sqrt(rmin*rmin+b*b)/rmin;
     // now catch those that give too high an energy
     Isochrone Iso(GM,b);

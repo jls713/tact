@@ -512,6 +512,33 @@ class NFW: public Potential_JS{
 
 //============================================================================
 ///
+///	## Triaxial Plummer potential
+///		rs is the scale radius
+///		GM is G times the mass M
+///		qy and qz are the y and z flattenings respectively
+///
+///	 \f[\Phi = \frac{-GM}{\sqrt{x^2+y^2/q_y^2+z^2/q_z^2+R_s^2}}\f]
+///
+//============================================================================
+class Plummer: public Potential_JS{
+	private:
+		const std::string desc =
+		"Plummer potential:Phi ="
+			"-GM/(sqrt{x^2+y^2/q_y^2+z^2/q_z^2+R_s^2})"
+		"\n\tTakes four parameters:\n\t\tG*mass: GM, the scale radius: rs and the axis ratios q_y, q_z";
+		double GM, rs, q1, q2;
+	public:
+		Plummer(double gm, double RS, double qy, double qz): GM(gm), rs(RS), q1(qy*qy), q2(qz*qz){}
+		inline std::string name(void) const {return desc;}
+		inline std::string params(void) const {
+			return "GM = "+std::to_string(GM)+", R_s = "+std::to_string(rs)+
+				   ", q_y = "+std::to_string(q1)+", q_z = "+std::to_string(q2);
+		}
+		double Phi(const VecDoub& x);
+		VecDoub Forces(const VecDoub& x);
+};
+//============================================================================
+///
 ///	## Triaxial Hernquist potential
 ///		rs is the scale radius
 ///		GM is G times the mass M

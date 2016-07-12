@@ -635,7 +635,7 @@ TEST(ActionTest_Small,StackelSF){
 #endif
 
 TEST(ActionTest_Small,Genfunc){
-  IsochronePotential Pot(1.,1.);
+  Isochrone Pot(1.,1.,1.,0.9);
   Actions_Genfunc AA(&Pot,"axisymmetric");
   double radius = 1.;
   double Vc = sqrt(radius*-Pot.Forces({1.,0.,0.})[0]);
@@ -706,9 +706,14 @@ TEST(ActionTest_Small,Genfunc){
   EXPECT_EQ(std::numeric_limits<double>::infinity()==Angs[5] or Angs[5]!=Angs[5],false);
 
   X = {40.,0.,40.,0.,0.,0.};
-  EXPECT_EQ(AA.actions(X)[0]>10.,1);
+  EXPECT_EQ(AA.actions(X)[0]>0.,1);
+  Actions_Isochrone Iso(1.,1.);
+  radius = 1.;
+  Vc = sqrt(radius*-Pot.Forces({1.,0.1,0.1})[0]);
   X = {1.,0.,0.,0.,0.,0.};
-  EXPECT_EQ(AA.actions(X)[0]>1.,1);
+  VecDoub ActsTrue = Iso.actions(X);
+  X = {1.,0.,0.,0.,0.,0.};
+  EXPECT_EQ(AA.actions(X)[0]>0.,1);
 }
 //=============================================================================
 
