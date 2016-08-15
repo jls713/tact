@@ -43,6 +43,200 @@
 
 namespace {
 
+TEST(MultipoleT,Sph){
+    for(int p=0;p<3;++p){
+    TestDensity_Hernquist rho(1.,1.,{1.,1.,1.});
+    MultipoleExpansion_Spherical ME(&rho,100,1.,0.01,200.);
+    VecDoub X = {1e-5,1e-5,1e-5};
+
+    int NMAX = 200;
+    VecDoub xx(NMAX,0), exact(NMAX,0), triaxial(NMAX,0), multipole(NMAX,0);
+
+    // #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+        double x = 0.0001*(double)xn+.0001;
+        xx[xn] = x;
+        VecDoub X2 = X;
+        X2[p]=x;
+        exact[xn] = rho.Phi(X2);
+        multipole[xn] = ME.Phi(X2);
+    }
+    for(int xn = 0; xn<NMAX; xn++)
+      EXPECT_NEAR(exact[xn],multipole[xn],1e-3*fabs(exact[xn]));
+  }
+}
+TEST(MultipoleT,Axisym){
+    Miyamoto_NagaiDensity rho(1.,1.,0.7);
+    MultipoleExpansion_Axisymmetric ME2(&rho,1000,30,20,1.,0.001,1000.);
+
+    int NMAX = 50;
+    for(int p=0;p<3;++p){
+    #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+        VecDoub X = {0.001,0.001,0.01};
+        double centre2 = rho.Phi(X);
+        double centre3 = ME2.Phi(X);
+        double x = 0.1*(double)xn;
+        VecDoub X2=X;
+        X2[p]=x;
+        double triaxial = (rho.Phi(X2)-centre2);
+        double multipole = (ME2.Phi(X2)-centre3);
+        EXPECT_NEAR(triaxial,multipole,5e-3*fabs(triaxial));
+        triaxial = rho.Forces(X2)[p];
+        multipole = ME2.Forces(X2)[p];
+        if(triaxial==0.) continue;
+        EXPECT_NEAR(triaxial,multipole,1e-3*fabs(triaxial));
+    }
+  }
+}
+TEST(MultipoleT,Stackel){
+    TestDensity_Stackel rho(1.,-30.,-10.);
+    MultipoleExpansion ME(&rho,5000,12,12,-1,1.,0.0001,10000.,false,true,true);
+
+    for(auto qq: {"No","general"}){
+    for(int p=0;p<3;++p){
+    VecDoub X = {1.,1.,1.};
+    double centre  = rho.Phi(X);
+    double centre3 = ME.Phi(X);
+
+    int NMAX = 100;
+
+    #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+        double exact,multipole;
+        double x = (double)xn+.1;
+        VecDoub X2 = X;
+        X2[p]=x;
+        if(qq=="general"){
+            X[0]=x/2.;X[1]=x/2.;X[2]=x/2.;
+        }
+        exact = (rho.Phi(X2)-centre);
+        multipole = (ME.Phi(X2)-centre3);
+        EXPECT_NEAR(exact,multipole,5e-3*fabs(exact));
+    }
+  }}
+}
+TEST(MultipoleT,StackelForces){
+    TestDensity_Stackel rho(1.,-30.,-10.);
+    MultipoleExpansion ME(&rho,5000,12,12,-1,1.,0.0001,10000.,false,true,true);
+
+    int NMAX = 50;
+
+    for(auto qq: {"general"}){
+    for(int q=0;q<1;++q){
+    for(int p=0;p<1;++p){
+
+    #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+      double exact, multipole;
+        double x = (double)xn+1.;
+        VecDoub X(3,1);
+        X[p]=x;
+        if(qq=="general"){
+            X[0]=x/2.;X[1]=x/3.;X[2]=x;
+        }
+        VecDoub ex = rho.Forces(X);
+        exact = rho.Forces(X)[q];
+        multipole = ME.Forces(X)[q];
+        EXPECT_NEAR(exact,multipole,5e-3*norm(ex));
+    }
+    }}}
+}
+TEST(MultipoleT,StackelTP){
+    TestDensity_Stackel rho(1.,-30.,-10.);
+    TriaxialPotential TP(&rho,1e8);
+    MultipoleExpansion ME(&rho,5000,12,12,-1,1.,0.0001,10000.,false,true,true);
+    double centre  = TP.Phi({1.,1.,1.});
+    double centre3 = ME.Phi({1.,1.,1.});
+
+    int NMAX = 50;
+
+    for(auto qq: {"general"}){
+    for(int q=0;q<1;++q){
+    for(int p=0;p<1;++p){
+
+    #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+      double exact, multipole;
+        double x = (double)xn+1.;
+        VecDoub X(3,1);
+        X[p]=x;
+        if(qq=="general"){
+            X[0]=x/2.;X[1]=x/3.;X[2]=x;
+        }
+        VecDoub ex = TP.Forces(X);
+        exact = TP.Forces(X)[q];
+        multipole = ME.Forces(X)[q];
+        EXPECT_NEAR(exact,multipole,5e-3*norm(ex));
+        exact = TP.Phi(X)-centre;
+        multipole = ME.Phi(X)-centre3;
+        EXPECT_NEAR(exact,multipole,5e-3*fabs(exact));
+    }
+    }}}
+}
+
+TEST(MultipoleT,StackelTriax){
+    TestDensity_Stackel rho(1.,-30.,-10.);
+    TriaxialPotential TP(&rho,1e8);
+    double centre=0.,centre3=0.;
+    int NMAX = 50;
+
+    for(auto qq: {"general"}){
+    for(int q=1;q<3;++q){
+    for(int p=0;p<1;++p){
+
+    #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+      double exact, triaxial;
+        double x = (double)xn+1.;
+        VecDoub X(3,1);
+        X[p]=x;
+        if(qq=="general"){
+            X[0]=x/2.;X[1]=x/3.;X[2]=x;
+        }
+        VecDoub ex = TP.Forces(X);
+        exact = rho.Forces(X)[q];
+        triaxial = TP.Forces(X)[q];
+        EXPECT_NEAR(exact,triaxial,5e-3*norm(ex));
+        exact = rho.Phi(X)-centre;
+        triaxial = TP.Phi(X)-centre3;
+        EXPECT_NEAR(exact,triaxial,5e-3*fabs(exact));
+    }
+    }}}
+}
+
+TEST(MultipoleT,Hernquist){
+    TestDensity_Hernquist rho(1.,10.,{1.,0.6,0.3});
+    TriaxialPotential TP(&rho,1e6);
+    MultipoleExpansion ME(&rho,5000,12,12,-1,1.,0.0001,10000.,false,true,true);
+    double centre  = 0.;//TP.Phi({1.,1.,1.});
+    double centre3 = 0.;//ME.Phi({1.,1.,1.});
+
+    int NMAX = 50;
+
+    for(auto qq: {"No","general"}){
+    for(int q=0;q<3;++q){
+    for(int p=0;p<3;++p){
+
+    #pragma omp parallel for schedule(dynamic)
+    for(int xn = 0; xn<NMAX; xn++){
+      double exact, multipole;
+        double x = (double)xn+1.;
+        VecDoub X(3,1);
+        X[p]=x;
+        if(qq=="general"){
+            X[0]=x/2.;X[1]=x/3.;X[2]=x;
+        }
+        VecDoub ex = TP.Forces(X);
+        exact = TP.Forces(X)[q];
+        multipole = ME.Forces(X)[q];
+        EXPECT_NEAR(exact,multipole,5e-3*norm(ex));
+        exact = TP.Phi(X)-centre;
+        multipole = ME.Phi(X)-centre3;
+        EXPECT_NEAR(exact,multipole,5e-3*fabs(exact));
+    }
+    }}}
+}
 TEST(GusTest,Number1){
   VecDoub x = {0.184035,0.184035,0.476411,-97.8458,70.3121,15.3668};
   PowerLaw pot(430107.95338751527*.5,0.5,1.,0.9);

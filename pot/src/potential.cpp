@@ -247,7 +247,8 @@ double StackelTriaxial::G(double tau){
 	/* de Zeeuw's perfect ellipsoid G function 			*/
 	/* calculated using GL integration of eq B9 of dZ85 */
 	TriaxialStackel_GIntegrand_struct P(tau,a*a-c*c,b*b-c*c,c*c);
-	return Const*GaussLegendreQuad(&G_integrand,0.,1.,&P);
+	integrator Int(1e6);
+	return Const*Int.integrate(&G_integrand,0.,1.,1e-5,&P);
 }
 
 static double GP_integrand(double s,void* params){
@@ -260,7 +261,8 @@ double StackelTriaxial::GPrime(double tau){
 	/* de Zeeuw's perfect ellipsoid GPrime function 	*/
 	/* calculated using GL integration of eq B9 of dZ85 */
 	TriaxialStackel_GIntegrand_struct P(tau,a*a-c*c,b*b-c*c,c*c);
-	return Const*GaussLegendreQuad(&GP_integrand,0.,1.,&P);
+	integrator Int(1e6);
+	return Const*Int.integrate(&GP_integrand,0.,1.,1e-5,&P);
 }
 
 /*

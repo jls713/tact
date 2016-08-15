@@ -59,6 +59,7 @@
 #include <gsl/gsl_sf_legendre.h>
 #include <stdlib.h>
 #include <iostream>
+#include <stdexcept>
 #include <functional>
 #include <vector>
 
@@ -191,8 +192,13 @@ class integrator{
 			if(p)
 				F.params=p;
 			double result;
-			gsl_integration_qags (&F, xa, xb, 0, eps, neval,w, &result, &err);
+			auto handler=gsl_set_error_handler_off();
+			int status = gsl_integration_qags (&F, xa, xb, 0, eps, neval,w, &result, &err);
+			gsl_set_error_handler(handler);
+			// Return even if round-off error reported
+			if(status==GSL_SUCCESS or status==GSL_EROUND or status==GSL_EDIVERGE)
 			return result;
+			else throw std::runtime_error("error: "+std::string(gsl_strerror(status))+"\n");
 			}
 		double error(){return err;}
 };
@@ -288,6 +294,10 @@ class interpolator{
         }
         double derivative(double xi){
         	return gsl_spline_eval_deriv(spline, xi, acc);
+        }
+        double derivative2(double xi){
+        	// second derivative
+        	return gsl_spline_eval_deriv2(spline, xi, acc);
         }
         void new_arrays(double *x, double *y,int n){
         	spline = gsl_spline_alloc(gsl_interp_cspline,n);

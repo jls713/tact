@@ -412,6 +412,55 @@ c linterp(const std::vector<c> &x, const std::vector<c> &y, c x0){ // linear int
     topbottom<c>(x,x0,&bot,&top);
     return y[bot]+(x0-x[bot])/(x[top]-x[bot])*(y[top]-y[bot]);
 }
+template<class c>
+c extrapolate_down(c X, const std::vector<c>&x, const std::vector<c>&y){
+    return (y[1]-y[0])/(x[1]-x[0])*(X-x[0])+y[0];
+}
+template<class c>
+c extrapolate_up(c X, const std::vector<c>&x, const std::vector<c>&y){
+    auto nx = x.size();
+    return (y[nx-1]-y[nx-2])/(x[nx-1]-x[nx-2])*(X-x[nx-1])+y[nx-1];
+}
+template<class c>
+c log_extrapolate_down(c X, const std::vector<c>&x, const std::vector<c>&y){
+    return exp((log(y[1])-log(y[0]))/(log(x[1])-log(x[0]))*(log(X)-log(x[0]))+log(y[0]));
+}
+template<class c>
+c log_extrapolate_up(c X, const std::vector<c>&x, const std::vector<c>&y){
+    auto nx = x.size();
+    return exp((log(y[nx-1])-log(y[nx-2]))/(log(x[nx-1])-log(x[nx-2]))*(log(X)-log(x[nx-1]))+log(y[nx-1]));
+}
+
+template<class c>
+c linterp_2d_irr(c x, c y, const std::vector<c>&X, const std::vector<std::vector<c>>&Y, const std::vector<std::vector<c>>&Z,std::string name=""){
+    // y data are not regularly spaced
+
+    int bot_x,top_x,bot_y1,top_y1,bot_y2,top_y2;
+    c dx,mdx,dy1,mdy1,dy2,mdy2;
+
+    if(x<X.front()) x=X.front();
+    else if(x>X.back()) x=X.back();
+    topbottom(X,x,&bot_x,&top_x,name+" x interp");
+    dx = (x-X[bot_x])/(X[top_x]-X[bot_x]); mdx=1-dx;
+
+    if(y<Y[bot_x].front()){top_y1=1;bot_y1=0;}
+    else if(y>Y[bot_x].back()){top_y1=Z.size()-1;bot_y1=top_y1-1;}
+    else{
+    topbottom(Y[bot_x],y,&bot_y1,&top_y1,name+" y interp");
+    }
+    dy1 = (y-Y[bot_x][bot_y1])/(Y[bot_x][top_y1]-Y[bot_x][bot_y1]);
+    mdy1=1.-dy1;
+
+    if(y<Y[top_x].front()){top_y2=1;bot_y2=0;}
+    else if(y>Y[top_x].back()){top_y2=Z.size()-1;bot_y2=top_y2-1;}
+    else{
+    topbottom(Y[top_x],y,&bot_y2,&top_y2,name+" y interp");
+    }
+    dy2 = (y-Y[top_x][bot_y2])/(Y[top_x][top_y2]-Y[top_x][bot_y2]);
+    mdy2=1.-dy2;
+    return mdx*(dy1*Z[bot_x][top_y1]+mdy1*Z[bot_x][bot_y1])
+           +dx*(dy2*Z[top_x][top_y2]+mdy2*Z[top_x][bot_y2]);
+}
 
 template<class c>
 c quad_extrapolate(c x0, std::vector<c> x, std::vector<c> y){

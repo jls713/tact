@@ -503,7 +503,7 @@ class NFW: public Potential_JS{
 		inline std::string name(void) const {return desc;}
 		inline std::string params(void) const {
 			return "GM = "+std::to_string(GM)+", R_s = "+std::to_string(rs)+
-				   ", q_y = "+std::to_string(q1)+", q_z = "+std::to_string(q2);
+				   ", q_y^2 = "+std::to_string(q1)+", q_z^2 = "+std::to_string(q2);
 		}
 		double Phi(const VecDoub& x);
 		VecDoub Forces(const VecDoub& x);
@@ -532,7 +532,7 @@ class Plummer: public Potential_JS{
 		inline std::string name(void) const {return desc;}
 		inline std::string params(void) const {
 			return "GM = "+std::to_string(GM)+", R_s = "+std::to_string(rs)+
-				   ", q_y = "+std::to_string(q1)+", q_z = "+std::to_string(q2);
+				   ", q_y^2 = "+std::to_string(q1)+", q_z^2 = "+std::to_string(q2);
 		}
 		double Phi(const VecDoub& x);
 		VecDoub Forces(const VecDoub& x);
@@ -559,7 +559,7 @@ class Hernquist: public Potential_JS{
 		inline std::string name(void) const {return desc;}
 		inline std::string params(void) const {
 			return "GM = "+std::to_string(GM)+", R_s = "+std::to_string(rs)+
-				   ", q_y = "+std::to_string(q1)+", q_z = "+std::to_string(q2);
+				   ", q_y^2 = "+std::to_string(q1)+", q_z^2 = "+std::to_string(q2);
 		}
 		double Phi(const VecDoub& x);
 		VecDoub Forces(const VecDoub& x);
@@ -694,6 +694,22 @@ class HernquistSpherical: public SphericalPotential{
 		inline double dPhi_r(double r){return GM/(rs+r)/(rs+r);}
 };
 
+class PlummerSpherical: public SphericalPotential{
+	private:
+		const std::string desc =
+		"Spherical Plummer potential:Phi ="
+			"-GM/sqrt(r_s^2+r^2)"
+		"\n\tTakes two parameters:\n\t\tG*mass: GM and the scale radius: r_s";
+		double GM, rs, rs2;
+	public:
+		PlummerSpherical(double GM, double rs): GM(GM),rs(rs){rs2=rs*rs;}
+		inline std::string name(void) const {return desc;}
+		inline std::string params(void) const {
+			return "GM = "+std::to_string(GM)+", r_s = "+std::to_string(rs);
+		}
+		inline double Phi_r(double r) {return -GM/sqrt(rs2+r*r);}
+		inline double dPhi_r(double r){return GM*r/(rs2+r*r)/sqrt(rs2+r*r);}
+};
 
 class PowerLawSpherical: public SphericalPotential{
 	private:

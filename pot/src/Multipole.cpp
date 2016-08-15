@@ -89,22 +89,26 @@ double TriaxialPotential::psi_m(double m){
     // we use a change of variables n = a_2^2/(m^2+a_2^2)
     double a22 = TD->get_a(2)*TD->get_a(2);
     double upper = a22/(m*m+a22);
-    // integrator Int(10000);
-    // return Int.integrate(&psi_m_integrand,upper,1.,1e-2,TD);
-    return GaussLegendreQuad(&psi_m_integrand,upper,1.,TD);
+    integrator Int(10000);
+    return Int.integrate(&psi_m_integrand,upper,1.,1e-2,TD);
+    // Gauss Legendre quadrature gives very poor accuracy here
+    // return GaussLegendreQuad(&psi_m_integrand,upper,1.,TD);
 }
 double TriaxialPotential::Phi(const VecDoub& x){
     // Here we calculate \int_0^inf dtau f(\tau) (see Eq 2.140 BT08)
     // we use a change of variables n = a_2/sqrt(tau+a_2^2)
     phi_integrand_st P(this, x, -1);
-    return -2.*PI*conv::G*get_a(1)/get_a(0)*integrate(&phi_integrand,0.,1.,5e-4,&P);
+    integrator Int(10000);
+    return -2.*PI*conv::G*get_a(1)/get_a(0)*Int.integrate(&phi_integrand,0.,1.,5e-4,&P);
 }
 
 VecDoub TriaxialPotential::Forces(const VecDoub& x){
     VecDoub F = {0.,0.,0.};
     for(int i=0;i<3;i++){
         phi_integrand_st P(this, x, i);
-        F[i] = 2.*PI*conv::G*get_a(1)/get_a(0)*GaussLegendreQuad(&force_integrand,0.,1.,&P);
+        integrator Int(10000);
+        F[i] = 2.*PI*conv::G*get_a(1)/get_a(0)*Int.integrate(&force_integrand,0.,1.,1e-3,&P);
+        // F[i] = 2.*PI*conv::G*get_a(1)/get_a(0)*GaussLegendreQuad(&force_integrand,0.,1.,&P);
     }
     return F;
 }

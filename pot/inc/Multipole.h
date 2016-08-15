@@ -79,6 +79,14 @@ public:
         double azb = a+sqrt(z2b2);
         return -conv::G*M/sqrt(R2+azb*azb);
     }
+    VecDoub Forces(const VecDoub& x){
+        double R2 = x[0]*x[0]+x[1]*x[1];
+        double z2b2 = x[2]*x[2]+b*b;
+        double azb = a+sqrt(z2b2);
+        double denom = R2+azb*azb; denom*=sqrt(denom);
+        denom= -conv::G*M/denom;
+        return {denom*x[0],denom*x[1],denom*azb*x[2]/sqrt(z2b2)};
+    }
 };
 
 // ============================================================================
@@ -239,9 +247,8 @@ class TriaxialPotential: public Potential_JS{
 private:
     TriaxialDensity *TD;
     double psi_inf;
-    integrator GL;
 public:
-    TriaxialPotential(TriaxialDensity *TD, double rmax = 1e3):TD(TD),GL(100000){
+    TriaxialPotential(TriaxialDensity *TD, double rmax = 1e3):TD(TD){
         // set maximum radius with rmax
         psi_inf=psi_m(rmax);
     }
