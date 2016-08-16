@@ -85,8 +85,8 @@ public:
       \param Rm  minimum radial grid point
       \param Rn  maximum radial grid point
       \param NR  number of ang. mom./radial grid points
-      \param ND  number of energy grid points for Delta estimation
       \param NGRID  number of energy grid points
+      \param NED  number of energy grid points for Delta estimation
       \param NEL  number of ang. mom. grid points for Delta estimation
     */
     Actions_AxisymmetricFudge_InterpTables(Potential_JS *Pot, std::string name="", bool tab=false,double Rm=1., double Rn=20.,int NR=60, int NGRID = 120,int NED=20,int NEL=5);

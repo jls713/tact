@@ -36,6 +36,7 @@
 #include "../aa/inc/stackel_fit.h"
 #include "../aa/inc/genfunc_aa.h"
 #include "../aa/inc/uv_orb.h"
+#include "../aa/inc/tables_aa.h"
 #ifdef TORUS
 #include "../aa/inc/it_torus.h"
 #endif
@@ -972,6 +973,29 @@ TEST(ActionTest,StackelUV){
   EXPECT_EQ(AA.actions(X)[0]>10.,1);
 }
 
+#ifdef TORUS
+TEST(ActionTest,Symmetry){
+  double radius = 8.;
+  GalPot Pot("tmp.Tpot");
+  Actions_AxisymmetricFudge_InterpTables AA(&Pot,"tmp",true,0.1,20.);
+  uv_orb AA_2(&Pot,0.1,20.,10,10,"");
+  double Vc = sqrt(radius*-Pot.Forces({radius,0.1,0.1})[0]);
+  VecDoub Xup = {radius,0.1,3.,0.4*Vc,.6*Vc,0.3*Vc};
+  VecDoub Xdown = Xup;
+  Xdown[2]*=-1.;
+  Xdown[5]*=-1.;
+  VecDoub jup=AA.actions(Xup);
+  VecDoub jdo=AA.actions(Xdown);
+  VecDoub jup2=AA_2.actions(Xup);
+  VecDoub jdo2=AA_2.actions(Xdown);
+  EXPECT_NEAR(jup[0],jdo[0],1e-5);
+  EXPECT_NEAR(jup2[0],jdo2[0],1e-5);
+  EXPECT_NEAR(jup[2],jdo[2],1e-5);
+  EXPECT_NEAR(jup2[2],jdo2[2],1e-5);
+  EXPECT_NEAR(jup[0],jdo2[0],5e-2*fabs(jup[0]));
+  EXPECT_NEAR(jup[2],jdo2[2],5e-2*fabs(jup[2]));
+}
+#endif
 TEST(DeltaTest,StackelUV){
   VecDoub X = {0.15,0.01,0.01,0.02,0.02,0.2};
   TestDensity_Plummer Plum(1.,1.,{1.,1.,0.9});

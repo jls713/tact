@@ -67,7 +67,7 @@ static double duturnfn(double u,void*p){//derivative of uturnfn
     uturn_st *P = (uturn_st *) p;
     double shu=sinh(u),chu=cosh(u),shu2=shu*shu,f[2];
     double Phi0=P->AAFT->dPhiu({u,P->v},f,P->Delta);
-    double dPhidu=P->Delta*(f[0]*chu*sqrt(P->sv2)+f[1]*shu*sqrt(1-P->sv2));
+    double dPhidu=P->Delta*(f[0]*chu*sqrt(P->sv2)+f[1]*shu*cos(P->v));
     return 2*(P->E-Phi0)*shu*chu-(shu2+P->sv2)*dPhidu+P->Lzsq*chu/(P->Delta2*shu2*shu);
 }
 
@@ -95,7 +95,8 @@ double Actions_AxisymmetricFudge_InterpTables::Getu0(double utry,double E,double
         return us;
     }
     root_find RF(TINY_UV,100);
-    return RF.findroot(&duturnfn,ui,uo,&UVV);
+    double ufound = RF.findroot(&duturnfn,ui,uo,&UVV);
+    return ufound;
 }
 
 double Actions_AxisymmetricFudge_InterpTables::find_umid(VecDoub X,double Delta,double E,double Lzsq){
