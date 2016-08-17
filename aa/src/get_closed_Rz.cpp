@@ -112,57 +112,53 @@ double delta_st::find_focus(void){
     // Uses algorithm from http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html for fitting an ellipse to noisy data
     // In some cases the best-fitting ellipse is oblate so we use
     // sqrt(a^2-b^2) for the focus
-    VecDoub data(36,0.);
-    MatDoub x(N,VecDoub(6,0.));
+    VecDoub data(9,0.);
+    MatDoub x(N,VecDoub(3,0.));
     double Rsc=Rp[0];
     for(int k=0;k<N;++k){
         x[k][0]=Rp[k]*Rp[k]/Rsc/Rsc;
-        x[k][1]=Rp[k]*zp[k]/Rsc/Rsc;
-        x[k][2]=zp[k]*zp[k]/Rsc/Rsc;
-        x[k][3]=Rp[k]/Rsc;
-        x[k][4]=zp[k]/Rsc;
-        x[k][5]=1.;
+        x[k][1]=zp[k]*zp[k]/Rsc/Rsc;
+        x[k][2]=1.;
     }
     MatDoub xT = transpose(x);
     MatDoub S = xT*x;
     MatDoub Inv = S;
     MatrixInversion(S,Inv);
-    MatDoub C(6,VecDoub(6,0.));
-    C[0][2]=2.;C[2][0]=2.;C[1][1]=-1.;
+    MatDoub C(3,VecDoub(3,0.));
+    C[0][1]=2.;C[1][0]=2.;
     S = Inv*C;
 
     unsigned j=0, l=0;
-    for(unsigned k=0;k<36;++k){
+    for(unsigned k=0;k<9;++k){
         data[k]=S[l][j];
-        ++j;if(j==6){ j=0; ++l;}
+        ++j;if(j==3){ j=0; ++l;}
     }
 
     gsl_matrix_view m
-        = gsl_matrix_view_array (&data[0], 6, 6);
-    gsl_vector_complex *eval = gsl_vector_complex_alloc (6);
-    gsl_vector_complex *tmp = gsl_vector_complex_alloc (6);
-    gsl_matrix_complex *evec = gsl_matrix_complex_alloc (6, 6);
+        = gsl_matrix_view_array (&data[0], 3, 3);
+    gsl_vector_complex *eval = gsl_vector_complex_alloc (3);
+    gsl_vector_complex *tmp = gsl_vector_complex_alloc (3);
+    gsl_matrix_complex *evec = gsl_matrix_complex_alloc (3, 3);
     gsl_eigen_nonsymmv_workspace * w =
-    gsl_eigen_nonsymmv_alloc (6);
+    gsl_eigen_nonsymmv_alloc (3);
     gsl_eigen_nonsymmv (&m.matrix, eval, evec, w);
     gsl_eigen_nonsymmv_free (w);
     gsl_eigen_nonsymmv_sort (eval, evec,
                         GSL_EIGEN_SORT_ABS_ASC);
 
-    VecDoub evec_m(6,0.);
-    gsl_matrix_complex_get_col (tmp, evec, 5);
-    for (int j = 0; j < 6; ++j)
+    VecDoub evec_m(3,0.);
+    gsl_matrix_complex_get_col (tmp, evec, 2);
+    for (int j = 0; j < 3; ++j)
         evec_m[j]=GSL_REAL(gsl_vector_complex_get(tmp,j));
 
     gsl_vector_complex_free (eval);
     gsl_vector_complex_free (tmp);
     gsl_matrix_complex_free (evec);
 
-    double b=evec_m[1]/2.,c=evec_m[2],d=evec_m[3]/2.;
-    double f=evec_m[4]/2.,g=evec_m[5],a=evec_m[0];
-    double up = 2*(a*f*f+c*d*d+g*b*b-2*b*d*f-a*c*g);
-    double down1=(b*b-a*c)*( (c-a)*sqrt(1+4*b*b/((a-c)*(a-c)))-(c+a));
-    double down2=(b*b-a*c)*( (a-c)*sqrt(1+4*b*b/((a-c)*(a-c)))-(c+a));
+    double c=evec_m[1],g=evec_m[2],a=evec_m[0],b;
+    double up = -a*c*g;
+    double down1=a*a*c;
+    double down2=a*c*c;
 
     a = up/down1;b=up/down2;
     if(a>b) return sqrt(a-b)*Rsc;
@@ -291,7 +287,8 @@ VecDoub find_best_delta::delta(double x0, int iter){
     delta_st DD(R0,Ri,zi,np);
     double max=0.;
     for(int i=0;i<np;i++) if(zi[i]>max) max = zi[i];
-    // for(int kk=0;kk<np;++kk)std::cout<<Ri[kk]<<" "<<zi[kk]<<" "<<E<<" "<<Lzsq<<std::endl;
+    // for(int kk=0;kk<np;++kk)std::cout<<Ri[kk]<<" "<<zi[kk]<<" "<<E<<" "<<Lzsq<<" "<<dtmp<<" "<<dtmp_a<<" "<<sqrt(dtmp2)<<std::endl;
+    // return {R0,sqrt(DD.get_delta2())};
     return {R0,DD.find_focus()};
 }
 
