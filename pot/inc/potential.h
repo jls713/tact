@@ -202,7 +202,7 @@ public:
 class IsochronePotential: public SphericalPotential{
 	private:
 		const std::string desc =
-		"Isochrone potential (spherical):\n\tPhi(r) = -frac{GM}{b+sqrt(b^2+r^2}	\n\tTakes two parameters:\n\t\tG*mass: GM and the scale radius: b ";
+		"Isochrone potential (spherical):\n\tPhi(r) = -frac{GM}{b+sqrt(b^2+r^2}}\n\tTakes two parameters:\n\t\tG*mass: GM and the scale radius: b ";
 		double GM, b;
 	public:
 		IsochronePotential(double GM, double b): GM(GM),b(b){};

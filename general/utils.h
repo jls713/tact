@@ -407,12 +407,6 @@ inline void topbottom(const std::vector<c> &xm,c x,int *botx,int *topx, std::str
 }
 
 template<class c>
-c linterp(const std::vector<c> &x, const std::vector<c> &y, c x0){ // linear interpolation
-    int bot, top;
-    topbottom<c>(x,x0,&bot,&top);
-    return y[bot]+(x0-x[bot])/(x[top]-x[bot])*(y[top]-y[bot]);
-}
-template<class c>
 c extrapolate_down(c X, const std::vector<c>&x, const std::vector<c>&y){
     return (y[1]-y[0])/(x[1]-x[0])*(X-x[0])+y[0];
 }
@@ -431,6 +425,30 @@ c log_extrapolate_up(c X, const std::vector<c>&x, const std::vector<c>&y){
     return exp((log(y[nx-1])-log(y[nx-2]))/(log(x[nx-1])-log(x[nx-2]))*(log(X)-log(x[nx-1]))+log(y[nx-1]));
 }
 
+template<class c>
+c linterp(const std::vector<c> &x, const std::vector<c> &y, c x0, std::string extrapolate = "constant"){ // linear interpolation
+    if(x0<x.front()){
+        if(extrapolate=="constant")
+            return y.front();
+        else if(extrapolate=="linear")
+            return extrapolate_down(x0,x,y);
+        else if(extrapolate=="log")
+            return log_extrapolate_down(x0,x,y);
+    }
+    else if(x0>x.back()){
+        if(extrapolate=="constant")
+            return y.back();
+        else if(extrapolate=="linear")
+            return extrapolate_up(x0,x,y);
+        else if(extrapolate=="log")
+            return log_extrapolate_up(x0,x,y);
+    }
+    else{
+        int bot, top;
+        topbottom<c>(x,x0,&bot,&top);
+        return y[bot]+(x0-x[bot])/(x[top]-x[bot])*(y[top]-y[bot]);
+    }
+}
 template<class c>
 c linterp_2d_irr(c x, c y, const std::vector<c>&X, const std::vector<std::vector<c>>&Y, const std::vector<std::vector<c>>&Z,std::string name=""){
     // y data are not regularly spaced

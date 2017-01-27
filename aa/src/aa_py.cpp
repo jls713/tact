@@ -49,6 +49,7 @@
 #include "uv_orb.h"
 #include "lmn_orb.h"
 #include "stackel_fit.h"
+#include "tables_aa.h"
 #include <boost/python.hpp>
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
@@ -187,6 +188,15 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
             "\n"
             "Returns:\n"
             "    Orbital time-scale for x\n"
+        "")
+      .def("DeltaGuess", &Potential_JS::DeltaGuess,
+           "Compute focal length (squared) for local approximation to St\"ackel potential \n"
+           "\n"
+            "Args:\n"
+            " param1: np.array of Cartesian position X = (x,y,z).\n"
+            "\n"
+            "Returns:\n"
+            "    focal length Delta^2 = gamma-alpha\n"
         "");
 
   // class_<Density, boost::noncopyable>("Density",init<double>());
@@ -449,6 +459,22 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
     "\n",
       init<Potential_JS*, double, double, int, int, std::string>());
 
+  class_<Actions_AxisymmetricFudge_InterpTables, bases<Action_Finder> >(
+      "Actions_AxisymmetricFudge_InterpTables",
+      "Interpolation tables for actions using scheme from Binney (2014)\n"
+"  Args:\n"
+    "param pot Potential_JS (axisymmetric)\n"
+    "param name filename for tables\n"
+    "param tab tabulate actions (False) or read from file (True)\n"
+    "param Rm  minimum radial grid point\n"
+    "param Rn  maximum radial grid point\n"
+   " param NE  number of radial grid points\n"
+    "param NGRID  number of energy grid points\n"
+   " param NED  number of delta energy grid points\n"
+    "param NEL  number of delta ang. mom. grid points\n"
+    "\n",
+      init<Potential_JS*, std::string, optional<bool, double, double, int, int, int, int>>());
+
   class_<lmn_orb, bases<Action_Finder> >(
       "Actions_TriaxialStackel_Fudge_DeltaGuess",
       ""
@@ -466,7 +492,9 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
       init<Potential_JS*, double, double, int, bool,bool, std::string>());
 
 
-  class_<Orbit, boost::noncopyable>("Orbit","Orbit integrator using GSL ode routines", init<Potential_JS*, double>())
+  class_<Orbit, boost::noncopyable>("Orbit",
+                                    "Orbit integrator using GSL ode routines"
+                                    "\nTakes two args: potential and accuracy", init<Potential_JS*, double>())
       .def("integrate", &Orbit::integrate,
            "Integrate phase-space point.\n"
               "Args:\n"

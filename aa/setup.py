@@ -21,7 +21,7 @@ for l in s:
   if "LAPACKPATH" in l:
     LapackPath=l[11:].replace('\n', '')
   if "TORUSPATH" in l:
-    TorusPath=l[10:].replace('\n', '')
+    TorusPath=l[11:].replace('\n', '')
   if "EBFPATH" in l:
     EBFPath=l[8:].replace('\n', '')
   if "BOOSTINCPATH" in l:
@@ -59,7 +59,7 @@ setup(name="aa_py",
                                   '../general/jamestools/octint',
 				                          GSLPath+'/include',
 				                          TorusPath+'/src',
-                                  TorusPath+'/src/pot',
+                                  TorusPath+'/src/pot/',
                                   TorusPath+'/src/utils',
                                   BoostPath+'include',
                                   np.get_include()],

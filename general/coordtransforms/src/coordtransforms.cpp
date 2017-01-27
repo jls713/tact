@@ -205,7 +205,7 @@ VecDoub EquatorialToGalactic(const VecDoub &Equatorial){
 	double cd = cos(delta), sd = sin(delta);
 	double dalpha = alpha-RA_GP;
 	double b=asin(sdGP*sd+cdGP*cd*cos(dalpha));
-	double l=lCP-atan2(cd*sin(alpha-RA_GP),cdGP*sd-sdGP*cd*cos(dalpha));
+	double l=lCP-atan2(cd*sin(dalpha),cdGP*sd-sdGP*cd*cos(dalpha));
 	if(l<0.)l+=2.*PI;
 	VecDoub Galactic {l,b,Equatorial[2]};
 	if(Equatorial.size()==3)return Galactic;

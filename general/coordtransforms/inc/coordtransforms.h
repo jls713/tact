@@ -50,6 +50,7 @@ namespace conv{
 // ============================================================================
 // Conventions
 // ============================================================================
+const VecDoub SunPeculiar {11.1,12.24,7.25}; // peculiar motion of Sun
 const VecDoub StandardSolar {8.0,0.014,11.1,232.24,7.25}; // in km/s with v_c = 220 km/s
 const VecDoub StandardSolar2 {8.29,0.014,0.01135,0.257055,0.0074148}; // in kpc/Myr with v_c=239.1km/s
 const VecDoub StandardSolarPAUL {8.29,0.014,11.1,251.34,7.25}; // in km/s with v_c = 239.1 km/s

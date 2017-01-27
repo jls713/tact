@@ -340,6 +340,7 @@ VecDoub Actions_AxisymmetricFudge_InterpTables::actions(const VecDoub &XX, void*
         JR=JJ[0]; Jz=JJ[2];
     }
     VecDoub JJ = {JR,Lz,Jz};
+    Lz=abs(Lz);
     if(wf){
         if(Lz<Lcgrid[0]) JJ.push_back(Pot->R_L(Lz,Rgrid[0]));
         else if(Lz>Lcgrid[NR-1]) JJ.push_back(Pot->R_L(Lz,Rgrid[NR-1]));

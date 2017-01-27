@@ -56,7 +56,7 @@ VecDoub UVProlateSpheroidCoordSys::xv2uv(const VecDoub& X){
     double cv2=.5*(r2+Delta2-sqrt(pow(Delta2+r2,2)-4*Delta2*z2))/Delta2;
     double cv= z<0? -sqrt(cv2) : sqrt(cv2);
    	double v=acos(cv),sv=sin(v), sv2=1-cv2;
-    double pR=X[3], pz=X[5];
+    double pR=(X[3]*X[0]+X[4]*X[1])/sqrt(R2), pz=X[5];
     double pu=Delta*(pR*chu*sv+pz*shu*cv);
     double pv=Delta*(pR*shu*cv-pz*chu*sv);
     return {u,phi,v,pu,vp,pv,shu2,sv2};
