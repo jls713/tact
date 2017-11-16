@@ -237,9 +237,8 @@ VecDoub Actions_Genfunc::find_isochrone_params(const std::vector<VecDoub> &orbit
 VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     // for(auto i: AF->actions(x)) std::cout<<i<<" ";
     // Set the parameters -- N_T, N_max, Total_T
-
     double timescale = TargetPot->torb(x);
-    Actions_Genfunc_data_structure AAR = Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,1200,timescale*32.,symmetry=="axisymmetric"?true:false);
+    Actions_Genfunc_data_structure AAR = Actions_Genfunc_data_structure(timescale*8., 300, 8, 1e-8,4801,timescale*128.1,symmetry=="axisymmetric"?true:false);
     if(params!=nullptr) AAR = *((Actions_Genfunc_data_structure *)params);
     Actions_Genfunc_data_structure *AA=&AAR;
 
@@ -463,6 +462,8 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
       (total_loop==0 and std::any_of(b.begin(),b.begin()+3,[](double i){return i<0;}))
         // Check if radial action positive
         or b[0]<0.
+        // Check if vertical action positive for axisymmetric
+        or (b[2]<0. and symmetry=="axisymmetric")
         // Check estimates are roughly right
         or fac_of_two
         ){
@@ -470,6 +471,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
             AA->N_T*=2.;
             fatal=true;
             need_to_repeat=true;
+            std::cout<<b[0]<<" "<<b[1]<<" "<<b[2]<<std::endl;
     }
 
     if(debug_genfunc){
@@ -487,21 +489,23 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
                  <<" fraction of max time"<<std::endl;
             }
             if(symmetry=="triaxial"){
-            if(std::any_of(loopi.begin(),loopi.end(),[](int i){return i!=0;}))
+                if(std::any_of(loopi.begin(),loopi.end(),[](int i){
+                    return i!=0;}))
                 av_acts[0]*=2.;
-            if(loopi[0]*loopi[0]==1 and la_switch==true){
-                double r2 = x[0]*x[0]+x[1]*x[1]+x[2]*x[2];
-                double acts;
-                if(AF)
-                    acts = AF->actions(x)[3];
-                else{
-                    Actions_TriaxialStackel_Fudge ActS(TargetPot,-r2/10.,-r2/20.);
-                    acts = ActS.actions(x)[3];
+                if(loopi[0]*loopi[0]==1 and la_switch==true){
+                    double r2 = x[0]*x[0]+x[1]*x[1]+x[2]*x[2];
+                    double acts;
+                    if(AF)
+                        acts = AF->actions(x)[3];
+                    else{
+                        Actions_TriaxialStackel_Fudge ActS(TargetPot,
+                                                           -r2/10.,-r2/20.);
+                        acts = ActS.actions(x)[3];
+                    }
+                    if(acts==2){
+                        double tmp = av_acts[0];av_acts[0]=av_acts[1];av_acts[1]=tmp;
+                    }
                 }
-                if(acts==2){
-                    double tmp = av_acts[0];av_acts[0]=av_acts[1];av_acts[1]=tmp;
-                }
-            }
             }
             // for(auto i: AF->actions(x)) std::cout<<i<<" ";
             return av_acts;
@@ -509,7 +513,7 @@ VecDoub Actions_Genfunc::actions(const VecDoub &x, void *params){
     if(need_to_repeat)
         if(AA->N_T<AA->NTMAX and AA->total_T<AA->maxtimescale){
             Actions_Genfunc_data_structure AA2 = *AA;
-        delete ToyAct;
+            delete ToyAct;
             return actions(x,&AA2);
         }
 

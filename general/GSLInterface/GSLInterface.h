@@ -285,12 +285,29 @@ class interpolator{
 			spline = gsl_spline_alloc(gsl_interp_cspline,n);
 			gsl_spline_init (spline, x, y, n);
 		}
+		interpolator(std::vector<double> x, std::vector<double> y){
+			int n=x.size();
+			acc = gsl_interp_accel_alloc();
+			spline = gsl_spline_alloc(gsl_interp_cspline,n);
+			gsl_spline_init (spline, &x[0], &y[0], n);
+		}
 		~interpolator(){
 			gsl_spline_free (spline);
          	gsl_interp_accel_free (acc);
         }
         double interpolate(double xi){
         	return gsl_spline_eval (spline, xi, acc);
+        }
+        double extrapolate(double xi){
+        	double y;
+        	auto status = spline->interp->type->eval(
+        	                                  spline->interp->state,
+        	                                  spline->x, spline->y,
+        	                                  spline->interp->size,
+                          					  xi, acc,&y);
+        	if (status != GSL_SUCCESS)
+        		{ GSL_ERROR_VAL("interpolation error", status,  GSL_NAN); }
+        	return y;
         }
         double derivative(double xi){
         	return gsl_spline_eval_deriv(spline, xi, acc);

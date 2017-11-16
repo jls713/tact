@@ -1,8 +1,8 @@
 ### example.py
 ## Gives an example of how to use the python interface to the tact code
-## 
+##
 ## Estimates actions using the variety of methods in Sanders & Binney (2016)
-## in multi-component potential from Piffl et al. (2014) 
+## in multi-component potential from Piffl et al. (2014)
 
 import numpy as np
 import sys
@@ -28,7 +28,7 @@ Tor = aa_py.IterativeTorusMachine(AA,Pot,1e-8,5,1e-5)
 #print '\t Actions:',Tor.actions(X)[:3]
 
 ## Generating Function
-print 'Using Generating Function'
+print 'Using Generating Function -- a fuller interface is available through full_actions and full_angles -- the default parameters may need tweaking to avoid spurious results (e.g. negative vertical action for highly eccentric orbits'
 AG = aa_py.Actions_Genfunc(Pot,"axisymmetric")
 print '\t Actions:',AG.actions(X)
 print '\t Angles and Freqs:',AG.angles(X)

@@ -48,7 +48,7 @@ VecDoub UVProlateSpheroidCoordSys::xv2uv(const VecDoub& X){
 	/* Calculates (u,v) given Cartesian x */
 	assert(X.size()==6);
  	double R2 = X[0]*X[0]+X[1]*X[1], phi = atan2(X[1],X[0]);
- 	double vp = (X[0]*X[4]-X[3]*X[1])/R2;
+ 	double phidot = (X[0]*X[4]-X[3]*X[1])/R2;
 	double z=X[2],z2 = X[2]*X[2],r2=R2+z2;
     double shu2 =.5*(r2-Delta2+sqrt(pow(Delta2-r2,2)+4*Delta2*R2))/Delta2;
     double shu=sqrt(shu2),u=asinh(shu);
@@ -59,7 +59,7 @@ VecDoub UVProlateSpheroidCoordSys::xv2uv(const VecDoub& X){
     double pR=(X[3]*X[0]+X[4]*X[1])/sqrt(R2), pz=X[5];
     double pu=Delta*(pR*chu*sv+pz*shu*cv);
     double pv=Delta*(pR*shu*cv-pz*chu*sv);
-    return {u,phi,v,pu,vp,pv,shu2,sv2};
+    return {u,phi,v,pu,phidot,pv,shu2,sv2};
 }
 
 VecDoub UVProlateSpheroidCoordSys::uv2Rz(const VecDoub& uv){
