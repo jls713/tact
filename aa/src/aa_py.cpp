@@ -148,6 +148,9 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
 // ============================================================================
 // Potentials
 // ============================================================================
+  double (Potential_JS::*R_E)(const VecDoub&) = &Potential_JS::R_E;
+  double (Potential_JS::*R_L)(const VecDoub&) = &Potential_JS::R_L;
+
   class_<Potential_JS, boost::noncopyable,
          boost::shared_ptr<Potential_JS_PythonCallback>>("Potential_JS",
             "Base potential class\n"
@@ -197,6 +200,24 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
             "\n"
             "Returns:\n"
             "    focal length Delta^2 = gamma-alpha\n"
+        "")
+      .def("RCircular_Energy", R_E,
+           "Compute radius of circular orbit with equivalent energy \n"
+           "\n"
+            "Args:\n"
+            " param1: np.array of Cartesian position X = (x,y,z).\n"
+            "\n"
+            "Returns:\n"
+            "    radius of circular orbit of energy\n"
+        "")
+      .def("RCircular_AngMom", R_L,
+           "Compute radius of circular orbit with equivalent angular momentum \n"
+           "\n"
+            "Args:\n"
+            " param1: np.array of Cartesian position X = (x,y,z).\n"
+            "\n"
+            "Returns:\n"
+            "    radius of circular orbit of angular momentum\n"
         "");
 
   // class_<Density, boost::noncopyable>("Density",init<double>());
@@ -232,6 +253,13 @@ BOOST_PYTHON_MODULE_INIT(aa_py) {
         "\n\tTakes two parameters:\n\t\t"
         "G*mass: GM, the power: k",
         init<double, double>());
+  class_<PowerLawSphericalScale, bases<SphericalPotential>>(
+         "PowerLawSphericalScale",
+         "Power-law spherical potential with scale: Phi ="
+          "-v0^2/(1+(r/rs)^2)^(alpha/2)"
+        "\n\tTakes three parameters:\n\t\t"
+        "the amplitude: v0, the power: alpha and the scale: rs.",
+        init<double, double, double>());
 
   class_<StackelOblate_PerfectEllipsoid,
 	bases<Potential_JS>>("StackelOblate_PerfectEllipsoid","Axisymmetric oblate perfect ellipsoid.\nThis potential is of St\"ackel form and is most simply defined by its density:\n\trho(R,z) = -frac{rho0}{1+m^2}^2\n\tm^2 = (R/a)^2+(z/b)^2\n\tTakes two parameters:\t the central density: rho0 and the parameter alpha such that ... hmm   ",init<double,double>());

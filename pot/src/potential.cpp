@@ -60,6 +60,8 @@ double RL_fn(double R, void*params){
 
 double Potential_JS::R_E(double E,double r){
 	// Can pass initial guess for speed
+	if(E>Phi_max())
+		return std::numeric_limits<double>::infinity();
 	RE_st RES(E,this);
 	root_find RF(1e-6,200);
 	double up = 1e5,down=1e-5;

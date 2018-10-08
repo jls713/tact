@@ -27,7 +27,8 @@
 
 #ifndef GSLINTERFACE_H
 #define GSLINTERFACE_H
-
+#include <string>
+#include <execinfo.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_roots.h>
@@ -57,6 +58,7 @@
 #include <gsl/gsl_monte_vegas.h>
 #include <gsl/gsl_siman.h>
 #include <gsl/gsl_sf_legendre.h>
+#include <gsl/gsl_sf_hyperg.h>
 #include <stdlib.h>
 #include <iostream>
 #include <stdexcept>
@@ -196,8 +198,10 @@ class integrator{
 			int status = gsl_integration_qags (&F, xa, xb, 0, eps, neval,w, &result, &err);
 			gsl_set_error_handler(handler);
 			// Return even if round-off error reported
-			if(status==GSL_SUCCESS or status==GSL_EROUND or status==GSL_EDIVERGE)
-			return result;
+			//std::cout<<xa<<"  "<<xb<<" "<<result<<std::endl;
+			if(status==GSL_SUCCESS or status==GSL_EROUND or status==GSL_EDIVERGE){
+				return result;
+			}
 			else throw std::runtime_error("error: "+std::string(gsl_strerror(status))+"\n");
 			}
 		double error(){return err;}
@@ -712,7 +716,22 @@ inline double ellint_third(double phi, double k, double n){ return gsl_sf_ellint
 inline double complete_beta(double a, double b){ return gsl_sf_beta(a,b);}
 inline double incomplete_beta(double a, double b, double x){ return gsl_sf_beta_inc(a,b,x);}
 inline double factorial(int n){return gsl_sf_fact (n);}
-
+inline double hyp_2f1(double a, double b, double c, double x){
+	//Using expressions from https://www.math.ucla.edu/~mason/research/pearson_final.pdf (4.16) & (4.20)
+	if(x<1. and x>-1.)
+		return gsl_sf_hyperg_2F1(a,b,c,x);
+	else if(x<-1.){
+		return gsl_sf_hyperg_2F1(a,c-b,c,x/(x-1.))*pow(1-x,-a);
+	}
+	else if(x==1.){
+		return gamma_fn(c)*gamma_fn(c-a-b)/gamma_fn(c-a)/gamma_fn(c-b);
+	}
+	else throw std::runtime_error("Error: 2F1 is complex for x>1\n");
+		// double coeff1 = pow(-x,-a)*gamma_fn(c)*gamma_fn(b-a)/gamma_fn(b)/gamma_fn(c-a);
+		// double coeff2 = pow(-x,-b)*gamma_fn(c)*gamma_fn(a-b)/gamma_fn(a)/gamma_fn(c-b);
+		// return coeff1*gsl_sf_hyperg_2F1(a,a-c+1,a-b+1,1./x)+coeff2*gsl_sf_hyperg_2F1(b-c+1,b,b-a+1,1./x);
+}
+// 2F1(a,b;c;x)
 //=============================================================================
 // SPHERICAL HARMONIC FUNCTIONS //
 

@@ -44,6 +44,12 @@
 
 namespace {
 
+TEST(SpecialFunctions,hyp2f1){
+  EXPECT_NEAR(hyp_2f1(0.5,0.5,1.5,0.5),1.110720734539591561753970247515173424654,1e-8);
+  EXPECT_NEAR(hyp_2f1(0.5,0.5,1.5,-1.5),0.842394655856376924652631707727225634212,1e-8);
+  EXPECT_NEAR(hyp_2f1(0.5,0.6,1.5,-1.5),0.815918213461504924263521763893678427151,1e-8);
+}
+
 TEST(MultipoleT,Sph){
     for(int p=0;p<3;++p){
     TestDensity_Hernquist rho(1.,1.,{1.,1.,1.});

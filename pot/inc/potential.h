@@ -729,6 +729,30 @@ class PowerLawSpherical: public SphericalPotential{
 		inline double dPhi_r(double r){return k*GM*pow(r,-k-1);}
 };
 
+class PowerLawSphericalScale: public SphericalPotential{
+	private:
+		double v02, alpha_h, rs;
+		const std::string desc =
+		"Power-law spherical potential with scale:Phi ="
+			"-v0**2/(1+(r/rs)^2)^{alpha/2}"
+		"\n\tTakes three parameters:\n\t\t"
+		"the amplitude v0, the power: alpha and the scale rs";
+	public:
+		PowerLawSphericalScale(double v0, double alpha, double rs):
+			v02(v0*v0),alpha_h(alpha*.5),rs(rs){}
+		inline std::string name(void) const {return desc;}
+		inline std::string params(void) const {
+			return "v0 = "+std::to_string(sqrt(v02))+", alpha = "+std::to_string(alpha_h*2.)+
+			       ", scale radius = "+std::to_string(rs);
+		}
+		inline double Phi_r(double r) {
+			r/=rs;
+			return -.5*v02/alpha_h*pow(r,-2.*alpha_h)*hyp_2f1(alpha_h,alpha_h,
+			                                  			 1+alpha_h,
+			                                            -1./(r*r));}
+		inline double dPhi_r(double r){
+			return v02/r*pow(1.+r*r/rs/rs,-alpha_h);}
+};
 
 class PowerLawSphericalExpCut: public SphericalPotential{
 	private:

@@ -450,6 +450,29 @@ c linterp(const std::vector<c> &x, const std::vector<c> &y, c x0, std::string ex
     }
 }
 template<class c>
+c linterp_2d(c x, c y, const std::vector<c>&X, const std::vector<c>&Y, const std::vector<std::vector<c>>&Z,std::string name=""){
+    // y data are not regularly spaced
+
+    int bot_x,top_x,bot_y1,top_y1,bot_y2,top_y2;
+    c dx,mdx,dy1,mdy1,dy2,mdy2;
+
+    if(x<X.front()) x=X.front();
+    else if(x>X.back()) x=X.back();
+    topbottom(X,x,&bot_x,&top_x,name+" x interp");
+    dx = (x-X[bot_x])/(X[top_x]-X[bot_x]); mdx=1-dx;
+
+    if(y<Y.front()){top_y1=1;bot_y1=0;}
+    else if(y>Y.back()){top_y1=Z.size()-1;bot_y1=top_y1-1;}
+    else{
+    topbottom(Y,y,&bot_y1,&top_y1,name+" y interp");
+    }
+    dy1 = (y-Y[bot_y1])/(Y[top_y1]-Y[bot_y1]);
+    mdy1=1.-dy1;
+
+    return mdx*(dy1*Z[bot_x][top_y1]+mdy1*Z[bot_x][bot_y1])
+           +dx*(dy1*Z[top_x][top_y2]+mdy1*Z[top_x][bot_y2]);
+}
+template<class c>
 c linterp_2d_irr(c x, c y, const std::vector<c>&X, const std::vector<std::vector<c>>&Y, const std::vector<std::vector<c>>&Z,std::string name=""){
     // y data are not regularly spaced
 
