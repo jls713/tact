@@ -56,7 +56,7 @@ struct chi_integrals{
     chi_integrals(Stackel_Fitted_Potential *SFP, double tau,VecDoub x2min={0.}, VecDoub x2max={0.}): SFP(SFP), tau(tau),x2min(x2min),x2max(x2max){};
 };
 
-static double *dmatrix(int n){// creates array of length n and fills with zeroes
+static double *dmatrix_SF(int n){// creates array of length n and fills with zeroes
     double *m1 = new double[n];
     for(int i=0;i<n;i++) m1[i]=0;
     return m1;
@@ -314,10 +314,10 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
     chibar = integral[0]/(L*N);
 
     // Grids for interpolation
-    lambdagrid=dmatrix(DATAPOINTS);
-    nugrid=dmatrix(DATAPOINTS);
-    flamgrid=dmatrix(DATAPOINTS);
-    fnugrid=dmatrix(DATAPOINTS);
+    lambdagrid=dmatrix_SF(DATAPOINTS);
+    nugrid=dmatrix_SF(DATAPOINTS);
+    flamgrid=dmatrix_SF(DATAPOINTS);
+    fnugrid=dmatrix_SF(DATAPOINTS);
 
     // Fill grids
     for(int i=0;i<DATAPOINTS;i++){
@@ -328,8 +328,8 @@ void Stackel_Fitted_Potential::fit_potential(VecDoub x){
     }
 
     // Create splines for interpolation
-    y2Lamgrid = dmatrix(DATAPOINTS);
-    y2Nugrid = dmatrix(DATAPOINTS);
+    y2Lamgrid = dmatrix_SF(DATAPOINTS);
+    y2Nugrid = dmatrix_SF(DATAPOINTS);
     spline(lambdagrid, flamgrid, DATAPOINTS, 1e30, 1e30, y2Lamgrid);
     spline(nugrid, fnugrid, DATAPOINTS, 1e30, 1e30, y2Nugrid);
 }
